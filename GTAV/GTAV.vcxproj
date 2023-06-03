@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{e59710e6-add2-4855-b745-5f8a85023609}</ProjectGuid>
+    <RootNamespace>GTAV</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;GTAV_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;GTAV_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;GTAV_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;GTAV_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalUsingDirectories>%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>C:\Users\hanky.DESKTOP-AFRKBFD\source\repos\GTAV\GTAV\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>../includes/minhook.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="src\core\core.h" />
+    <ClInclude Include="src\core\exception.h" />
+    <ClInclude Include="src\features\features.h" />
+    <ClInclude Include="src\features\manager\abstract.h" />
+    <ClInclude Include="src\features\manager\manager.h" />
+    <ClInclude Include="src\features\manager\types.h" />
+    <ClInclude Include="src\framework.h" />
+    <ClInclude Include="src\gui\options\abstract_option.h" />
+    <ClInclude Include="src\gui\options\abstract_submenu.h" />
+    <ClInclude Include="src\gui\options\button.h" />
+    <ClInclude Include="src\gui\options\core.h" />
+    <ClInclude Include="src\gui\options\number.h" />
+    <ClInclude Include="src\gui\options\scroll.h" />
+    <ClInclude Include="src\gui\options\submenu.h" />
+    <ClInclude Include="src\gui\options\submenu_option.h" />
+    <ClInclude Include="src\gui\options\toggle.h" />
+    <ClInclude Include="src\gui\render.h" />
+    <ClInclude Include="src\gui\renderer.h" />
+    <ClInclude Include="src\gui\types.h" />
+    <ClInclude Include="src\gui\util\char_mem_stream.h" />
+    <ClInclude Include="src\gui\util\flags.h" />
+    <ClInclude Include="src\gui\options\option.h" />
+    <ClInclude Include="src\gui\util\fonts.h" />
+    <ClInclude Include="src\gui\util\panels.h" />
+    <ClInclude Include="src\gui\util\timer.h" />
+    <ClInclude Include="src\gui\util\translate.h" />
+    <ClInclude Include="src\hooks\hooks.h" />
+    <ClInclude Include="src\hooks\patterns.h" />
+    <ClInclude Include="src\memory\pattern.h" />
+    <ClInclude Include="src\menu\submenus\main.h" />
+    <ClInclude Include="src\menu\submenus\main\network.h" />
+    <ClInclude Include="src\menu\submenus\main\network\network_players.h" />
+    <ClInclude Include="src\menu\submenus\main\network\players\network_selected_player.h" />
+    <ClInclude Include="src\menu\submenus\main\player.h" />
+    <ClInclude Include="src\menu\submenus\main\settings.h" />
+    <ClInclude Include="src\menu\submenus\main\settings\position.h" />
+    <ClInclude Include="src\menu\submenus\main\spawner.h" />
+    <ClInclude Include="src\pch.h" />
+    <ClInclude Include="src\rage\classes\atMap.h" />
+    <ClInclude Include="src\rage\classes\base.h" />
+    <ClInclude Include="src\rage\classes\classes.h" />
+    <ClInclude Include="src\rage\classes\enums.h" />
+    <ClInclude Include="src\rage\classes\joaat.h" />
+    <ClInclude Include="src\rage\classes\scrNativeCallContext.h" />
+    <ClInclude Include="src\rage\classes\scrNativeRegistration.h" />
+    <ClInclude Include="src\rage\classes\scrNativeRegistrationTable.h" />
+    <ClInclude Include="src\rage\classes\scrOpCode.h" />
+    <ClInclude Include="src\rage\classes\scrProgram.h" />
+    <ClInclude Include="src\rage\classes\scrValue.h" />
+    <ClInclude Include="src\rage\classes\vector.h" />
+    <ClInclude Include="src\rage\engine.h" />
+    <ClInclude Include="src\rage\invoker\crossmap.h" />
+    <ClInclude Include="src\rage\invoker\invoker.h" />
+    <ClInclude Include="src\rage\invoker\natives.h" />
+    <ClInclude Include="src\rage\invoker\spoof_call.h" />
+    <ClInclude Include="src\rage\invoker\types.h" />
+    <ClInclude Include="src\util\caller.h" />
+    <ClInclude Include="src\util\dirs.h" />
+    <ClInclude Include="src\util\fiber.h" />
+    <ClInclude Include="src\util\hooking\hooking.h" />
+    <ClInclude Include="src\util\hooking\minhook.h" />
+    <ClInclude Include="src\util\hooking\script.h" />
+    <ClInclude Include="src\util\log.h" />
+    <ClInclude Include="src\util\math.h" />
+    <ClInclude Include="src\util\thread_pool.h" />
+    <ClInclude Include="src\util\util.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\core\core.cpp" />
+    <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\features\features.cpp" />
+    <ClCompile Include="src\features\manager\manager.cpp" />
+    <ClCompile Include="src\gui\renderer.cpp" />
+    <ClCompile Include="src\gui\util\fonts.cpp" />
+    <ClCompile Include="src\gui\util\panels.cpp" />
+    <ClCompile Include="src\gui\util\translate.cpp" />
+    <ClCompile Include="src\hooks\hooks.cpp" />
+    <ClCompile Include="src\hooks\hooks\stat_get_int.cpp" />
+    <ClCompile Include="src\hooks\patterns.cpp" />
+    <ClCompile Include="src\memory\pattern.cpp" />
+    <ClCompile Include="src\menu\submenus\main.cpp" />
+    <ClCompile Include="src\menu\submenus\main\network.cpp" />
+    <ClCompile Include="src\menu\submenus\main\network\network_players.cpp" />
+    <ClCompile Include="src\menu\submenus\main\network\players\network_selected_player.cpp" />
+    <ClCompile Include="src\menu\submenus\main\player.cpp" />
+    <ClCompile Include="src\menu\submenus\main\settings.cpp" />
+    <ClCompile Include="src\menu\submenus\main\settings\position.cpp" />
+    <ClCompile Include="src\menu\submenus\main\spawner.cpp" />
+    <ClCompile Include="src\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\rage\invoker\invoker.cpp" />
+    <ClCompile Include="src\util\dirs.cpp" />
+    <ClCompile Include="src\util\fiber.cpp" />
+    <ClCompile Include="src\util\hooking\hooking.cpp" />
+    <ClCompile Include="src\util\hooking\script.cpp" />
+    <ClCompile Include="src\util\log.cpp" />
+    <ClCompile Include="src\util\thread_pool.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="src\rage\invoker\spoof_call.asm" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
+  </ImportGroup>
+</Project>
