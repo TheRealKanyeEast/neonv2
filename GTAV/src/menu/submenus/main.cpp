@@ -5,6 +5,7 @@
 #include "util/log.h"
 #include "gui/util/fonts.h"
 #include "gui/util/panels.h"
+#include "gui/util/notify.h"
 
 using namespace base::gui;
 
@@ -23,15 +24,16 @@ namespace menu {
 
 			core->add_option(submenu_option("Settings")
 				.set_target("Settings"));
+
+			core->add_option(button_option("Test")
+				.add_click([] { notify::stacked("Test Notification", "Txl and Stash are lovers"); }));
 		});
 
 	}
 
 	void main_menu::update() {
 		fonts::update_queue();
-		renderer::renderer::get_renderer()->render();
+		renderer::getRenderer()->render();
 		render();
-
-		
 	}
 }

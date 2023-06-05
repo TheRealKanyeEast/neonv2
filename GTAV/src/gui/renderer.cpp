@@ -94,8 +94,7 @@ namespace menu::renderer {
 	}
 	void renderer::handle_keys() {
 		static auto openTicker = GetTickCount();
-		if (m_open_key && GetTickCount() - openTicker >= static_cast<std::uint32_t>(m_open_delay))
-		{
+		if (m_open_key && GetTickCount() - openTicker >= static_cast<std::uint32_t>(m_open_delay)) {
 			openTicker = GetTickCount();
 			m_opened ^= true;
 
@@ -104,83 +103,68 @@ namespace menu::renderer {
 
 		static Timer backTimer(0ms);
 		backTimer.SetDelay(std::chrono::milliseconds(m_back_delay));
-		if (m_opened && m_back_key && backTimer.Update())
-		{
+		if (m_opened && m_back_key && backTimer.Update()) {
 
 			AUDIO::PLAY_SOUND_FRONTEND(-1, "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
 
-			if (m_submenu_stack.size() <= 1)
-			{
+			if (m_submenu_stack.size() <= 1) {
 				m_opened = false;
 			}
-			else
-			{
+			else {
 				m_submenu_stack.pop();
 			}
 		}
 
-		if (m_opened && !m_submenu_stack.empty())
-		{
+		if (m_opened && !m_submenu_stack.empty()) {
 			auto sub = m_submenu_stack.top();
 
 			static Timer enterTimer(0ms);
 			enterTimer.SetDelay(std::chrono::milliseconds(m_enter_delay));
-			if (m_enter_key && sub->get_options_size() != 0 && enterTimer.Update())
-			{
-
+			if (m_enter_key && sub->get_options_size() != 0 && enterTimer.Update()) {
 				AUDIO::PLAY_SOUND_FRONTEND(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
-
-				if (auto opt = sub->get_option(sub->get_selected_option()))
-				{
+				if (auto opt = sub->get_option(sub->get_selected_option())) {
 					opt->handle_action(eOptionAction::click);
 				}
 			}
 
 			static Timer upTimer(0ms);
 			upTimer.SetDelay(std::chrono::milliseconds(m_vertical_delay));
-			if (m_up_key && sub->get_options_size() != 0 && upTimer.Update())
-			{
-
+			if (m_up_key && sub->get_options_size() != 0 && upTimer.Update()) {
 				AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
-
 				sub->scroll_backward();
 			}
 
 			static Timer downTimer(0ms);
 			downTimer.SetDelay(std::chrono::milliseconds(m_vertical_delay));
-			if (m_down_key && sub->get_options_size() != 0 && downTimer.Update())
-			{
-
+			if (m_down_key && sub->get_options_size() != 0 && downTimer.Update()) {
 				AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
-
 				sub->scroll_forward();
 			}
 
 			static Timer leftTimer(0ms);
 			leftTimer.SetDelay(std::chrono::milliseconds(m_horizontal_delay));
-			if (m_left_key && sub->get_options_size() != 0 && leftTimer.Update())
-			{
-
+			if (m_left_key && sub->get_options_size() != 0 && leftTimer.Update()) {
 				AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
-
-				if (auto opt = sub->get_option(sub->get_selected_option()))
-				{
+				if (auto opt = sub->get_option(sub->get_selected_option())) {
 					opt->handle_action(eOptionAction::left_click);
 				}
 			}
-
 			static Timer rightTimer(0ms);
 			rightTimer.SetDelay(std::chrono::milliseconds(m_horizontal_delay));
-			if (m_right_key && sub->get_options_size() != 0 && rightTimer.Update())
-			{
-
+			if (m_right_key && sub->get_options_size() != 0 && rightTimer.Update()) {
 				AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
-
-				if (auto opt = sub->get_option(sub->get_selected_option()))
-				{
+				if (auto opt = sub->get_option(sub->get_selected_option())) {
 					opt->handle_action(eOptionAction::right_click);
 				}
 			}
+	/*		if (m_left_key && sub->get_options_size() != 0 && !leftTimer.Update()) {
+				m_horizontal_delay = 15;  
+				AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+			}
+			if (m_right_key && sub->get_options_size() != 0 && !rightTimer.Update()) {
+				m_horizontal_delay = 15;
+				AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+			}*/
 		}
 	}
 
@@ -231,7 +215,7 @@ namespace menu::renderer {
 		}
 
 		if (option->get_flag(eOptionFlag::toggle_option)) {
-			auto size = render::get_sprite_scale(0.028);
+			auto size = render::get_sprite_scale(0.03);
 			if (m_toggled_on) {
 				render::draw_sprite({ "commonmenu", "common_medal" }, { m_position.x + (m_width / m_option.m_padding.x - 0.0045f),
 					m_draw_base_y + (m_option.m_height / 2.f), }, { size.x, size.y }, { 130, 214, 157, 255 }, 0.0f);
@@ -254,8 +238,37 @@ namespace menu::renderer {
 	}
 
 	void renderer::render_tooltip() {
+
+		const char* description{};
+
+		if (!m_submenu_stack.empty())
+		{
+			auto sub = m_submenu_stack.top();
+			if (sub->get_options_size())
+			{
+				if (auto opt = sub->get_option(sub->get_selected_option()))
+				{
+					description = opt->get_description();
+				}
+			}
+		}
+
+		if (!description || !*description)
+			return;
+
+		m_draw_base_y += 0.005f;
+
+		render::draw_rect({ m_position.x, m_draw_base_y + (0.033f / 2.f) },
+			{ m_width, 0.033f },
+			m_option.m_color);
+
 		
 
+		render::draw_left_text(description, m_position.x - (m_width / 0.005f), m_draw_base_y + (0.033f / 2.f)
+			- (render::get_text_height(m_option.m_font, 0.28f) / 1.5f), 0.28f, m_option.m_font,
+			m_option.m_selected_text_color, false, false);
+
+		m_draw_base_y += 0.033f;
 	}
 
 	void renderer::draw_footer() {

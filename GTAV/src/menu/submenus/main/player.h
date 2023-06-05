@@ -25,6 +25,9 @@ namespace menu {
 	namespace player::vars {
 		struct variables {
 			bool m_godmode;
+			bool m_cops_turn_blind_eye;
+			bool m_off_the_radar;
+			bool m_reveal_hidden_players;
 		};
 
 		extern variables m_vars;

@@ -46,7 +46,7 @@ namespace menu::render {
 		draw_rect({ position.x + scale.x, position.y - thickness }, { (thickness * 0.60f), scale.y + (thickness * 2.f) }, border_color); // right
 	}
 
-	inline float get_rect_base(float rect_height, float draw_base = renderer::renderer::get_renderer()->m_draw_base_y) {
+	inline float get_rect_base(float rect_height, float draw_base = renderer::getRenderer()->m_draw_base_y) {
 		return draw_base + (rect_height / 2.f);
 	}
 
@@ -58,10 +58,10 @@ namespace menu::render {
 		if (justify == eJustify::JUSTIFY_RIGHT) {
 			HUD::SET_TEXT_WRAP(0.f, position.x);
 			HUD::SET_TEXT_RIGHT_JUSTIFY(true);
-			position.x = position.x + (renderer::renderer::get_renderer()->m_width / padding.y);
+			position.x = position.x + (renderer::getRenderer()->m_width / padding.y);
 		}
 		if (justify == eJustify::JUSTIFY_LEFT) {
-			position.x = position.x - (renderer::renderer::get_renderer()->m_width / padding.x);
+			position.x = position.x - (renderer::getRenderer()->m_width / padding.x);
 		}
 		if (half) {
 			position.y -= get_text_height(font, size) / 2.f;
@@ -165,5 +165,14 @@ namespace menu::render {
 		}
 
 		return scale;
+	}
+
+	inline void draw_sprite_aligned(std::pair<std::string, std::string> asset, math::vector2<float> position, math::vector2<float> scale, float rotation, color color) {
+
+		if (!GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED(asset.first.c_str()) && asset.first != "aethertextures") {
+			GRAPHICS::REQUEST_STREAMED_TEXTURE_DICT(asset.first.c_str(), true);
+		}
+
+		GRAPHICS::DRAW_SPRITE(asset.first.c_str(), asset.second.c_str(), { position.x + (scale.x * 0.5f), position.y + (scale.y * 0.5f) }, scale.x, scale.y, rotation, color.r, color.g, color.b, color.a, TRUE, TRUE);
 	}
 }

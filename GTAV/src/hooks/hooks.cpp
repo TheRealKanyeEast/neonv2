@@ -5,6 +5,7 @@
 #include "patterns.h"
 #include "util/caller.h"
 #include "gui/util/fonts.h"
+#include "rage/classes/enums.h"
 using namespace memory;
 
 namespace base::hooks {
@@ -81,6 +82,22 @@ namespace base::hooks {
 			patterns::set_this_thread_networked = ptr.add(8).as<decltype(patterns::set_this_thread_networked)>();
 		}, out);
 
+		batch.Add("SG", "48 8D 15 ? ? ? ? 4C 8B C0 E8 ? ? ? ? 48 85 FF 48 89 1D", [](Ptr ptr) {
+			patterns::script_globals = ptr.from_instruction().as<std::int64_t**>();
+		}, out);
+
+		batch.Add("ICF", "48 8D 0D ? ? ? ? 88 05 ? ? ? ? 48 8D 05", [](Ptr ptr) {
+			patterns::interval_check_func = ptr.from_instruction().as<PVOID>();
+		}, out);
+
+		batch.Add("RCOEP", "48 89 5C 24 ? 57 48 83 EC 20 8B D9 E8 ? ? ? ? ? ? ? ? 8B CB", [](Ptr ptr) {
+			byte_patch::make(ptr.add(0x13).as<std::uint16_t*>(), 0x9090)->apply();
+		}, out);
+
+		batch.Add("CW", "74 44 E8 ? ? ? ? 80 65 2B F8 48 8D 0D ? ? ? ? 48 89 4D 17 48 89 7D 1F 89 7D 27 C7 45", [](Ptr ptr) {
+			byte_patch::make(ptr.as<uint8_t*>(), 0xEB)->apply();
+		}, out);
+
 		auto mod = memory::module("GTA5.exe");	
 		batch.run(mod);
 
@@ -101,6 +118,20 @@ namespace base::hooks {
 			return hooking::detour("GFI", patterns::get_font_id, &get_font_id, &get_font_id_t);
 		}, out);
 
+		batch.Add("QD", "48 89 5C 24 ? 57 48 83 EC ? 0F B6 99", [](Ptr ptr) {
+			patterns::queue_dependency = ptr.as<uint64_t>();
+			//return hooking::detour("QD", patterns::queue_dependency, &queue_dependency, &queue_dependency_t);
+		}, out);
+
+		batch.Add("SNE", "48 8B 5F 08 48 8B 7F 10 49 8B D6 48 8B 03 48 8B CB FF 90 ? ? ? ? 84 C0 0F 85", [](Ptr ptr) {
+			patterns::send_network_event = ptr.sub(0x3A).as<uint64_t>();
+			//return hooking::detour("SNE", patterns::send_network_event, &send_network_event, &send_network_event_t);
+		}, out);
+
+		batch.Add("NTQVMC", "66 0F 6F 0D ? ? ? ? 66 0F 6F 05 ? ? ? ? 66 0F 66 C4", [](Ptr ptr) {
+			byte_patch::make(ptr.add(4).rip().sub(32).as<uint64_t*>(), (uint64_t)&hooks::nt_query_virtual_memory)->apply();
+		}, out);
+
 		auto mod = memory::module("GTA5.exe");
 		batch.run(mod);
 
@@ -119,5 +150,32 @@ namespace base::hooks {
 			}
 		}
 		return get_font_id_t(font, id);
+	}
+
+	int nt_query_virtual_memory(void* _this, HANDLE handle, PVOID base_addr, int info_class, MEMORY_BASIC_INFORMATION* info, int size, size_t* return_len) {
+		return 1;
+	}
+	void queue_dependency(void* dependency) {
+		if (dependency == patterns::interval_check_func) {
+			return;
+		}
+
+		return queue_dependency_t(dependency);
+	}
+
+	void send_network_event(uint64_t net_table, uint64_t event) {
+		if (event) {
+			short type = *(short*)(event + 8);
+
+			if (type == 83u || type == 84u || type == 78u) {
+				LOG_CUSTOM_WARN("AC", "Blocking network event - %i", type);
+
+				uint64_t table = *(uint64_t*)event;
+				caller::call<int>(*(uint64_t*)table, event, 1); // Deallocate event
+				return;
+			}
+		}
+
+		return send_network_event_t(net_table, event);
 	}
 }

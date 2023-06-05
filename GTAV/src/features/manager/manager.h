@@ -1,5 +1,5 @@
 #pragma once
-#include "types.h"
+#include "features/manager/types.h"
 #define ONCE(a) do a while (false)
 
 namespace features {
@@ -35,36 +35,7 @@ namespace features {
 		std::vector<abstractFeature*> m_features{};
 	};
 	inline manager g_manager{};
-
-	inline manager* getManager() {
-		static manager instance;
-		return &instance;
-	}
-
-	inline void init() {
-		getManager()->init();
-	}
-
-	inline void remove(uint32_t id) {
-		getManager()->remove(id);
-	}
-
-	inline void clear() {
-		getManager()->clear();
-	}
-
-	inline void tick() {
-		getManager()->tick();
-	}
-
-	template<typename t>
-	inline void add(t feature) {
-		getManager()->add(feature);
-	}
 }
-
-// :O
-
 inline features::abstractFeature* operator ""_ABF(const char* str, size_t) {
 	return features::g_manager.getFeature<features::abstractFeature>(str);
 }

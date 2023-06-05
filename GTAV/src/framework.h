@@ -39,6 +39,7 @@
 #include <cassert>
 #include <utility>
 #include <xutility>
+#include <conio.h>
 
 //include libs
 #pragma comment(lib, "winmm.lib")

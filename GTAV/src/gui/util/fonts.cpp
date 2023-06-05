@@ -29,7 +29,7 @@ namespace fonts {
 		if (!set_default) {
 			int id = get_font_id("RDR");
 			if (id > 0) {
-				menu::renderer::renderer::get_renderer()->m_header.m_font = id;
+				menu::renderer::getRenderer()->m_header.m_font = id;
 				set_default = true;
 			}
 		}

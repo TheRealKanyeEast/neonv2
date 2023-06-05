@@ -10,7 +10,7 @@ namespace menu::renderer {
 		float m_height = 0.08f, m_font_scale = 1.f;
 		int m_font = 7;
 
-		color m_color = { 255, 192, 255 };
+		color m_color = { 102, 51, 153 };
 		color m_text_color = { 255, 255, 255 };
 	};
 
@@ -54,7 +54,6 @@ namespace menu::renderer {
 		std::vector<std::unique_ptr<base::gui::abstract_submenu>>& get_all_subs() { return m_all_subs; }
 		std::stack<base::gui::abstract_submenu*, std::vector<base::gui::abstract_submenu*>>& get_submenu_stack() { return m_submenu_stack; }
 
-		static renderer* get_renderer();
 	public:
 		bool m_opened{};
 		bool m_toggled_on{};
@@ -77,6 +76,7 @@ namespace menu::renderer {
 		footer m_footer;
 		tooltip m_tooltip;
 
+		float m_delta = 0.f;
 		float m_tooltip_x = 0.0985f;
 
 		std::int32_t m_open_delay = 200, m_back_delay = 300, m_enter_delay = 300, m_vertical_delay = 120, m_horizontal_delay = 120;
@@ -119,13 +119,13 @@ namespace menu::renderer {
 		}
 	};
 
-	inline renderer* renderer::get_renderer() {
+	inline renderer* getRenderer() {
 		static renderer instance;
 		return &instance;
 	}
 	
 	inline void add_submenu(const char* name, std::function<void(base::gui::core*)> action) {
-		renderer::get_renderer()->add_submenu<base::gui::core>(name, action);
+		getRenderer()->add_submenu<base::gui::core>(name, action);
 	}
 
 

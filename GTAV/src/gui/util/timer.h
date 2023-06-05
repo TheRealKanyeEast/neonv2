@@ -29,6 +29,7 @@ public:
         return std::chrono::duration_cast<std::chrono::milliseconds>(m_Delay);
     }
 
+
     void Reset() {
         m_Timer = std::chrono::high_resolution_clock::now();
     }

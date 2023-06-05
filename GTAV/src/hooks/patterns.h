@@ -16,10 +16,14 @@ namespace patterns {
 	extern void* jmp_rbx_register;
 
 	extern PVOID set_this_thread_networked;
+	extern uint64_t queue_dependency;
+	extern PVOID interval_check_func;
+
+	extern uint64_t send_network_event;
 
 	extern uint32_t* game_state;
 	extern uint32_t* frame_count;
-
+	extern int64_t** script_globals;
 	extern uint64_t script_vm;
 	extern uint64_t get_font_id;
 	extern uint64_t font_table;

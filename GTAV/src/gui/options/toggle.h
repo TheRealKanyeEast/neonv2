@@ -40,7 +40,7 @@ namespace base::gui {
 
 		bool get_flag(eOptionFlag flag) override {
 			if (flag == eOptionFlag::toggle_option) {
-				menu::renderer::renderer::get_renderer()->m_toggled_on = *m_Bool;
+				menu::renderer::getRenderer()->m_toggled_on = *m_Bool;
 				return true;
 			}
 			return base_option::get_flag(flag);

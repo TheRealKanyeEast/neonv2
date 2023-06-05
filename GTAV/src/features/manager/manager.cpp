@@ -1,16 +1,17 @@
 #include "pch.h"
 #include "manager.h"
-
+#include "gui/util/notify.h"
 namespace features {
 	void hotkey::add_hotkey(int key) {
-		m_keys.emplace_back(key);//update the vector for each new hot key
+		m_keys.emplace_back(key);
 	}
 	bool hotkey::pressed() {
 		if (m_enabled)
 			return false;
 		bool pressed{};
 		for (auto& k : m_keys) {
-			if (GetAsyncKeyState(k)) {//could be better but ok
+			if (GetAsyncKeyState(k)) {
+				menu::notify::stacked("Hotkey", "Triggered Hotkey");
 				pressed = true;
 			}
 		}
@@ -36,7 +37,7 @@ namespace features {
 				f->run();
 			}
 			else if (f->m_hotkey.pressed()) {
-				ONCE({//haxxer do while loop
+				ONCE({
 					f->run();
 					});
 			}

@@ -2,6 +2,7 @@
 #include "features.h"
 #include "features/manager/manager.h"
 #include "rage/invoker/natives.h"
+#include "util/fiber.h"
 namespace features {
 
 	void suicide(features::actionFeature* feature) {
@@ -9,13 +10,13 @@ namespace features {
 	}
 
 	void run() {
-		features::add(features::actionFeature("suicide", "suicide", suicide));
-		//"suicide"_AF->add_hotkey(VK_F8);
-		features::init();
+		features::g_manager.add(features::actionFeature("suicide", "suicide", suicide));
+		"suicide"_AF->add_hotkey(VK_F8);
+		features::g_manager.init();
 
 		while (true) {
-			features::tick();
-			std::this_thread::yield();
+			features::g_manager.tick();
+			util::fiber::go_to_main();
 		}
 	}
 }

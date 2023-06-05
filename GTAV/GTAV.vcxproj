@@ -113,6 +113,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>C:\neon\GTAV\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -133,7 +134,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalUsingDirectories>%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>C:\Users\hanky.DESKTOP-AFRKBFD\source\repos\GTAV\GTAV\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\neon\GTAV\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
@@ -169,6 +170,8 @@
     <ClInclude Include="src\gui\util\flags.h" />
     <ClInclude Include="src\gui\options\option.h" />
     <ClInclude Include="src\gui\util\fonts.h" />
+    <ClInclude Include="src\gui\util\hotkeys.h" />
+    <ClInclude Include="src\gui\util\notify.h" />
     <ClInclude Include="src\gui\util\panels.h" />
     <ClInclude Include="src\gui\util\timer.h" />
     <ClInclude Include="src\gui\util\translate.h" />
@@ -183,6 +186,7 @@
     <ClInclude Include="src\menu\submenus\main\settings.h" />
     <ClInclude Include="src\menu\submenus\main\settings\position.h" />
     <ClInclude Include="src\menu\submenus\main\spawner.h" />
+    <ClInclude Include="src\menu\util\globals.h" />
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\rage\classes\atMap.h" />
     <ClInclude Include="src\rage\classes\base.h" />
@@ -205,6 +209,7 @@
     <ClInclude Include="src\util\caller.h" />
     <ClInclude Include="src\util\dirs.h" />
     <ClInclude Include="src\util\fiber.h" />
+    <ClInclude Include="src\util\fiber_pool.h" />
     <ClInclude Include="src\util\hooking\hooking.h" />
     <ClInclude Include="src\util\hooking\minhook.h" />
     <ClInclude Include="src\util\hooking\script.h" />
@@ -220,6 +225,8 @@
     <ClCompile Include="src\features\manager\manager.cpp" />
     <ClCompile Include="src\gui\renderer.cpp" />
     <ClCompile Include="src\gui\util\fonts.cpp" />
+    <ClCompile Include="src\gui\util\hotkeys.cpp" />
+    <ClCompile Include="src\gui\util\notify.cpp" />
     <ClCompile Include="src\gui\util\panels.cpp" />
     <ClCompile Include="src\gui\util\translate.cpp" />
     <ClCompile Include="src\hooks\hooks.cpp" />
@@ -234,6 +241,7 @@
     <ClCompile Include="src\menu\submenus\main\settings.cpp" />
     <ClCompile Include="src\menu\submenus\main\settings\position.cpp" />
     <ClCompile Include="src\menu\submenus\main\spawner.cpp" />
+    <ClCompile Include="src\menu\util\globals.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -243,6 +251,7 @@
     <ClCompile Include="src\rage\invoker\invoker.cpp" />
     <ClCompile Include="src\util\dirs.cpp" />
     <ClCompile Include="src\util\fiber.cpp" />
+    <ClCompile Include="src\util\fiber_pool.cpp" />
     <ClCompile Include="src\util\hooking\hooking.cpp" />
     <ClCompile Include="src\util\hooking\script.cpp" />
     <ClCompile Include="src\util\log.cpp" />

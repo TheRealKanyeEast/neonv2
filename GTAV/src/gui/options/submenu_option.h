@@ -28,7 +28,7 @@ namespace base::gui {
 
 		void handle_action(eOptionAction action) override {
 			if (action == eOptionAction::click) {
-				menu::renderer::renderer::get_renderer()->switch_to_submenu(m_sub_id);
+				menu::renderer::getRenderer()->switch_to_submenu(m_sub_id);
 			}
 			base_option::handle_action(action);
 		}

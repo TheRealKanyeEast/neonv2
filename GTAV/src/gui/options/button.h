@@ -1,6 +1,8 @@
 #pragma once
 #include "option.h"
-
+#include "gui/util/hotkeys.h"
+#include "util/util.h"
+#include "util/log.h"
 namespace base::gui {
 	class button_option : public base_option<button_option> {
 	private:
@@ -23,6 +25,11 @@ namespace base::gui {
 
 		button_option& add_click(std::function<void()> function) {
 			set_action(std::move(function));
+			return *this;
+		}
+
+		button_option& add_hotkey() {
+			menu::get_hotkey()->read_hotkey();		
 			return *this;
 		}
 

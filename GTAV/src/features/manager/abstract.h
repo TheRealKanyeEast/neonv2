@@ -1,8 +1,8 @@
 #pragma once
 #include "pch.h"
 #include "rage/classes/joaat.h"
+
 namespace features {
-	//define rust types
 	union value {
 		const char* str;
 		bool toggle;
@@ -16,11 +16,10 @@ namespace features {
 		int64_t i64;
 		uint64_t u64;
 		value* reference;
-		//CNetGamePlayer* game_player;
-		//rage::netPlayer* net_player;
-		//rage::rlGamerInfo* gamer_info;
+	/*	CNetGamePlayer* game_player;
+		rage::netPlayer* net_player;
+		rage::rlGamerInfo* gamer_info;*/
 	};
-	//hotkeys :)
 	class hotkey {
 	public:
 		std::vector<int> m_keys{};
@@ -28,8 +27,6 @@ namespace features {
 		void add_hotkey(int key);
 		bool pressed();
 	};
-	//define feature types as an enum for ease of use
-
 	enum class eFeatureType : uint8_t {
 		AbstractFeature,
 		ToggleFeature,

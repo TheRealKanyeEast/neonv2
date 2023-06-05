@@ -20,7 +20,7 @@ namespace base::core {
 		hooking::cleanup();
 		util::threads::getThreadPool()->Cleanup();
 		util::fiber::cleanup();
-		features::clear();
+		features::g_manager.clear();
 		util::log::Cleanup();
 
 		FreeLibraryAndExitThread(static_cast<HMODULE>(handle), 0);
@@ -73,6 +73,7 @@ namespace base::core {
 		}
 
 		auto script_hooks = std::make_unique<script::native_hooks>();
+
 
 		g_running = true;
 

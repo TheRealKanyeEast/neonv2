@@ -18,8 +18,13 @@ namespace patterns {
 
 	rage::hash_list* hash_list;
 
-	PVOID set_this_thread_networked;
+	uint64_t queue_dependency;
+	PVOID interval_check_func;
 
+	uint64_t send_network_event;
+
+	PVOID set_this_thread_networked;
+	int64_t** script_globals;
 	uint64_t get_font_id;
 	uint64_t font_table;
 	uint64_t font_memory_helper;

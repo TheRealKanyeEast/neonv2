@@ -4,7 +4,8 @@
 #include "util/caller.h"
 #include "classes/classes.h"
 #include "rage/invoker/natives.h"
-
+#include "util/fiber.h"
+#include "util/fiber_pool.h"
 namespace rage::engine {
 	inline rage::types::store_module* get_store_module_extension(const char* extension) {
 		return caller::call<rage::types::store_module*>(patterns::get_store_module_extension, &patterns::store_manager->m_module, extension);
@@ -47,43 +48,34 @@ namespace rage::engine {
 		return HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(ss.str().c_str()) == "NULL" ? "Unknown Class" : HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(ss.str().c_str());
 	}
 
-	inline void request_model(std::uint32_t hash) {
-		STREAMING::REQUEST_MODEL(hash);
-		while (!STREAMING::HAS_MODEL_LOADED(hash)) {
-			std::this_thread::yield();
-		}
-	}
+
 
 	inline float deg_to_rad(float degs) {
 		return degs * 3.141592653589793f / 180.f;
 	}
 
-	inline Vehicle spawn_vehicle(std::uint32_t hash) {
-		if (!STREAMING::IS_MODEL_VALID(hash)) {
-			return NULL;
+
+	inline void simple_request_model(uint32_t model) {
+		int tries = 0;
+		while (!STREAMING::HAS_MODEL_LOADED(model) && tries < 25) {
+			STREAMING::REQUEST_MODEL(model);
+			tries++;
+			util::fiber::go_to_main();
 		}
-		request_model(hash);
-		float forward = 5.f;
-		Vector3 coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
-		float heading = ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID());
-		float x = forward * sin(deg_to_rad(heading)) * -1.f;
-		float y = forward * cos(deg_to_rad(heading));
-		*(unsigned short*)patterns::set_this_thread_networked = 0x9090; // we set this thread as networked so we can spawn the vehicle / u can add rage classes and use excute under thread instead of this
-		Vehicle the_vehicle = VEHICLE::CREATE_VEHICLE(hash, coords, heading, NETWORK::NETWORK_IS_SESSION_ACTIVE(), false, false);
-		std::int32_t net_id = NETWORK::VEH_TO_NET(the_vehicle);
-		*(unsigned short*)patterns::set_this_thread_networked = 0x0574; // We restore it so we don't get detected 
-		if (NETWORK::NETWORK_IS_SESSION_STARTED()) {
-			NETWORK::NETWORK_FADE_IN_ENTITY(the_vehicle, true, 0);
-			NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(net_id, TRUE);
-			if (ENTITY::IS_ENTITY_VISIBLE_TO_SCRIPT(NETWORK::NET_TO_VEH(net_id))) {
-				PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), NETWORK::NET_TO_VEH(net_id), -1);
-				float speed = ENTITY::GET_ENTITY_SPEED(the_vehicle);
-				VEHICLE::SET_VEHICLE_FORWARD_SPEED(NETWORK::NET_TO_VEH(net_id), speed);
-				VEHICLE::SET_VEHICLE_ENGINE_ON(NETWORK::NET_TO_VEH(net_id), TRUE, TRUE, TRUE);
-				DECORATOR::DECOR_SET_INT(NETWORK::NET_TO_VEH(net_id), "MPBitset", (1 << 10));
-				return the_vehicle;
-			}
-		}
-		return NULL;
 	}
+
+	inline void spawn_vehicle(std::uint32_t hash) {
+		if (STREAMING::IS_MODEL_IN_CDIMAGE(hash)) {
+			util::fiber::pool::add([=] {
+				simple_request_model(hash);
+				float forward = 5.f;
+				Vector3 coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+				float heading = ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID());
+				float x = forward * sin(deg_to_rad(heading)) * -1.f;
+				float y = forward * cos(deg_to_rad(heading));
+				VEHICLE::CREATE_VEHICLE(hash, { coords.x + x, coords.y + y, coords.z }, heading, false, false, false);
+				});
+		}
+	}
+
 }
