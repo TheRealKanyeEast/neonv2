@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include <span>
 
 namespace memory {
 	class Ptr {

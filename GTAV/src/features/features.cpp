@@ -31,10 +31,6 @@ namespace features {
 		features::g_manager.add(features::toggleFeature("player_godmode", "Godmode", godmode));
 		features::g_manager.add(features::toggleFeature("player_disable_police", "Disable Police", never_wanted));
 
-		"suicide"_AF->add_hotkey(VK_F8);
-		"player_godmode"_TF->add_hotkey(VK_F5);
-		"player_disable_police"_TF->add_hotkey(VK_F6);
-
 		features::g_manager.init();
 
 		while (true) {

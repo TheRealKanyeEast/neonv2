@@ -32,6 +32,7 @@ namespace menu {
 
 		return results;
 	}
+
 	void main_menu::render() {	
 
 		renderer::addSubmenu("Main Menu", [](core* core) {

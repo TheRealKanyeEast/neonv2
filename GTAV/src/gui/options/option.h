@@ -34,6 +34,10 @@ namespace base::gui {
 			return m_action;
 		}
 
+		bool* get_bool_pointer() override {
+			return nullptr;
+		}
+
 		void set_value(double text) override {}
 		void set_value(std::string text) {}
 

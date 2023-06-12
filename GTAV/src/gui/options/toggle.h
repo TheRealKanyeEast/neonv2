@@ -38,6 +38,10 @@ namespace base::gui {
 			base_option::handle_action(action);
 		}
 
+		bool* get_bool_pointer() override {
+			return m_Bool;
+		}
+
 		bool get_flag(eOptionFlag flag) override {
 			if (flag == eOptionFlag::toggle_option) {
 				menu::renderer::getRenderer()->m_toggled_on = *m_Bool;

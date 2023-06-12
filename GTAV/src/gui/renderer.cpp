@@ -5,6 +5,8 @@
 #include "rage/classes/enums.h"
 #include "util/timer.h"
 #include "gui/util/panels.h"
+#include <gui/util/notify.h>
+#include <menu/submenus/main.h>
 
 namespace menu::renderer {
 	bool pushed_options = false;
@@ -16,6 +18,7 @@ namespace menu::renderer {
 		return 0;
 	}
 
+
 	bool is_key_pressed(std::uint16_t key) {
 		if (GetForegroundWindow() == g_window) {
 			if (GetAsyncKeyState(key) & 0x8000) {
@@ -23,6 +26,14 @@ namespace menu::renderer {
 			}
 		}
 		return false;
+	}
+
+	void update_last_key_pressed() {
+		for (int i = 0; i > 255; i++) {
+			if (GetAsyncKeyState(i)) {
+				m_last_key_pressed = i;
+			}
+		}
 	}
 
 	bool g_is_mouse_enabled;
@@ -135,8 +146,10 @@ namespace menu::renderer {
 	void renderer::render() {
 		//fonts::gfx::load();
 		check_keys();
+		update_hotkeys();
 		handle_keys();
 		drawOverlay();
+		update_last_key_pressed();
 		if (m_opened) {
 			if (!pushed_options) {
 				util::fiber::sleep(50);
@@ -184,12 +197,14 @@ namespace menu::renderer {
 	void renderer::reset_keys() {
 		m_open_key = false, m_back_key = false, m_enter_key = false, m_up_key = false; m_down_key = false,
 			m_left_key = false, m_right_key = false;
+		m_hotkey = false;
 	}
 	void renderer::check_keys() {
 		reset_keys();
 		m_open_key = is_key_pressed(VK_F4) || (PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlScriptRB) && PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendX)), m_back_key = is_key_pressed(VK_BACK) || PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendCancel), m_enter_key = is_key_pressed(VK_RETURN) || PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendAccept),
 			m_up_key = is_key_pressed(VK_UP) || PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendUp), m_down_key = is_key_pressed(VK_DOWN) || PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendDown), m_left_key = is_key_pressed(VK_LEFT) || PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendLeft),
 			m_right_key = is_key_pressed(VK_RIGHT) || PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendRight);
+		m_hotkey = is_key_pressed(VK_F8);
 	}
 	void renderer::handle_keys() {
 		if (is_key_pressed(VK_F12)) {
@@ -215,6 +230,13 @@ namespace menu::renderer {
 			else {
 				m_submenu_stack.pop();
 			}
+		}
+
+		static Timer hotkeyTimer(0ms);
+		hotkeyTimer.SetDelay(std::chrono::milliseconds(m_back_delay));
+		if (m_opened && m_hotkey && hotkeyTimer.Update()) {
+			AUDIO::PLAY_SOUND_FRONTEND(-1, "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+			m_hotkey_pressed = !m_hotkey_pressed;
 		}
 
 		if (m_opened && !m_submenu_stack.empty()) {
@@ -429,6 +451,22 @@ namespace menu::renderer {
 		if (sub->get_selected_option() >= sub->get_options_size()) {
 			sub->set_selected_option(sub->get_options_size() - 1);
 		}
+		if (m_hotkey_pressed && selected && option->get_bool_pointer()) {
+			render::draw_left_text(std::format("Option Assigned To {}", g_key_names[m_last_key_pressed]).c_str(), 0.5f, 0.5f, 0.5f, 0, { 255, 255, 255, 255 }, false, true);
+
+			static int delay_tick;
+
+			if (GetTickCount64() - delay_tick > 150) {
+				if (is_key_pressed(VK_RETURN)) {
+					m_bool_hotkeys.insert({ rage::joaat(option->get_left_text()), { m_last_key_pressed, option->get_bool_pointer(), option->get_left_text() } });
+
+					menu::notify::stacked(std::format("Assigned Option {} To Hotkey {}", option->get_left_text(), g_key_names[m_last_key_pressed]));
+
+					m_hotkey_pressed = false;
+					delay_tick = GetTickCount64();
+				}
+			}
+		}
 
 		m_draw_base_y += m_option.m_height;
 	}
@@ -548,6 +586,30 @@ namespace menu::renderer {
 			m_OverlayLineColor);
 	}
 
+	void renderer::update_hotkeys() {
+		if (m_bool_hotkeys.empty()) {
+			return; // Or handle the case appropriately
+		}
 
+		static int delay_tick;
+		for (auto pair : m_bool_hotkeys) {
+			if (GetTickCount64() - delay_tick > 500) {
+				if (is_key_pressed(pair.second.m_key)) {
+					*pair.second.m_pointer = !*pair.second.m_pointer;
+
+					AUDIO::PLAY_SOUND_FRONTEND(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", FALSE);
+
+					if (*pair.second.m_pointer) {
+						menu::notify::stacked(std::format("Pressed {}, Enabled {},", g_key_names[m_last_key_pressed], pair.second.m_name).c_str());
+					}
+					else {
+						menu::notify::stacked(std::format("Pressed {}, Disabled {},", g_key_names[m_last_key_pressed], pair.second.m_name).c_str());
+					}
+
+					delay_tick = GetTickCount64();
+				}
+			}
+		}
+	}
 }
 
