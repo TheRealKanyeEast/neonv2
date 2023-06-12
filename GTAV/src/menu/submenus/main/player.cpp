@@ -3,6 +3,7 @@
 #include "features/manager/manager.h"
 #include "menu/util/globals.h"
 #include "gui/options/option.h"
+#include "gui/util/panels.h"
 
 using namespace base::gui;
 using namespace menu::player::vars;
@@ -53,14 +54,17 @@ namespace menu {
 
 
 	void player_menu::render() {
-		renderer::add_submenu("Player", [](core* core) {
+		renderer::addSubmenu("Player", [](core* core) {
 
 			core->add_option(toggle_option("Godmode")
-				.add_toggle(&m_vars.m_godmode).add_click([] {
-					if (!m_vars.m_godmode) {
+				.add_toggle(&"player_godmode"_TF->m_value.toggle).add_click([] {
+					if (!"player_godmode"_TF->m_value.toggle) {
 						ENTITY::SET_ENTITY_INVINCIBLE(PLAYER::PLAYER_PED_ID(), false);
 					}
 				}));
+
+			core->add_option(toggle_option("Disable Police")
+				.add_toggle(&"player_disable_police"_TF->m_value.toggle));
 
 			core->add_option(toggle_option("Off the Radar")
 				.add_toggle(&m_vars.m_off_the_radar)
@@ -75,16 +79,12 @@ namespace menu {
 				.add_click(reveal_hidden_players));
 
 			core->add_option(button_option("Suicide")
-				.add_click([] { suicide(0); }));
+				.add_click([] { suicide("player_suicide"_AF); }));
 		});
 	}
 
 	void player_menu::update() {
 		render();	
-
-		if (m_vars.m_godmode) {
-			ENTITY::SET_ENTITY_INVINCIBLE(PLAYER::PLAYER_PED_ID(), true);
-		}
 
 		if (m_vars.m_off_the_radar) {
 			off_the_radar();

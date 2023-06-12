@@ -28,8 +28,12 @@ namespace fonts {
 		static bool set_default = false;
 		if (!set_default) {
 			int id = get_font_id("RDR");
-			if (id > 0) {
+			int id2 = get_font_id("Roboto");
+			if (id > 0 && id2 > 0) {
 				menu::renderer::getRenderer()->m_header.m_font = id;
+				menu::renderer::getRenderer()->m_option.m_font = id2;
+				menu::renderer::getRenderer()->m_title.m_font = id2;
+				menu::renderer::getRenderer()->m_footer.m_font = id2;
 				set_default = true;
 			}
 		}

@@ -2,7 +2,6 @@
 #include "pch.h"
 #include "hooks/patterns.h"
 #include "util/caller.h"
-#include "classes/classes.h"
 #include "rage/invoker/natives.h"
 #include "util/fiber.h"
 #include "util/fiber_pool.h"
@@ -55,27 +54,30 @@ namespace rage::engine {
 	}
 
 
-	inline void simple_request_model(uint32_t model) {
-		int tries = 0;
-		while (!STREAMING::HAS_MODEL_LOADED(model) && tries < 25) {
-			STREAMING::REQUEST_MODEL(model);
-			tries++;
+	inline void request_model(std::uint32_t hash) {
+		STREAMING::REQUEST_MODEL(hash);
+		while (!STREAMING::HAS_MODEL_LOADED(hash)) {
 			util::fiber::go_to_main();
 		}
 	}
 
-	inline void spawn_vehicle(std::uint32_t hash) {
-		if (STREAMING::IS_MODEL_IN_CDIMAGE(hash)) {
-			util::fiber::pool::add([=] {
-				simple_request_model(hash);
-				float forward = 5.f;
-				Vector3 coords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
-				float heading = ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID());
-				float x = forward * sin(deg_to_rad(heading)) * -1.f;
-				float y = forward * cos(deg_to_rad(heading));
-				VEHICLE::CREATE_VEHICLE(hash, { coords.x + x, coords.y + y, coords.z }, heading, false, false, false);
-				});
-		}
-	}
+	inline std::vector<uint32_t> get_hash_list_from_hash_table(uint32_t count, uint64_t table) {
+		std::vector<uint32_t> hashes;
 
+		if (count && table) {
+			uint64_t* ptr = (uint64_t*)table;
+
+			for (uint32_t i = 0; i < count; i++) {
+				if (ptr[i]) {
+					uint32_t hash = *(uint32_t*)(ptr[i] + 0x10);
+
+					if (hash) {
+						hashes.push_back(hash);
+					}
+				}
+			}
+		}
+
+		return hashes;
+	}
 }

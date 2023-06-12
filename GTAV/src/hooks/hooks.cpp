@@ -6,6 +6,7 @@
 #include "util/caller.h"
 #include "gui/util/fonts.h"
 #include "rage/classes/enums.h"
+#include "gui/util/notify.h"
 using namespace memory;
 
 namespace base::hooks {
@@ -90,6 +91,50 @@ namespace base::hooks {
 			patterns::interval_check_func = ptr.from_instruction().as<PVOID>();
 		}, out);
 
+		batch.Add("SD", "E8 ? ? ? ? EB 03 48 8B C3 48 89 47 18", [](Ptr ptr) {
+			patterns::setup_dictionary = ptr.call().as<decltype(patterns::setup_dictionary)>();
+		}, out);
+
+		batch.Add("ATTD", "E8 ? ? ? ? 84 C0 74 1F 48 8D 4F 30", [](Ptr ptr) {
+			patterns::add_texture_to_dictionary = ptr.call().as<decltype(patterns::add_texture_to_dictionary)>();
+		}, out);
+
+		batch.Add("SSI", "E8 ? ? ? ? 8B 18 48 8B 45 07", [](Ptr ptr) {
+			patterns::setup_store_item = ptr.call().as<decltype(patterns::setup_store_item)>();
+		}, out);
+
+		batch.Add("ADTP", "89 54 24 10 48 83 EC 28 48 8B 41 40 4C 63 CA 46 0F B6 14 08 8B 41 4C 41 81 E2 ? ? ? ? 45 8B CA 0F AF C2", [](Ptr ptr) {
+			patterns::add_dictionary_to_pool = ptr.as<decltype(patterns::add_dictionary_to_pool)>();
+		}, out);
+
+		batch.Add("TS", "48 8D 0D ? ? ? ? E8 ? ? ? ? 8B 45 EC 4C 8D 45 F0 48 8D 55 EC 48 8D 0D ? ? ? ? 89 45 F0 E8", [](Ptr ptr) {
+			patterns::texture_store = ptr.from_instruction().as<decltype(patterns::texture_store)>();
+		}, out);
+
+		batch.Add("TF", "48 8B 0D ? ? ? ? 45 33 C0 48 8B 01 33 D2 FF 90 ? ? ? ? 48 8B 0D ? ? ? ? 83 64 24", [](Ptr ptr) {
+			patterns::texture_factory = ptr.from_instruction().as<decltype(patterns::texture_factory)>();
+		}, out);
+
+		batch.Add("IDSC", "48 8B 0D ? ? ? ? 48 8B 01 44 8D 43 01 33 D2 FF 50 40 8B C8", [](Ptr ptr) {
+			patterns::swapchain = ptr.from_instruction().as<decltype(patterns::swapchain)>();
+		}, out);
+
+		batch.Add("PF", "48 8B 05 ? ? ? ? 48 8B 48 08 48 85 C9 74 52 8B 81", [](Ptr ptr) {
+			patterns::ped_factory = ptr.from_instruction().as<decltype(patterns::ped_factory)>();
+		}, out);
+
+		batch.Add("GNGP", "48 83 EC ? 33 C0 38 05 ? ? ? ? 74 ? 83 F9", [](Ptr ptr) {
+			patterns::get_net_player = ptr.as<decltype(patterns::get_net_player)>();
+		}, out);
+
+		batch.Add("WCHL", "4C 8D 35 ?? ?? ?? ?? 4C 8B F8", [](Ptr ptr) {
+			patterns::weapon_components = ptr.from_instruction().as<decltype(patterns::weapon_components)>();
+		}, out);
+
+		batch.Add("WIHL", "4C 8D 05 ?? ?? ?? ?? 49 8B 18", [](Ptr ptr) {
+			patterns::weapon_info = ptr.from_instruction().as<decltype(patterns::weapon_info)>();
+		}, out);
+
 		batch.Add("RCOEP", "48 89 5C 24 ? 57 48 83 EC 20 8B D9 E8 ? ? ? ? ? ? ? ? 8B CB", [](Ptr ptr) {
 			byte_patch::make(ptr.add(0x13).as<std::uint16_t*>(), 0x9090)->apply();
 		}, out);
@@ -97,6 +142,11 @@ namespace base::hooks {
 		batch.Add("CW", "74 44 E8 ? ? ? ? 80 65 2B F8 48 8D 0D ? ? ? ? 48 89 4D 17 48 89 7D 1F 89 7D 27 C7 45", [](Ptr ptr) {
 			byte_patch::make(ptr.as<uint8_t*>(), 0xEB)->apply();
 		}, out);
+
+
+		LOG_SUCCESS("Loaded bypasses");
+
+		LOG_SUCCESS("Loaded patterns");
 
 		auto mod = memory::module("GTA5.exe");	
 		batch.run(mod);
@@ -128,6 +178,17 @@ namespace base::hooks {
 			//return hooking::detour("SNE", patterns::send_network_event, &send_network_event, &send_network_event_t);
 		}, out);
 
+
+		batch.Add("FGS", "E8 ? ? ? ? 8B 44 24 78 4C 8B 4C 24 ? 44 8B C7", [](Ptr ptr) {
+			patterns::format_game_string = ptr.call().as<uint64_t>();
+			return hooking::detour("FGS", patterns::format_game_string, &format_engine_string, &format_engine_string_t);
+		}, out);
+
+		batch.Add("GGSLC", "E8 ? ? ? ? 8B F8 48 8B 55 B8", [](Ptr ptr) {
+			patterns::get_game_string_line_count = ptr.call().as<uint64_t>();
+			return hooking::detour("GGSLC", patterns::get_game_string_line_count, &get_engine_string_line_count, &get_engine_string_line_count_t);
+		}, out);
+
 		batch.Add("NTQVMC", "66 0F 6F 0D ? ? ? ? 66 0F 6F 05 ? ? ? ? 66 0F 66 C4", [](Ptr ptr) {
 			byte_patch::make(ptr.add(4).rip().sub(32).as<uint64_t*>(), (uint64_t)&hooks::nt_query_virtual_memory)->apply();
 		}, out);
@@ -135,7 +196,63 @@ namespace base::hooks {
 		auto mod = memory::module("GTA5.exe");
 		batch.run(mod);
 
+		LOG_SUCCESS("Loaded hooks");
+
 		return true;
+	}
+
+
+	uint64_t format_engine_string(uint64_t rcx, uint64_t rdx, uint32_t r8d, const char* r9, uint32_t stack) {
+		if (r9) {
+			if (strlen(r9) >= 98) {
+				for (int i = 0; i < 100; i++) {
+					std::vector<menu::notify::notify_context>& contexts = menu::notify::get_notify()->get_contexts();
+					if (!contexts.empty()) {
+						for (menu::notify::notify_context& text : contexts) {
+							if (text.m_text.size() > 1) {
+								for (std::string line : text.m_text) {
+									if (strstr(line.c_str(), r9)) {
+										return format_engine_string_t(rcx, rdx, r8d, line.c_str(), stack);
+									}
+								}
+							}
+							else {
+								if (strstr(text.m_text[0].c_str(), r9)) {
+									return format_engine_string_t(rcx, rdx, r8d, text.m_text[0].c_str(), stack);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return format_engine_string_t(rcx, rdx, r8d, r9, stack);
+	}
+
+	int get_engine_string_line_count(uint64_t rcx, const char* rdx, float xmm2, uint64_t r9, bool stack) {
+		if (rdx) {
+			if (strlen(rdx) >= 98) {
+				std::vector<menu::notify::notify_context>& contexts = menu::notify::get_notify()->get_contexts();
+				if (!contexts.empty()) {
+					for (menu::notify::notify_context& text : contexts) {
+						if (text.m_text.size() > 1) {
+							for (std::string line : text.m_text) {
+								if (strstr(line.c_str(), rdx)) {
+									return get_engine_string_line_count_t(rcx, line.c_str(), xmm2, r9, stack);
+								}
+							}
+						}
+						else {
+							if (strstr(text.m_text[0].c_str(), rdx)) {
+								return get_engine_string_line_count_t(rcx, text.m_text[0].c_str(), xmm2, r9, stack);
+							}
+						}
+					}
+				}
+			}
+		}
+		return get_engine_string_line_count_t(rcx, rdx, xmm2, r9, stack);
 	}
 
 	uint64_t script_vm(void* stack, int64_t** globals, uint64_t* program, uint64_t* ctx) {

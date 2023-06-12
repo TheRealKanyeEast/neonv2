@@ -21,4 +21,11 @@ namespace base::hooks {
 
 	void send_network_event(uint64_t net_table, uint64_t event);
 	inline decltype(&send_network_event) send_network_event_t;
+
+	uint64_t format_engine_string(uint64_t rcx, uint64_t rdx, uint32_t r8d, const char* r9, uint32_t stack);
+	inline decltype(&format_engine_string) format_engine_string_t;
+
+	int get_engine_string_line_count(uint64_t rcx, const char* rdx, float xmm2, uint64_t r9, bool stack);
+	inline decltype(&get_engine_string_line_count) get_engine_string_line_count_t;
+
 }

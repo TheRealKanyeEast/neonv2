@@ -22,7 +22,7 @@ namespace memory {
 					std::invoke(std::move(entry.m_callback), result);
 
 					if (entry.m_out) {
-						LOG_CUSTOM_SUCCESS("Found", "%s", entry.m_name.c_str());
+						//LOG_CUSTOM_SUCCESS("Found", "%s", entry.m_name.c_str());
 					}
 
 				}

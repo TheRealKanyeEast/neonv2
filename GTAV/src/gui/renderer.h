@@ -4,13 +4,15 @@
 #include "types.h"
 #include "gui/options/core.h"
 
+
 namespace menu::renderer {
 
+
 	struct header {
-		float m_height = 0.08f, m_font_scale = 1.f;
+		float m_height = 0.092f, m_font_scale = 1.1f;
 		int m_font = 7;
 
-		color m_color = { 102, 51, 153 };
+		color m_color = { 23, 22, 22 };
 		color m_text_color = { 255, 255, 255 };
 	};
 
@@ -25,12 +27,12 @@ namespace menu::renderer {
 
 	struct option {
 		float m_height = 0.0315f, m_font_scale = 0.29f;
-		int m_font = (int)eFont::ChaletLondon;
+		int m_font = 0;
 		math::vector2<float> m_padding = { 2.05f, 2.05f };
 
 
 		color m_color = { 0, 0, 0, 160 };
-		color m_text_color = { 255, 255, 255, 255 };
+		color m_text_color = { 220, 220, 220, 220 };
 		color m_selected_text_color = { 0, 0, 0, 255 };
 	};
 
@@ -51,14 +53,18 @@ namespace menu::renderer {
 	public:
 		void render();
 
+		base::gui::abstract_option* get_option_pointer(u32 id);
+		void push_options();
+
 		std::vector<std::unique_ptr<base::gui::abstract_submenu>>& get_all_subs() { return m_all_subs; }
+		std::unordered_map<u32, base::gui::abstract_option*>& get_all_options() { return m_all_options; }
 		std::stack<base::gui::abstract_submenu*, std::vector<base::gui::abstract_submenu*>>& get_submenu_stack() { return m_submenu_stack; }
 
 	public:
 		bool m_opened{};
 		bool m_toggled_on{};
 
-		math::vector2<float> m_position = { 0.31f, 0.08f };
+		math::vector2<float> m_position = { 0.15f, 0.08f };
 		float m_draw_base_y{};
 		float m_width = 0.21f;
 
@@ -68,13 +74,15 @@ namespace menu::renderer {
 		float m_current = { 0.f };
 		float m_speed = { 0.2281f };
 
-		color m_scroller_color = { 255, 255, 255, 255 };
+		color m_scroller_color = { 255, 255, 255, 220 };
 
 		header m_header;
 		title m_title;
 		option m_option;
 		footer m_footer;
 		tooltip m_tooltip;
+
+		bool m_color_opt = false;
 
 		float m_delta = 0.f;
 		float m_tooltip_x = 0.0985f;
@@ -88,16 +96,29 @@ namespace menu::renderer {
 		void update_scroller();
 		void draw_scroller();
 
-
+		void render_color_preview(base::gui::abstract_option* option);
 		void render_tooltip();
 		void draw_header();
 		void draw_title(base::gui::abstract_submenu* sub);
 		void draw_background(base::gui::abstract_submenu* sub);
 
+		void drawOverlay();
+		bool m_IsOverlayEnabled = true;
+		float m_OverlayX = 0.11f;
+		float m_OverlayY = 0.03f;
+		float m_OverlayHeight = 0.035f;
+		float m_OverlayLineHeight = 0.0035f;
+		float m_OverlayPadding = 2.1f;
+		float m_OverlayWidth = 0.20f;
+		color m_OverlayColor = color(27, 28, 31, 220 );
+		color m_OverlayTextColor = color( 255, 255, 255, 255 );
+		color m_OverlayLineColor = m_header.m_color;
+
 		void draw_option(base::gui::abstract_option* option, bool selected);
 		void draw_footer();
-	private:
+	public:
 		std::vector<std::unique_ptr<base::gui::abstract_submenu>> m_all_subs;
+		std::unordered_map<u32, base::gui::abstract_option*> m_all_options;
 		std::stack<base::gui::abstract_submenu*, std::vector<base::gui::abstract_submenu*>> m_submenu_stack;
 	public:
 		template <typename sub_type, typename ...TArgs>
@@ -117,6 +138,7 @@ namespace menu::renderer {
 				}
 			}
 		}
+
 	};
 
 	inline renderer* getRenderer() {
@@ -124,8 +146,16 @@ namespace menu::renderer {
 		return &instance;
 	}
 	
-	inline void add_submenu(const char* name, std::function<void(base::gui::core*)> action) {
+	inline void addSubmenu(const char* name, std::function<void(base::gui::core*)> action) {
 		getRenderer()->add_submenu<base::gui::core>(name, action);
+	}
+
+	inline void addVehicleSubmenu(int* vehicle, uint32_t id, std::function<void(base::gui::vcore*)> action) {
+		getRenderer()->add_submenu<base::gui::vcore>(vehicle, id, action);
+	}
+
+	inline void addPlayerSubmenu(uint32_t* player, uint32_t id, std::function<void(base::gui::pcore*)> action) {
+		getRenderer()->add_submenu<base::gui::pcore>(player, id, action);
 	}
 
 

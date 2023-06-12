@@ -32,4 +32,79 @@ using fnptr = std::add_pointer_t<t>;
 
 
 
+namespace rage::types {
+
+    struct guid_pool {
+    public:
+        char* m_data;
+        int8_t* m_flags;
+        uint32_t m_max;
+        uint32_t m_size;
+        uint32_t m_count;
+
+        template<typename T>
+        T* get(int index) {
+            if (m_flags[index] < 0) return nullptr;
+            return (T*)(m_data + (index * m_size));
+        }
+    };
+
+    struct store_entry {
+        uint32_t m_handle;
+        uint32_t m_flag;
+    };
+
+    struct store_module {
+        char _0x0000[0x8];
+        uint32_t m_base_index;
+        char _0x000C[0x2C];
+        guid_pool m_pool;
+    };
+
+    struct store_module_manager {};
+
+    struct store_manager {
+        store_entry* m_entries;
+        char _0x0008[0x1B0];
+        store_module_manager m_module;
+    };
+
+}
+
+namespace rage {
+
+
+
+#pragma pack(push, 1)
+    class hash_list
+    {
+    public:
+        std::uint64_t* list; //0x0000
+        std::int32_t capacity; //0x0008
+        char pad_000C[4]; //0x000C
+        std::int32_t free; //0x0010
+        char pad_0014[4]; //0x0014
+        std::uint64_t item_size; //0x0018
+        char pad_0020[16]; //0x0020
+        std::uint32_t* data; //0x0030
+        char pad_0038[16]; //0x0038
+        std::int32_t occupied; //0x0048
+        const std::uint64_t get(std::int32_t index) const {
+            if ((this->data[index >> 5] >> (index & 0x1F)) & 1)
+                return this->list[index];
+            return NULL;
+        }
+    }; // Size: 0x004C
+#pragma pack(pop)
+
+  
+}
+
+namespace rage {
+    struct weapon_hash_list {
+        uint64_t m_count;
+        uint64_t m_list;
+    };
+}
+
 #endif 

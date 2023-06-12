@@ -12,11 +12,11 @@
 #include "util/hooking/script.h"
 #include "util/fiber.h"
 #include "util/dirs.h"
+#include "gui/d3d.h"
 namespace base::core {
 
 
 	DWORD WINAPI unload(LPVOID handle) {
-		
 		hooking::cleanup();
 		util::threads::getThreadPool()->Cleanup();
 		util::fiber::cleanup();
@@ -34,7 +34,7 @@ namespace base::core {
 		}
 
 		util::log::Load();
-		LOG_SUCCESS("Neon Initializing");
+		LOG("Welcome to Aether - Grand Theft Auto V");
 
 		if (!(g_window = FindWindowA(("grcWindow"), NULL))) {
 			int timeout = 0;
@@ -62,9 +62,12 @@ namespace base::core {
 			std::this_thread::yield();
 		}
 
+
 		if (!invoker::invoker::handlers_cached()) {
 			invoker::invoker::cache_handlers();
 		}
+
+		d3d::initialize();
 
 		if (!base::hooks::hooks()) {
 			LOG_WARN("Failed to load hooks, unloading...");
@@ -74,10 +77,11 @@ namespace base::core {
 
 		auto script_hooks = std::make_unique<script::native_hooks>();
 
+		LOG_SUCCESS("Loaded in-game patterns");
+		LOG_SUCCESS("Loaded in-game hooks");
 
 		g_running = true;
-
-		LOG_SUCCESS("Neon Initialized");
+	
 
 		while (g_running) {
 			if (GetAsyncKeyState(VK_END)) {

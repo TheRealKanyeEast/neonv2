@@ -52,17 +52,17 @@ namespace util::dirs {
 		SHGetFolderPathA(NULL, CSIDL_LOCAL_APPDATA, NULL, SHGFP_TYPE_CURRENT, tmp);
 
 		sprintf_s(m_paths[PATH_TMP], ("%s\\"), tmp);
-		sprintf_s(m_paths[PATH_AETHER], ("%s\\aether"), m_paths[PATH_DOCUMENTS]);
+		sprintf_s(m_paths[PATH_AETHER], ("%s\\neon"), m_paths[PATH_DOCUMENTS]);
 		sprintf_s(m_paths[PATH_GFX], ("%s\\fonts\\"), m_paths[PATH_AETHER]);
 		sprintf_s(m_paths[PATH_TEXTURES], ("%s\\textures\\"), m_paths[PATH_AETHER]);
 		sprintf_s(m_paths[PATH_LOG], create_string(m_paths[PATH_AETHER], ("log.txt")).c_str());
-		sprintf_s(m_paths[PATH_CONFIG], create_string(m_paths[PATH_AETHER], ("config.json")).c_str());
 		sprintf_s(m_paths[PATH_GFX], ("%s\\fonts\\"), m_paths[PATH_AETHER]);
 
 
 		bool success = create_directories({
 			m_paths[PATH_AETHER],
 			create_string(m_paths[PATH_AETHER], ("textures")),
+			create_string(m_paths[PATH_AETHER], ("fonts"))
 			});
 
 		if (success == false) return success;

@@ -1,16 +1,18 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "log.h"
 #include "Util.h"
+#include "util/fiber.h"
 namespace util::log {
 
 	void log::Load() {
 		AllocConsole();
-		SetConsoleTitleA("neon | vali is gay");
+		SetConsoleTitleA("Aether");
 
 		FILE* stream;
 		freopen_s(&stream, "CONOUT$", "w", stdout);
 
 		m_console.open("CONOUT$");
+		SetConsoleMode(GetStdHandle(-11), ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 
 		m_path.append(Util::GetDocumentsPath());
 		m_path.append("neon");
@@ -25,6 +27,8 @@ namespace util::log {
 	}
 
 	void log::Cleanup() {
+		LOG("Goodbye <3");
+		util::fiber::sleep(5000);
 		fclose(stdout);
 		FreeConsole();
 		m_console.clear();
@@ -34,7 +38,8 @@ namespace util::log {
 	}
 
 	void set_color(int color) {
-		SetConsoleTextAttribute(GetStdHandle(-11), color);
+		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+		SetConsoleTextAttribute(hConsole, color);
 	}
 
 	void log::Log(int color, const char* type, const char* message, ...) {
@@ -49,14 +54,15 @@ namespace util::log {
 
 		va_end(args);
 
-		set_color(color);
 		auto time = std::time(nullptr);
 		auto tm = std::localtime(&time);
 
 		char tag[64] = {};
 		snprintf(tag, sizeof(tag) - 1, "[%s] ", type);
 
-		m_file << tag << buffer.get() << std::endl;
-		m_console << tag << buffer.get() << std::endl;
+		std::cout << forgound_color::Code(color) << tag << buffer.get() << std::endl;
+
+		m_file << forgound_color::Code(color) << tag << buffer.get() << std::endl;
+		//m_console << forgound_color::Code(color) << tag << buffer.get() << std::endl;
 	}
 }

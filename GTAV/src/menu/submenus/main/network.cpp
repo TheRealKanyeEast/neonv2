@@ -6,7 +6,7 @@ using namespace base::gui;
 namespace menu {
 
 	void network_menu::render() {
-		renderer::add_submenu("Network", [](core* core) {
+		renderer::addSubmenu("Network", [](core* core) {
 			core->add_option(submenu_option("Players")
 				.set_target("Players"));
 		});

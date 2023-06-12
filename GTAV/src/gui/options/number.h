@@ -15,6 +15,7 @@ namespace base::gui {
 		using base = base_option<number_option<Type>>;
 		using display_type = std::conditional_t<sizeof(Type) == 1, std::uint32_t, Type>;
 		std::function<void()> m_function;
+		std::function<void()> m_on_hover = []() {};
 		std::string m_name = "";
 	public:
 		explicit number_option(const char* text) {
@@ -30,6 +31,11 @@ namespace base::gui {
 
 		number_option& add_click(std::function<void()> action = [] {}) {
 			base::set_action(std::move(action));
+			return *this;
+		}
+
+		number_option& add_hover(std::function<void()> function) {
+			m_on_hover = function;
 			return *this;
 		}
 
@@ -68,6 +74,7 @@ namespace base::gui {
 		}
 
 		void handle_action(eOptionAction action) override {
+			m_on_hover();
 			if (action == eOptionAction::left_click) {
 				if (*m_number - m_step < m_min)
 					*m_number = m_max;
@@ -85,6 +92,18 @@ namespace base::gui {
 					std::invoke(base::m_action);
 			}
 			else if (action == eOptionAction::click) {
+				static bool active = false;
+				MISC::DISPLAY_ONSCREEN_KEYBOARD(true, (char*)"Input", (char*)"", (char*)"", (char*)"", (char*)"", (char*)"", 20);
+				while (MISC::UPDATE_ONSCREEN_KEYBOARD() == 0) {
+					active = true;
+					menu::renderer::getRenderer()->reset_keys();
+					util::fiber::go_to_main();
+				}
+				active = false;
+				if (!MISC::GET_ONSCREEN_KEYBOARD_RESULT())
+					return;
+
+				*m_number = std::atoi(MISC::GET_ONSCREEN_KEYBOARD_RESULT());
 				if (base::m_action)
 					std::invoke(base::m_action);
 			}

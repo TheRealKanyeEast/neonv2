@@ -1,14 +1,14 @@
 #pragma once
 
-#define LOG(fmt, ...) util::log::Log(util::log::foreground::GRAY, "Info", fmt, ##__VA_ARGS__);
-#define LOG_WARN(fmt, ...) util::log::Log(util::log::foreground::DARKYELLOW, "Warning", fmt, ##__VA_ARGS__);
-#define LOG_ERROR(fmt, ...) util::log::Log(util::log::foreground::RED, "Error", fmt, ##__VA_ARGS__);
-#define LOG_SUCCESS(fmt, ...) util::log::Log(util::log::foreground::GREEN, "Success", fmt, ##__VA_ARGS__);
+#define LOG(fmt, ...) util::log::Log(util::log::forgound_color::Code::Generic, "Inf", fmt, ##__VA_ARGS__);
+#define LOG_WARN(fmt, ...) util::log::Log(util::log::forgound_color::Code::Developer, "Wrn", fmt, ##__VA_ARGS__);
+#define LOG_ERROR(fmt, ...) util::log::Log(util::log::forgound_color::Code::Error, "Err", fmt, ##__VA_ARGS__);
+#define LOG_SUCCESS(fmt, ...) util::log::Log(util::log::forgound_color::Code::Success, "Suc", fmt, ##__VA_ARGS__);
 
-#define LOG_CUSTOM(tag, fmt, ...) util::log::Log(util::log::foreground::GRAY, tag, fmt, ##__VA_ARGS__);
-#define LOG_CUSTOM_WARN(tag, fmt, ...) util::log::Log(util::log::foreground::DARKYELLOW, tag, fmt, ##__VA_ARGS__);
-#define LOG_CUSTOM_ERROR(tag, fmt, ...) util::log::Log(util::log::foreground::RED, tag, fmt, ##__VA_ARGS__);
-#define LOG_CUSTOM_SUCCESS(tag, fmt, ...) util::log::Log(util::log::foreground::GREEN, tag, fmt, ##__VA_ARGS__);
+#define LOG_CUSTOM(tag, fmt, ...) util::log::Log(util::log::forgound_color::Code::Generic, tag, fmt, ##__VA_ARGS__);
+#define LOG_CUSTOM_WARN(tag, fmt, ...) util::log::Log(util::log::forgound_color::Code::Warning, tag, fmt, ##__VA_ARGS__);
+#define LOG_CUSTOM_ERROR(tag, fmt, ...) util::log::Log(util::log::forgound_color::Code::Error, tag, fmt, ##__VA_ARGS__);
+#define LOG_CUSTOM_SUCCESS(tag, fmt, ...) util::log::Log(util::log::forgound_color::Code::Success, tag, fmt, ##__VA_ARGS__);
 
 namespace util::log {
 	namespace foreground {
@@ -52,6 +52,46 @@ namespace util::log {
 			WHITE = BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE,
 		};
 	};
+
+	namespace forgound_color
+	{
+		enum Code
+		{
+			Default = 0,
+			Generic = 243,
+			Success = 84,
+			Error = 196,
+			Warning = 3,
+			Developer = 26,
+		};
+
+		inline std::ostream& operator<<(std::ostream& os, Code code)
+		{
+			return os << "\033[38;5;" << static_cast<int>(code) << "m";
+		}
+	}
+
+	namespace background_color {
+		enum Code {
+			Default = 49,
+			Black = 40,
+			Red = 41,
+			Green = 42,
+			Yellow = 43,
+			Blue = 44,
+			Magenta = 45,
+			Cyan = 46,
+			LightGray = 47,
+			DarkGray = 100,
+			LightRed = 101,
+			LightGreen = 102,
+			LightYellow = 103,
+			LightBlue = 104,
+			LightMagenta = 105,
+			LightCyan = 106,
+			White = 107
+		};
+	}
 
 	void Load();
 	void Log(int color, const char* type, const char* message, ...);

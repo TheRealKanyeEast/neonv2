@@ -189,9 +189,6 @@
     <ClInclude Include="src\util\dirs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\rage\classes\classes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\rage\engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -219,10 +216,166 @@
     <ClInclude Include="src\util\fiber_pool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\gui\util\hotkeys.h">
+    <ClInclude Include="src\gui\util\notify.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\gui\util\notify.h">
+    <ClInclude Include="src\util\disassembler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gui\util\texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\sysMemAllocator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\TlsContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\RTTI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\grcLockedTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\grcRenderTarget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\grcTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\grcTextureFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\grcTextureStore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\pgDictionaryPool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\pgDictionary.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\includes\STB\STBImage.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\includes\STB\STBImageWrite.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gui\d3d.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gui\options\break.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\menu\submenus\main\spawner\spawner_manage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\menu\submenus\main\spawner\spawner_settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\menu\util\players.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\CPed.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\CPedBoneInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\CPedWeaponManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\CWeaponInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\CItemInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\CPedIntelligence.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\CPedInventory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\CPlayerInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\GamerInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\PeerInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\GamerHandle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\NetSocketAddress.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\CPhysical.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\CEntity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\fwExtensible.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\fwEntity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\CNavigation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\fwDrawData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\NetObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\SyncTree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\CNetGamePlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\NetPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\CNonPhysicalPlayerData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\NonPhysicalPlayerDataBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\ClanData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\SessionInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\CPedFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rage\classes\Vehicle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gui\options\color.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\menu\submenus\main\settings\color.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\menu\util\scr_global.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\menu\submenus\main\weapon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\menu\util\lists.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\menu\submenus\main\vehicle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -317,10 +470,31 @@
     <ClCompile Include="src\util\fiber_pool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\gui\util\hotkeys.cpp">
+    <ClCompile Include="src\gui\util\notify.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\gui\util\notify.cpp">
+    <ClCompile Include="src\gui\util\texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gui\d3d.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\menu\submenus\main\spawner\spawner_manage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\menu\submenus\main\spawner\spawner_settings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\menu\util\players.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\menu\submenus\main\settings\color.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\menu\submenus\main\weapon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\menu\submenus\main\vehicle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

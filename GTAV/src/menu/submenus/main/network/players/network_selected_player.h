@@ -7,7 +7,7 @@
 #include "gui/options/number.h"
 #include "gui/options/toggle.h"
 #include "gui/options/scroll.h"
-
+#include "menu/util/players.h"
 
 namespace menu {
 	class network_selected_player_menu {
@@ -19,5 +19,13 @@ namespace menu {
 	static network_selected_player_menu* getNetworkSelectedPlayerMenu() {
 		static network_selected_player_menu instance;
 		return &instance;
+	}
+
+	namespace players::selected::vars {
+		struct variables {
+			bool m_spectate;
+		};
+
+		extern variables m_vars;
 	}
 }

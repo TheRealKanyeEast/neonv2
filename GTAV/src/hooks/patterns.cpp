@@ -13,10 +13,11 @@ namespace patterns {
 
 	rage::scrNativeRegistrationTable* native_registration_table;
 	rage::scrProgramTable* script_program;
-
 	rage::types::store_manager* store_manager;
-
 	rage::hash_list* hash_list;
+	rage::weapon_hash_list* weapon_components;
+	rage::weapon_hash_list* weapon_info;
+	CPedFactory** ped_factory;
 
 	uint64_t queue_dependency;
 	PVOID interval_check_func;
@@ -36,4 +37,17 @@ namespace patterns {
 	uint64_t get_store_module_extension;
 	uint64_t register_streaming_file;
 	uint64_t request_streaming_file;
+
+
+	setup_dictionary_t setup_dictionary;
+	add_texture_to_dictionary_t add_texture_to_dictionary;
+	setup_store_item_t setup_store_item;
+	add_dictionary_to_pool_t add_dictionary_to_pool;
+	rage::grcTextureStore* texture_store;
+	rage::grcTextureFactory** texture_factory;
+	get_net_game_player get_net_player;
+	IDXGISwapChain** swapchain;
+
+	uint64_t format_game_string;
+	uint64_t get_game_string_line_count;
 }

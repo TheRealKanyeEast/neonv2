@@ -32,5 +32,6 @@ enum class eOptionFlag {
 	keyboard_option = (1 << 6),
 	break_option = (1 << 7),
 	toggle_scroll_option = (1 << 8),
-	vehicle_option = (1 << 9)
+	vehicle_option = (1 << 9),
+	color_option = (1 << 10)
 };

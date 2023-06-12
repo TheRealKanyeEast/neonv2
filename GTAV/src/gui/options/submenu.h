@@ -73,4 +73,5 @@ namespace base::gui {
 		std::vector<std::unique_ptr<abstract_option>> m_options;
 		std::size_t m_selected_option{};
 	};
+
 }

@@ -25,7 +25,7 @@ namespace hooking {
 
 					MH_STATUS hook_status = MH_CreateHook((void*)address, function, (void**)trampoline);
 					if (hook_status == MH_OK || hook_status == MH_ERROR_ALREADY_CREATED) {
-						LOG_CUSTOM_WARN("Hook", "Hooking %s", name)
+						//LOG_CUSTOM_WARN("Hook", "Hooking %s", name)
 						hook_status = MH_EnableHook((void*)address);
 						if (hook_status == MH_OK) {
 							
@@ -38,7 +38,7 @@ namespace hooking {
 
 							m_detours.push_back(detour);//update detour vector
 
-							LOG_CUSTOM_SUCCESS("Hook", "Hooked %s", name);
+							//LOG_CUSTOM_SUCCESS("Hook", "Hooked %s", name);
 							return true;
 						}
 					}

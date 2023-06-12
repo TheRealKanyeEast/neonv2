@@ -46,10 +46,10 @@ namespace base::gui
 			MemoryStringStream stream(base::m_right_text);
 			if (m_data) {
 				stream << m_data[*m_position];
-				stream << " ~c~[" << *m_position + 1 << " / " << m_data_size << "]";
+				stream << " ~c~[" << *m_position + 1 << "/" << m_data_size << "]";
 			}
 			else {
-				stream << "Unknown ~c~[0 / 0]";
+				stream << "Unknown ~c~[0/0]";
 			}
 			return base::get_right_text();
 		}
@@ -75,6 +75,10 @@ namespace base::gui
 					if (base::m_action)
 						std::invoke(base::m_action);
 				}
+			}
+			else if (action == eOptionAction::click) {
+				if (base::m_action)
+					std::invoke(base::m_action);
 			}
 			if (m_data) {
 				base::handle_action(action);

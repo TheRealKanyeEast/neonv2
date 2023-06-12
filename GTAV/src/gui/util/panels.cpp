@@ -33,7 +33,8 @@ namespace menu {
         g_panel_pos.y = renderer::getRenderer()->m_position.y - 0.006f;
 
         render::draw_rect({ g_panel_pos.x, render::get_rect_base(m_title_height, g_panel_base + 0.01f) }, { m_width, m_title_height + 0.001f }, m_back_ground);
-        render::draw_rect({ g_panel_pos.x, render::get_rect_base(m_title_height, g_panel_base - 0.002f) }, { m_width, 0.004f }, menu->m_header.m_color);
+        
+        render::draw_rect({ g_panel_pos.x, render::get_rect_base(m_title_height, g_panel_base - 0.004f) }, { m_width, 0.004f }, menu->m_header.m_color);
 
         render::draw_text(title.c_str(), eJustify::JUSTIFY_LEFT, { g_panel_pos.x, render::get_rect_base(m_title_height, g_panel_base + 0.013f) }, m_title_font_scale, (int)m_title_font, m_padding);
         g_panel_base += m_title_height + 0.001;

@@ -7,7 +7,7 @@
 #include "gui/options/number.h"
 #include "gui/options/toggle.h"
 #include "gui/options/scroll.h"
-
+#include "gui/options/break.h"
 namespace menu {
 	class network_players_menu {
 	public:
@@ -22,7 +22,7 @@ namespace menu {
 
 	namespace players::vars {
 		struct variables {
-			int m_selected_player;
+			uint32_t m_selected_player;
 		};
 
 		extern variables m_vars;

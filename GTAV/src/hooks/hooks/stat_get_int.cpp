@@ -7,14 +7,17 @@
 #include "menu/submenus/main/player.h"
 #include "menu/submenus/main/spawner.h"
 #include "menu/submenus/main/network.h"
+#include "menu/submenus/main/weapon.h"
+#include "menu/submenus/main/vehicle.h"
 #include "util/fiber.h"
 #include "features/features.h"
 #include "gui/util/fonts.h"
+#include "gui/util/texture.h"
 #include "gui/util/panels.h"
 #include "util/fiber_pool.h"
-#include "gui/util/hotkeys.h"
 #include "gui/renderer.h"
 #include "gui/util/notify.h"
+#include "menu/util/players.h"
 
 namespace base::hooks {
 	void stat_get_int(rage::scrNativeCallContext* context) {
@@ -32,15 +35,15 @@ namespace base::hooks {
 
 			if (!call_once_loaded) {
 				try {
-					call_once_loaded = true;
+					menu::player::update();
 
 					util::fiber::load();
 					util::fiber::pool::load();
 					fonts::load();
+					menu::textures::initialize();
 
 					util::fiber::add("F_BASE", [] {
 						menu::notify::get_notify()->update();
-						menu::get_hotkey()->update();
 					});
 
 					util::fiber::add("F_FEATURES", [] {
@@ -53,7 +56,15 @@ namespace base::hooks {
 						menu::getPlayerMenu()->update();
 						menu::getSpawnerMenu()->update();
 						menu::getNetworkMenu()->update();
-					});		
+						menu::getWeaponMenu()->update();
+						menu::getVehicleMenu()->update();
+					});	
+
+					util::fiber::add("F_UTIL", [] {
+						menu::player::update();;
+					});
+
+					call_once_loaded = true;
 		
 				}
 				catch (std::exception& exception) {

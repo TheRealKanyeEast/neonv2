@@ -7,6 +7,7 @@
 #include "gui/options/number.h"
 #include "gui/options/toggle.h"
 #include "gui/options/scroll.h"
+#include "gui/options/break.h"
 
 namespace menu {
 	class spawner_menu {
@@ -23,6 +24,7 @@ namespace menu {
 	namespace spawner::vars {
 		struct variables {
 			int m_selected_vehicle_class;
+			std::string m_spawn_by_name = "";
 		};
 
 		extern variables m_vars;

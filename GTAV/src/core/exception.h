@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "util/Log.h"
+
 namespace base::core::exception::handler {
 
     enum class exception_access_vioaltion_types : ULONG_PTR {

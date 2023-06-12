@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "abstract_option.h"
-
+#include "gui/types.h"
 namespace base::gui {
 	template <typename T>
 	class base_option : public abstract_option {
@@ -15,6 +15,11 @@ namespace base::gui {
 		const char* get_description() override {
 			return &m_description[0];
 		}
+
+		color get_color() override {
+			return m_color;
+		}
+
 		void handle_action(eOptionAction action) override {
 			if (action == eOptionAction::click) {
 				if (m_action) {
@@ -51,10 +56,18 @@ namespace base::gui {
 			return static_cast<T&>(*this);
 		}
 
+		T& set_color(color col) {
+			m_color = col;
+			return static_cast<T&>(*this);
+		}
+
+
+
 	protected:
 		std::function<void()> m_action;
 		char m_left_text[128] = {};
 		char m_right_text[128] = {};
 		char m_description[1024] = {};
+		color m_color;
 	};
 }

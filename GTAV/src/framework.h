@@ -4,6 +4,7 @@
 #define WIN32_LEAN_AND_MEAN  
 #define NOMINMAX  
 #define _CRT_SECURE_NO_WARNINGS
+#define STB_IMAGE_IMPLEMENTATION
 #pragma warning(disable : 4996 4091 4838 4311 4302 4191 4018 4305 4800 4804 4305 4551 4390 4715)
 
 //include headers
@@ -40,7 +41,10 @@
 #include <utility>
 #include <xutility>
 #include <conio.h>
-
+#include <wrl/client.h>
+#include <winternl.h>
+#include <d3d11.h>
+#include <random>
 //include libs
 #pragma comment(lib, "winmm.lib")
 
