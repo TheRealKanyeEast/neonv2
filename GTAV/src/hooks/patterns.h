@@ -7,6 +7,9 @@
 #include "rage/classes/grcTextureStore.h"
 #include "rage/classes/grcTextureFactory.h"
 #include "rage/classes/CPedFactory.h"
+#include "rage/invoker/types.h"
+#include "memory/pattern.h"
+
 namespace patterns {
 	extern rage::scrNativeRegistrationTable* native_registration_table;
 	extern rage::scrProgramTable* script_program;
@@ -64,4 +67,15 @@ namespace patterns {
 	extern uint64_t get_game_string_line_count;
 
 	extern IDXGISwapChain** swapchain;
+
+	extern bool* is_session_started;
+
+	using handle_to_ptr_t = rage::CDynamicEntity* (*)(Entity);
+	extern handle_to_ptr_t handle_to_ptr;
+	
+	using request_control_t = void (*)(rage::netObject* net_object);
+	extern request_control_t request_control;
+
+	extern memory::byte_patch* max_wanted_level;
+	extern memory::byte_patch* max_wanted_level_2;
 }

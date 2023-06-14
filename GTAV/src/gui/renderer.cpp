@@ -5,6 +5,9 @@
 #include "rage/classes/enums.h"
 #include "util/timer.h"
 #include "gui/util/panels.h"
+#include <gui/util/notify.h>
+#include <menu/submenus/main.h>
+#include "util/json.h"
 
 namespace menu::renderer {
 	bool pushed_options = false;
@@ -105,6 +108,14 @@ namespace menu::renderer {
 		}
 	}
 
+	void update_last_key_pressed() {
+		for (int i = 0; i > 255; i++) {
+			if (GetAsyncKeyState(i)) {
+				m_last_key_pressed = i;
+			}
+		}
+	}
+
 	bool is_key_held(bool keyState, bool& keyHeld, Timer& holdTimer, Timer& scrollTimer, std::chrono::milliseconds initialDelay, std::chrono::milliseconds accelerationDelay)
 	{
 		if (keyState) {
@@ -133,10 +144,16 @@ namespace menu::renderer {
 
 
 	void renderer::render() {
+
+
+
+
 		//fonts::gfx::load();
+		update_hotkeys();
 		check_keys();
 		handle_keys();
-		drawOverlay();
+		//drawOverlay();
+		update_last_key_pressed();
 		if (m_opened) {
 			if (!pushed_options) {
 				util::fiber::sleep(50);
@@ -174,6 +191,8 @@ namespace menu::renderer {
 		}
 	}
 
+
+
 	void renderer::update_scroller() {
 		if (m_current != m_target)
 			m_current = m_current * (1 - m_speed) + m_target * m_speed;
@@ -181,15 +200,17 @@ namespace menu::renderer {
 			m_current = m_target;
 	}
 
+
+
 	void renderer::reset_keys() {
 		m_open_key = false, m_back_key = false, m_enter_key = false, m_up_key = false; m_down_key = false,
-			m_left_key = false, m_right_key = false;
+			m_left_key = false, m_right_key = false; m_hotkey = false;
 	}
 	void renderer::check_keys() {
 		reset_keys();
 		m_open_key = is_key_pressed(VK_F4) || (PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlScriptRB) && PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendX)), m_back_key = is_key_pressed(VK_BACK) || PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendCancel), m_enter_key = is_key_pressed(VK_RETURN) || PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendAccept),
 			m_up_key = is_key_pressed(VK_UP) || PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendUp), m_down_key = is_key_pressed(VK_DOWN) || PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendDown), m_left_key = is_key_pressed(VK_LEFT) || PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendLeft),
-			m_right_key = is_key_pressed(VK_RIGHT) || PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendRight);
+			m_right_key = is_key_pressed(VK_RIGHT) || PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendRight); m_hotkey = is_key_pressed(VK_F8);
 	}
 	void renderer::handle_keys() {
 		if (is_key_pressed(VK_F12)) {
@@ -215,6 +236,13 @@ namespace menu::renderer {
 			else {
 				m_submenu_stack.pop();
 			}
+		}
+
+		static Timer hotkeyTimer(0ms);
+		hotkeyTimer.SetDelay(std::chrono::milliseconds(m_back_delay));
+		if (m_opened && m_hotkey && hotkeyTimer.Update()) {
+			AUDIO::PLAY_SOUND_FRONTEND(-1, "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+			m_hotkey_pressed = !m_hotkey_pressed;
 		}
 
 		if (m_opened && !m_submenu_stack.empty()) {
@@ -324,7 +352,16 @@ namespace menu::renderer {
 	void renderer::draw_background(base::gui::abstract_submenu* sub) {
 		GRAPHICS::SET_SCRIPT_GFX_DRAW_ORDER(1);
 		int visible_options = sub->get_options_size() > m_max_vis_options ? m_max_vis_options : sub->get_options_size();
-		render::draw_rect({ m_position.x, m_draw_base_y + ((m_option.m_height * visible_options) / 2.f) }, { m_width, m_option.m_height * visible_options }, m_option.m_color);
+
+		float bg_height = m_option.m_height * visible_options;
+		m_bg_target = bg_height;
+
+		if (m_bg_current != m_bg_target)
+			m_bg_current = m_bg_current * (1 - m_speed) + m_bg_target * m_speed;
+		if ((m_bg_current > m_bg_target - 0.0005) && (m_bg_current < m_bg_target + 0.0005))
+			m_bg_current = m_bg_target;
+
+		render::draw_rect({ m_position.x, m_draw_base_y + (m_bg_current / 2.f) }, { m_width, m_bg_current }, m_option.m_color);
 	}
 
 	void renderer::draw_option(base::gui::abstract_option* option, bool selected) {
@@ -339,8 +376,10 @@ namespace menu::renderer {
 		
 		if (selected) {
 			if (!strcmp(sub->get_name(), "Players")) {
-				menu::g_panel_spacing = 0.22;
-				menu::player_info_panel(get_id_from_name(option->get_left_text()));
+				if (sub->get_selected_option() != 0 && sub->get_selected_option() != 1) {
+					g_panel_spacing = 0.06f;
+					menu::player_info_panel(get_id_from_name(option->get_left_text()));
+				}
 			}
 		}
 
@@ -375,6 +414,37 @@ namespace menu::renderer {
 					m_draw_base_y + (m_option.m_height / 2.f), }, { size.x, size.y }, selected ? m_option.m_selected_text_color : m_option.m_text_color, 0.0f);
 			}
 		}
+
+		if (option->get_flag(eOptionFlag::toggle_number_option)) {
+			render::draw_text(option->get_left_text(), JUSTIFY_LEFT, { m_position.x, y_pos }, m_option.m_font_scale, m_option.m_font, m_option.m_padding, selected ? m_option.m_selected_text_color : m_option.m_text_color);
+			auto size = render::get_sprite_scale(0.045);
+			if (m_toggled_on) {
+				render::draw_sprite({ "textures", "toggle_on" }, { m_position.x + (m_width / m_option.m_padding.x - 0.0045f),
+					m_draw_base_y + (m_option.m_height / 2.f), }, { size.x, size.y }, selected ? m_option.m_selected_text_color : m_option.m_text_color, 0.0f);
+			}
+			else {
+				render::draw_sprite({ "textures", "toggle_off" }, { m_position.x + (m_width / m_option.m_padding.x - 0.0045f),
+					m_draw_base_y + (m_option.m_height / 2.f), }, { size.x, size.y }, selected ? m_option.m_selected_text_color : m_option.m_text_color, 0.0f);
+			}
+
+			render::draw_text(option->get_right_text(), JUSTIFY_RIGHT, { m_position.x + test, y_pos }, m_option.m_font_scale, m_option.m_font, { m_option.m_padding.x - test, m_option.m_padding.y }, selected ? m_option.m_selected_text_color : m_option.m_text_color);
+		}
+
+		if (option->get_flag(eOptionFlag::toggle_scroll_option)) {
+			render::draw_text(option->get_left_text(), JUSTIFY_LEFT, { m_position.x, y_pos }, m_option.m_font_scale, m_option.m_font, m_option.m_padding, selected ? m_option.m_selected_text_color : m_option.m_text_color);
+			auto size = render::get_sprite_scale(0.045);
+			if (m_toggled_on) {
+				render::draw_sprite({ "textures", "toggle_on" }, { m_position.x + (m_width / m_option.m_padding.x - 0.0045f),
+					m_draw_base_y + (m_option.m_height / 2.f), }, { size.x, size.y }, selected ? m_option.m_selected_text_color : m_option.m_text_color, 0.0f);
+			}
+			else {
+				render::draw_sprite({ "textures", "toggle_off" }, { m_position.x + (m_width / m_option.m_padding.x - 0.0045f),
+					m_draw_base_y + (m_option.m_height / 2.f), }, { size.x, size.y }, selected ? m_option.m_selected_text_color : m_option.m_text_color, 0.0f);
+			}
+
+			render::draw_text(option->get_right_text(), JUSTIFY_RIGHT, { m_position.x + test, y_pos }, m_option.m_font_scale, m_option.m_font, { m_option.m_padding.x - test, m_option.m_padding.y }, selected ? m_option.m_selected_text_color : m_option.m_text_color);
+		}
+
 		if (option->get_flag(eOptionFlag::color_option)) {
 			m_color_opt = true;
 			auto size = render::get_sprite_scale(0.02);
@@ -430,7 +500,112 @@ namespace menu::renderer {
 			sub->set_selected_option(sub->get_options_size() - 1);
 		}
 
+		if (m_hotkey_pressed && selected && option->get_bool_pointer()) {
+			render::draw_text("Press any key to set hotkey...", JUSTIFY_CENTER, { 0.5f, 0.5f }, 0.5f, 0, { 0, 0}, { 255, 255, 255, 255 }, false, true);
+
+			static int delay_tick;
+			static bool waiting_for_key = true;
+
+			if (GetTickCount64() - delay_tick > 150 && waiting_for_key) {
+				for (int key = 0; key < 256; key++) {
+					if (is_key_pressed(key) && key != VK_F8) {
+						m_last_key_pressed = key;
+						waiting_for_key = false;
+						break;
+					}
+				}
+			}
+
+			if (!waiting_for_key) {
+				m_bool_hotkeys.insert({ rage::joaat(option->get_left_text()), { m_last_key_pressed, option->get_bool_pointer(), option->get_left_text() } });
+
+				menu::notify::stacked(std::format("Assigned Option {} To Hotkey {}", option->get_left_text(), g_key_names[m_last_key_pressed]));
+
+				m_hotkey_pressed = false;
+				delay_tick = GetTickCount64();
+				waiting_for_key = true;
+			}
+		}
+
 		m_draw_base_y += m_option.m_height;
+	}
+
+	void renderer::update_hotkeys() {
+		if (m_bool_hotkeys.empty()) {
+			return; // Or handle the case appropriately
+		}
+
+		static int delay_tick;
+		for (auto pair : m_bool_hotkeys) {
+			if (GetTickCount64() - delay_tick > 500) {
+				if (is_key_pressed(pair.second.m_key)) {
+					*pair.second.m_pointer = !*pair.second.m_pointer;
+
+					AUDIO::PLAY_SOUND_FRONTEND(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", FALSE);
+
+					if (*pair.second.m_pointer) {
+						menu::notify::stacked(std::format("Pressed {}, Enabled {},", g_key_names[pair.second.m_key], pair.second.m_name).c_str());
+					}
+					else {
+						menu::notify::stacked(std::format("Pressed {}, Disabled {},", g_key_names[pair.second.m_key], pair.second.m_name).c_str());
+					}
+
+					delay_tick = GetTickCount64();
+				}
+			}
+		}
+	}
+
+	void renderer::load_hotkeys() {
+		using jsonf = nlohmann::json;
+		static jsonf loader;
+		try {
+			std::filesystem::path cheat_path;
+			cheat_path.append(Util::GetDocumentsPath());
+			cheat_path.append("neon");
+			cheat_path.append("hotkeys.json");
+			std::ifstream file(cheat_path);
+			if (!file.good()) {
+				return;
+			}
+			file >> loader;
+			LOG("Found %d Hotkeys", loader.size());
+			m_bool_hotkeys;
+			for (auto& item : loader.items()) {
+				const std::string& key = item.key();
+				u32 id = std::stoul(key.c_str());
+				int hotkey = item.value()["Hotkey"].get<int>();
+				if (get_option_pointer(id)) {
+					if (get_option_pointer(id)->get_bool_pointer()) {
+						m_bool_hotkeys.insert({ id, { hotkey, get_option_pointer(id)->get_bool_pointer(), get_option_pointer(id)->get_left_text()} });
+					}
+				}
+			}
+		}
+
+		catch (const std::exception& e) { // catch any exception derived from std::exception
+			LOG_ERROR(e.what());
+		}
+	}
+
+	void renderer::save_hotkeys() {
+		if (m_bool_hotkeys.empty()) {
+			return; 
+		}
+
+		using jsonf = nlohmann::json;
+		static jsonf save;
+		for (auto hotkey : m_bool_hotkeys) {
+			std::filesystem::path cheat_path;
+			cheat_path.append(Util::GetDocumentsPath());
+			cheat_path.append("neon");
+			cheat_path.append("hotkeys.json");
+			std::ofstream file(cheat_path, std::ios::out | std::ios::trunc);
+			save[std::to_string(hotkey.first).c_str()]["Hotkey"] = hotkey.second.m_key;
+			std::ofstream json_file(cheat_path);
+			json_file << std::setw(4) << save << std::endl;
+			json_file.close();
+		}
 	}
 
 	void renderer::render_color_preview(base::gui::abstract_option* option) {
@@ -442,9 +617,6 @@ namespace menu::renderer {
 	}
 
 	void renderer::render_tooltip() {
-
-		const char* description{};
-
 		if (!m_submenu_stack.empty())
 		{
 			auto sub = m_submenu_stack.top();
@@ -452,37 +624,50 @@ namespace menu::renderer {
 			{
 				if (auto opt = sub->get_option(sub->get_selected_option()))
 				{
-					description = opt->get_description();
+					tooltip = opt->get_description();
 				}
 			}
 		}
 
-		if (!description || !*description)
+		if (!tooltip.c_str() || !*tooltip.c_str())
 			return;
 
-		m_draw_base_y += 0.005f;
+		m_draw_base_y += 0.001f;
+		float y = 0.f;
+		y += m_draw_base_y;
 
-		render::draw_rect({ m_position.x, m_draw_base_y + (0.033f / 2.f) },
-			{ m_width, 0.033f },
-			m_option.m_color);
+		float scaled_body_height = render::get_normalized_font_scale(m_option.m_font, m_option.m_font_scale);
+		HUD::SET_TEXT_FONT(m_option.m_font);
+		HUD::SET_TEXT_SCALE(0.f, scaled_body_height);
+		HUD::SET_TEXT_WRAP(m_position.x - (m_width / 2.f) + 0.004f, (1.0f - (1.0f - (m_position.x + 0.1575f - (0.23f - m_option.m_font_scale)) - m_wrap)));
+		HUD::BEGIN_TEXT_COMMAND_GET_NUMBER_OF_LINES_FOR_STRING("STRING");
+		HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(tooltip.c_str());
 
-		
+		float height = m_option.m_height;
 
-		render::draw_left_text(description, m_position.x - (m_width / 0.005f), m_draw_base_y + (0.033f / 2.f)
-			- (render::get_text_height(m_option.m_font, 0.28f) / 1.5f), 0.28f, m_option.m_font,
-			m_option.m_selected_text_color, false, false);
+		int lines = HUD::END_TEXT_COMMAND_GET_NUMBER_OF_LINES_FOR_STRING({ m_position.x - (m_width / 2.f) + 0.004f, y + 0.005f });
+		if (lines > 1) {
+			height = (lines * HUD::GET_RENDERED_CHARACTER_HEIGHT(scaled_body_height, m_option.m_font)) + (0.005f * lines) + 0.005f;
+		}
 
-		m_draw_base_y += 0.033f;
+		std::pair<std::string, std::string> texture = { "textures", "scroller" };
+		render::draw_sprite_aligned(texture, { m_position.x - (m_width / 2.f), y}, { m_width, height }, 0.f, m_option.m_color);
+		render::draw_text2(tooltip.c_str(), {m_position.x - (m_width / 2.f) + 0.004f, y + 0.005f }, scaled_body_height, m_option.m_font, { 255, 255, 255, 255 }, JUSTIFY_LEFT, { m_position.x - (m_width / 2.f) + 0.004f, (1.0f - (1.0f - (m_position.x + 0.1575f - (0.23f - m_option.m_font_scale)) - m_wrap)) });
+
+		m_draw_base_y += m_option.m_height;
 	}
 
 	void renderer::draw_footer() {
 	//	render::draw_rect({ m_position.x, m_draw_base_y + (m_footer.m_height / 2.f) }, { m_width, m_footer.m_height }, m_footer.m_color);;
-		render::draw_sprite({ "textures", "footer" }, { m_position.x,  m_draw_base_y + (m_footer.m_height / 2.f) }, { m_width, m_footer.m_height }, m_footer.m_color, 0.f);
+		
+		render::draw_sprite({ "textures", "footer" }, { m_position.x, render::get_rect_base(m_footer.m_height, m_position.y + m_header.m_height + m_title.m_height + m_bg_current) }, { m_width, m_footer.m_height }, m_footer.m_color, 0.f); // so the footer animates like the option bg
+
+		//render::draw_sprite({ "textures", "footer" }, { m_position.x,  m_draw_base_y + (m_footer.m_height / 2.f) }, { m_width, m_footer.m_height }, m_footer.m_color, 0.f);
 		float size = 0.02f;
 		auto sizee = render::get_sprite_scale(size);
 		
-		render::draw_text("1.0", JUSTIFY_RIGHT, { m_position.x + (m_width / m_title.m_padding.x), render::get_rect_base(m_title.m_height) }, m_title.m_font_scale, m_title.m_font, m_title.m_padding);
-		render::draw_sprite({ "textures", "dots" }, { m_position.x, m_draw_base_y + (m_footer.m_height / 2.f) }, { sizee.x, sizee.y }, { 255, 255, 255, 255 }, 0.f);
+		render::draw_text("1.0", JUSTIFY_RIGHT, { m_position.x + (m_width / m_title.m_padding.x), render::get_rect_base(m_footer.m_height, m_position.y + m_header.m_height + m_title.m_height + m_bg_current) }, m_title.m_font_scale, m_title.m_font, m_title.m_padding);
+		render::draw_sprite({ "textures", "dots" }, { m_position.x, render::get_rect_base(m_footer.m_height, m_position.y + m_header.m_height + m_title.m_height + m_bg_current) }, { sizee.x, sizee.y }, { 255, 255, 255, 255 }, 0.f);
 		m_draw_base_y += m_footer.m_height;
 	}
 
@@ -500,7 +685,7 @@ namespace menu::renderer {
 			return &(it->second)[0];
 		}
 		else {
-			LOG_CUSTOM("Option Manager", std::format("Failed To Find Option {}", name).c_str());
+			LOG(std::format("Failed To Find Option {}", name).c_str());
 			return nullptr;
 		}
 	}

@@ -62,7 +62,8 @@ namespace util::dirs {
 		bool success = create_directories({
 			m_paths[PATH_AETHER],
 			create_string(m_paths[PATH_AETHER], ("textures")),
-			create_string(m_paths[PATH_AETHER], ("fonts"))
+			create_string(m_paths[PATH_AETHER], ("fonts")),
+			create_string(m_paths[PATH_AETHER], ("translations"))
 			});
 
 		if (success == false) return success;

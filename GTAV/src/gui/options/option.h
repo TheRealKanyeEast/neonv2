@@ -20,6 +20,8 @@ namespace base::gui {
 			return m_color;
 		}
 
+
+
 		void handle_action(eOptionAction action) override {
 			if (action == eOptionAction::click) {
 				if (m_action) {
@@ -32,6 +34,10 @@ namespace base::gui {
 		}
 		std::function<void()> get_action() override {
 			return m_action;
+		}
+
+		bool* get_bool_pointer() override {
+			return nullptr;
 		}
 
 		void set_value(double text) override {}

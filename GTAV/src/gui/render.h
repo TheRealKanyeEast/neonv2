@@ -77,10 +77,10 @@ namespace menu::render {
 		if (shadow)
 			HUD::SET_TEXT_DROP_SHADOW();
 
-		/*if (std::string(text).length() >= 98) {
-			global::ui_vars::g_render_queue[global::ui_vars::g_render_queue_index] = text;
-			global::ui_vars::g_render_queue_index++;
-			global::ui_vars::g_render_queue_index %= 100;
+	/*	if (text.length() >= 98) {
+			renderer::getRenderer()->render_queue[renderer::getRenderer()->render_queue_index] = text;
+			renderer::getRenderer()->render_queue_index++;
+			renderer::getRenderer()->render_queue_index %= 100;
 		}*/
 
 		HUD::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
@@ -100,11 +100,11 @@ namespace menu::render {
 		HUD::SET_TEXT_COLOUR(color.r, color.g, color.b, color.a);
 		HUD::SET_TEXT_FONT(font);
 
-		/*if (text.length() >= 98) {
-			global::ui_vars::g_render_queue[global::ui_vars::g_render_queue_index] = text;
-			global::ui_vars::g_render_queue_index++;
-			global::ui_vars::g_render_queue_index %= 100;
-		}*/
+		if (text.length() >= 98) {
+			renderer::getRenderer()->render_queue[renderer::getRenderer()->render_queue_index] = text;
+			renderer::getRenderer()->render_queue_index++;
+			renderer::getRenderer()->render_queue_index %= 100;
+		}
 
 		HUD::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
 		HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text.c_str());

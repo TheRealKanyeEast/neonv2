@@ -1,6 +1,9 @@
 #pragma once
 #include "util/hooking/hooking.h"
 #include "rage/classes/scrNativeCallContext.h"
+#include "rage/classes/scrThread.h"
+#include "rage/classes/scrProgram.h"
+
 namespace base::hooks {
 	bool patterns();
 	bool hooks();
@@ -8,7 +11,7 @@ namespace base::hooks {
 	void stat_get_int(rage::scrNativeCallContext* context);
 
 
-	uint64_t script_vm(void* stack, int64_t** globals, uint64_t* program, uint64_t* ctx);
+	uint64_t script_vm(void* stack, int64_t** globals, rage::scrProgram* program, rage::scrThreadContext* ctx);
 	inline decltype(&script_vm) script_vm_t;
 
 	void* get_font_id(uint64_t font, int id);

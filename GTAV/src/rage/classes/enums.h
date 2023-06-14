@@ -1,6 +1,15 @@
 #pragma once
 #include "pch.h"
 #include "joaat.h"
+enum eAnimationFlags {
+	AnimationNormal = 0,
+	AnimationRepeat = 1,
+	AnimationStopLastFrame = 2,
+	AnimationUpperBody = 16,
+	AnimationEnablePlayerControl = 32,
+	AnimationCancelable = 120,
+	AnimationCreature = 256
+};
 enum class eActivityType
 {
 	HeistPrep = 233,

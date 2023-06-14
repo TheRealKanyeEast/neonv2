@@ -4,6 +4,7 @@
 #include "menu/util/lists.h"
 #include "rage/engine.h"
 #include "util/util.h"
+#include "weapon/weapon_mods.h"
 
 using namespace base::gui;
 
@@ -57,27 +58,36 @@ namespace menu {
 	void weapon_menu::render() {
 		renderer::addSubmenu("Weapons", [](core* core) {
 
-			core->add_option(submenu_option("Weapon Mods"));
+			core->add_option(submenu_option("Weapon Mods")
+				.add_translate()
+				.set_target("Weapon Mods"));
+
 			core->add_option(submenu_option("Weapon Mangement"));
 			core->add_option(submenu_option("Tint Mangement"));
 
 			core->add_option(break_option("Quick Access"));
 
 			core->add_option(button_option("Give All Weapons")
+				.add_translate()
 				.add_click([] {
 					for (const auto& weapon : lists::g_weapons) {
 						give_weapon(PLAYER::PLAYER_PED_ID(), weapon.id, true, false);
 					}
 				}));
 
+			uint32_t m_weapon_hash = 0;
+			WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &m_weapon_hash, false);
+			auto curWeapon = WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &m_weapon_hash, false);
+
 			core->add_option(scroll_option<const char*, std::size_t>("Remove Weapons")
+				.add_translate()
 				.add_array(&remove_weapons).set_position(&remove_weapons_id)
-				.add_click([] {
+				.add_click([=] {
 					uint32_t hash;
 					switch (remove_weapons_id) {
 					case 0:
 						if (Util::is_key_pressed(VK_RETURN)) {
-							WEAPON::REMOVE_WEAPON_FROM_PED(PLAYER::PLAYER_PED_ID(), WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &hash, 0));
+							WEAPON::REMOVE_WEAPON_FROM_PED(PLAYER::PLAYER_PED_ID(), curWeapon);
 						}
 						break;
 					case 1:
@@ -89,11 +99,12 @@ namespace menu {
 				}));
 
 			core->add_option(scroll_option<const char*, std::size_t>("Give Ammo")
+				.add_translate()
 				.add_array(&give_ammo).set_position(&give_ammo_id)
-				.add_click([] {
+				.add_click([=] {
 					uint32_t hash;
 					int ammo = -1;
-					WEAPON::GET_MAX_AMMO(PLAYER::PLAYER_PED_ID(), WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &hash, 0), &ammo);
+					WEAPON::GET_MAX_AMMO(PLAYER::PLAYER_PED_ID(), curWeapon, &ammo);
 					switch (give_ammo_id) {
 					case 0:
 						if (Util::is_key_pressed(VK_RETURN)) {
@@ -112,15 +123,16 @@ namespace menu {
 				}));
 
 			core->add_option(scroll_option<const char*, std::size_t>("Remove Ammo")
+				.add_translate()
 				.add_array(&remove_ammo).set_position(&remove_ammo_id)
-				.add_click([] {
+				.add_click([=] {
 					uint32_t hash;
 					int ammo = -1;
-					WEAPON::GET_MAX_AMMO(PLAYER::PLAYER_PED_ID(), WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &hash, 0), &ammo);
+					WEAPON::GET_MAX_AMMO(PLAYER::PLAYER_PED_ID(), curWeapon, &ammo);
 					switch (remove_ammo_id) {
 					case 0:
 						if (Util::is_key_pressed(VK_RETURN)) {
-							WEAPON::SET_PED_AMMO(PLAYER::PLAYER_PED_ID(), WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &hash, 0), 0, 0);
+							WEAPON::SET_PED_AMMO(PLAYER::PLAYER_PED_ID(), curWeapon, 0, 0);
 						}
 
 						break;
@@ -136,15 +148,16 @@ namespace menu {
 				}));
 
 			core->add_option(scroll_option<const char*, std::size_t>("Upgrade Components")
+				.add_translate()
 				.add_array(&give_components).set_position(&give_components_id)
-				.add_click([] {
+				.add_click([=] {
 					uint32_t hash;
 					int ammo = -1;
-					WEAPON::GET_MAX_AMMO(PLAYER::PLAYER_PED_ID(), WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &hash, 0), &ammo);
+					WEAPON::GET_MAX_AMMO(PLAYER::PLAYER_PED_ID(), curWeapon, &ammo);
 					switch (give_components_id) {
 					case 0:
 						if (Util::is_key_pressed(VK_RETURN)) {
-							upgrade_weapon_components(PLAYER::PLAYER_PED_ID(), WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &hash, 0));
+							upgrade_weapon_components(PLAYER::PLAYER_PED_ID(), curWeapon);
 						}
 
 						break;
@@ -160,15 +173,16 @@ namespace menu {
 				}));
 
 			core->add_option(scroll_option<const char*, std::size_t>("Downgrade Components")
+				.add_translate()
 				.add_array(&remove_components).set_position(&remove_components_id)
-				.add_click([] {
+				.add_click([=] {
 					uint32_t hash;
 					int ammo = -1;
-					WEAPON::GET_MAX_AMMO(PLAYER::PLAYER_PED_ID(), WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &hash, 0), &ammo);
+					WEAPON::GET_MAX_AMMO(PLAYER::PLAYER_PED_ID(), curWeapon,&ammo);
 					switch (remove_components_id) {
 					case 0:
 						if (Util::is_key_pressed(VK_RETURN)) {
-							remove_weapon_upgrades(PLAYER::PLAYER_PED_ID(), WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &hash, 0));
+							remove_weapon_upgrades(PLAYER::PLAYER_PED_ID(), curWeapon);
 						}
 
 						break;
@@ -187,5 +201,6 @@ namespace menu {
 
 	void weapon_menu::update() {
 		render();
+		getWeaponModsMenu()->update();
 	}
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "option.h"
 #include "gui/renderer.h"
+#include "gui/util/translate.h"
 
 namespace base::gui {
 	class submenu_option : public base_option<submenu_option> {
@@ -23,6 +24,12 @@ namespace base::gui {
 
 		submenu_option& add_tooltip(const char* const text) {
 			base_option::set_tooltip(text);
+			return *this;
+		}
+
+		submenu_option& add_translate() {
+			const char* translation = TRANSLATE(base_option::get_left_text());
+			//set_left_text(translation);
 			return *this;
 		}
 

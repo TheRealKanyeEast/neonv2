@@ -36,45 +36,49 @@ namespace menu {
 
 		renderer::addSubmenu("Main Menu", [](core* core) {
 			core->add_option(submenu_option("Player")
+				.add_translate()
 				.set_target("Player"));
 
 			core->add_option(submenu_option("Network")
+				.add_translate()
 				.set_target("Network"));
 
 			core->add_option(submenu_option("Protections")
+				.add_translate()
 				.set_target("Protections"));
 
 			core->add_option(submenu_option("Vehicle")
+				.add_translate()
 				.set_target("Vehicle"));
 
 			core->add_option(submenu_option("Weapons")
+				.add_translate()
 				.set_target("Weapons"));
 
 			core->add_option(submenu_option("Teleport")
+				.add_translate()
 				.set_target("Teleport"));
 
 			core->add_option(submenu_option("Spawner")
+				.add_translate()
 				.set_target("Spawner"));
 
 			core->add_option(submenu_option("World")
+				.add_translate()
 				.set_target("World"));
 
 			core->add_option(submenu_option("Recovery")
+				.add_translate()
 				.set_target("Recovery"));
 
 			core->add_option(submenu_option("Miscellaneous")
+				.add_translate()
 				.set_target("Miscellaneous"));
 
 			core->add_option(submenu_option("Settings")
+				.add_translate()
 				.set_target("Settings"));
 
-			core->add_option(keyboard_option("Search")
-				.add_right_text(""));
-
-			core->add_option(button_option("test")
-				.add_click([] { menu::notify::stacked("Blocked Crash (S01) From BigBootyBallsack69420"); }));
-
-			//std::vector<base::gui::abstract_option*> searchResults = SearchOptions("godmode");
 		});
 
 	}

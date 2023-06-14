@@ -1,46 +1,55 @@
 #include "pch.h"
 #include "translate.h"
+#include "util/log.h"
+#include "util/util.h"
+namespace base::gui {
 
-translation::translation() {}
+	void translationManager::loadTranslation(const char* name) {
+		m_translations.clear();
 
-translation::translation(std::string original, bool translate, bool global_register) {
-	if (global_register) {
-		register_translation();
+		try {
+			m_path.append("neon").append("translations");
+			if (std::filesystem::exists(m_path)) {
+				std::filesystem::directory_iterator it{ m_path };
+				for (auto&& entry : it) {
+					if (entry.is_regular_file()) {
+						auto path{ entry.path()};
+						std::ifstream file(path.filename().c_str());
+
+						if (file.good()) {
+							std::stringstream str;
+							std::string line;
+							while (std::getline(file, line)) {
+								str << line << '\n';
+							}
+
+							nlohmann::json json = nlohmann::json::parse(str, nullptr, false);
+							auto objects = json.get<std::unordered_map<std::string, nlohmann::json>>();
+
+							for (auto&& [key, value] : objects) {
+								m_translations.emplace(rage::joaat(key.c_str()), value.get<std::string>());
+							}
+							LOG("loaded %s", name);
+						}
+					}
+				}
+			}
+		}
+		catch (nlohmann::detail::exception const&) {
+			LOG_WARN("failed to parse %s", name);
+		}
+
 	}
 
-	m_translate = translate;
-	set(original);
-}
-
-void translation::reset() {
-	set_mapped(m_original);
-}
-
-void translation::set(std::string str) {
-	m_original = str;
-	set_mapped(m_original);
-}
-
-void translation::set_mapped(std::string str) {
-	m_mapped = str;
-}
-
-void translation::set_translate(bool translate) {
-	m_translate = translate;
-}
-
-void translation::register_translation() {
-	//TODO :)
-}
-
-std::string translation::get_original() {
-	return m_original;
-}
-
-std::string translation::get() {
-	return m_translate ? m_mapped : m_original;
-}
-
-bool translation::has_translation() {
-	return m_translate;
+	const char* translationManager::getTranslation(uint32_t label) {
+		if (auto it = m_translations.find(label); it != m_translations.end()) {
+			return &(it->second)[0];
+		}
+		else {
+			static char buf[64];
+			std::fill(std::begin(buf), std::end(buf), '\0');
+			std::snprintf(&buf[0], sizeof(buf) - 1, "Error (0x%08X)", label);
+			return &buf[0];
+		}
+	}
 }

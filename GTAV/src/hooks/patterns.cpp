@@ -50,4 +50,11 @@ namespace patterns {
 
 	uint64_t format_game_string;
 	uint64_t get_game_string_line_count;
+
+	bool* is_session_started;
+	request_control_t request_control;
+	handle_to_ptr_t handle_to_ptr;
+
+	memory::byte_patch* max_wanted_level;
+	memory::byte_patch* max_wanted_level_2;
 }

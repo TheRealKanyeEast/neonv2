@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include "rage/invoker/natives.h"
 
 class Timer {
 public:
@@ -21,6 +22,7 @@ public:
 
         return false;
     }
+
 
     void SetDelay(std::chrono::milliseconds delay) {
         m_Delay = delay;

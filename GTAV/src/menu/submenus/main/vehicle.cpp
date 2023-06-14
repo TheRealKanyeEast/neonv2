@@ -18,14 +18,17 @@ namespace menu {
 			core->add_option(break_option("Quick Access"));
 
 			core->add_option(toggle_option("Godmode")
+				.add_hotkey().add_translate()
 				.add_toggle(&m_vars.m_godmode)
 				.add_click([] { if (!m_vars.m_godmode) ENTITY::SET_ENTITY_INVINCIBLE(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), false); }));
 
 			core->add_option(toggle_option("Invisibility")
+				.add_hotkey().add_translate()
 				.add_toggle(&m_vars.m_invisibility)
 				.add_click([] { if (!m_vars.m_invisibility) ENTITY::SET_ENTITY_VISIBLE(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), true, true); }));
 
 			core->add_option(toggle_option("Seatbelt")
+				.add_hotkey().add_translate()
 				.add_toggle(&m_vars.m_seatbelt)
 				.add_click([] {
 					if (!m_vars.m_seatbelt) {

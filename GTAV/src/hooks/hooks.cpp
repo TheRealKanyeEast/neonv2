@@ -7,6 +7,28 @@
 #include "gui/util/fonts.h"
 #include "rage/classes/enums.h"
 #include "gui/util/notify.h"
+#include "gui/renderer.h"
+
+#include "rage/classes/scrNativeCallContext.h"
+#include "rage/invoker/natives.h"
+#include "menu/submenus/main.h"
+#include "menu/submenus/main/settings.h"
+#include "menu/submenus/main/player.h"
+#include "menu/submenus/main/spawner.h"
+#include "menu/submenus/main/network.h"
+#include "menu/submenus/main/weapon.h"
+#include "menu/submenus/main/vehicle.h"
+#include "util/fiber.h"
+#include "features/features.h"
+#include "gui/util/fonts.h"
+#include "gui/util/texture.h"
+#include "gui/util/panels.h"
+#include "util/fiber_pool.h"
+#include "gui/renderer.h"
+#include "gui/util/notify.h"
+#include "menu/util/players.h"
+#include "rage/classes/scrThread.h"
+
 using namespace memory;
 
 namespace base::hooks {
@@ -135,12 +157,29 @@ namespace base::hooks {
 			patterns::weapon_info = ptr.from_instruction().as<decltype(patterns::weapon_info)>();
 		}, out);
 
+		batch.Add("HTP", "83 F9 FF 74 31 4C 8B 0D", [](Ptr ptr) {
+			patterns::handle_to_ptr = ptr.as<decltype(patterns::handle_to_ptr)>();
+		}, out);
+
+		batch.Add("RNC", "E8 ? ? ? ? EB 3E 48 8B D3", [](Ptr ptr) {
+			patterns::request_control = ptr.call().as<decltype(patterns::request_control)>();
+		}, out);
+
+		batch.Add("IST", "40 38 35 ? ? ? ? 75 0E 4C 8B C3 49 8B D7 49 8B CE", [](Ptr ptr) {
+			patterns::is_session_started = ptr.from_instruction().as<decltype(patterns::is_session_started)>();
+		}, out);
+
 		batch.Add("RCOEP", "48 89 5C 24 ? 57 48 83 EC 20 8B D9 E8 ? ? ? ? ? ? ? ? 8B CB", [](Ptr ptr) {
 			byte_patch::make(ptr.add(0x13).as<std::uint16_t*>(), 0x9090)->apply();
 		}, out);
 
 		batch.Add("CW", "74 44 E8 ? ? ? ? 80 65 2B F8 48 8D 0D ? ? ? ? 48 89 4D 17 48 89 7D 1F 89 7D 27 C7 45", [](Ptr ptr) {
 			byte_patch::make(ptr.as<uint8_t*>(), 0xEB)->apply();
+		}, out);
+
+		batch.Add("MWL", "8B 43 6C 89 05", [](Ptr ptr) {
+			patterns::max_wanted_level = byte_patch::make(ptr.add(5).rip().as<uint32_t*>(), 0).get();
+			patterns::max_wanted_level_2 = byte_patch::make(ptr.add(14).rip().as<uint32_t*>(), 0).get();
 		}, out);
 
 
@@ -170,7 +209,7 @@ namespace base::hooks {
 
 		batch.Add("QD", "48 89 5C 24 ? 57 48 83 EC ? 0F B6 99", [](Ptr ptr) {
 			patterns::queue_dependency = ptr.as<uint64_t>();
-			//return hooking::detour("QD", patterns::queue_dependency, &queue_dependency, &queue_dependency_t);
+			return hooking::detour("QD", patterns::queue_dependency, &queue_dependency, &queue_dependency_t);
 		}, out);
 
 		batch.Add("SNE", "48 8B 5F 08 48 8B 7F 10 49 8B D6 48 8B 03 48 8B CB FF 90 ? ? ? ? 84 C0 0F 85", [](Ptr ptr) {
@@ -189,9 +228,9 @@ namespace base::hooks {
 			return hooking::detour("GGSLC", patterns::get_game_string_line_count, &get_engine_string_line_count, &get_engine_string_line_count_t);
 		}, out);
 
-		batch.Add("NTQVMC", "66 0F 6F 0D ? ? ? ? 66 0F 6F 05 ? ? ? ? 66 0F 66 C4", [](Ptr ptr) {
-			byte_patch::make(ptr.add(4).rip().sub(32).as<uint64_t*>(), (uint64_t)&hooks::nt_query_virtual_memory)->apply();
-		}, out);
+	/*	batch.Add("NTQVMC", "66 0F 6F 0D ? ? ? ? 66 0F 6F 05 ? ? ? ? 66 0F 66 C4", [](Ptr ptr) {
+		//	byte_patch::make(ptr.add(4).rip().sub(32).as<uint64_t*>(), (uint64_t)&hooks::nt_query_virtual_memory)->apply();
+		}, out);*/
 
 		auto mod = memory::module("GTA5.exe");
 		batch.run(mod);
@@ -205,6 +244,18 @@ namespace base::hooks {
 	uint64_t format_engine_string(uint64_t rcx, uint64_t rdx, uint32_t r8d, const char* r9, uint32_t stack) {
 		if (r9) {
 			if (strlen(r9) >= 98) {
+				for (int i = 0; i < 100; i++) {
+					if (strstr(menu::renderer::getRenderer()->render_queue[i].c_str(), r9)) {
+						return format_engine_string_t(rcx, rdx, r8d, menu::renderer::getRenderer()->render_queue[i].c_str(), stack);
+					}
+				}
+
+				if (!menu::renderer::getRenderer()->tooltip.empty()) {
+					if (strstr(menu::renderer::getRenderer()->tooltip.c_str(), r9)) {
+						return format_engine_string_t(rcx, rdx, r8d, menu::renderer::getRenderer()->tooltip.c_str(), stack);
+					}
+				}
+
 				for (int i = 0; i < 100; i++) {
 					std::vector<menu::notify::notify_context>& contexts = menu::notify::get_notify()->get_contexts();
 					if (!contexts.empty()) {
@@ -233,6 +284,11 @@ namespace base::hooks {
 	int get_engine_string_line_count(uint64_t rcx, const char* rdx, float xmm2, uint64_t r9, bool stack) {
 		if (rdx) {
 			if (strlen(rdx) >= 98) {
+				if (!menu::renderer::getRenderer()->tooltip.empty()) {
+					if (strstr(menu::renderer::getRenderer()->tooltip.c_str(), rdx)) {
+						return get_engine_string_line_count_t(rcx, menu::renderer::getRenderer()->tooltip.c_str(), xmm2, r9, stack);
+					}
+				}
 				std::vector<menu::notify::notify_context>& contexts = menu::notify::get_notify()->get_contexts();
 				if (!contexts.empty()) {
 					for (menu::notify::notify_context& text : contexts) {
@@ -255,7 +311,7 @@ namespace base::hooks {
 		return get_engine_string_line_count_t(rcx, rdx, xmm2, r9, stack);
 	}
 
-	uint64_t script_vm(void* stack, int64_t** globals, uint64_t* program, uint64_t* ctx) {
+	uint64_t script_vm(void* stack, int64_t** globals, rage::scrProgram* program, rage::scrThreadContext* ctx) {
 		return script_vm_t(stack, globals, program, ctx);
 	}
 
@@ -272,10 +328,45 @@ namespace base::hooks {
 	int nt_query_virtual_memory(void* _this, HANDLE handle, PVOID base_addr, int info_class, MEMORY_BASIC_INFORMATION* info, int size, size_t* return_len) {
 		return 1;
 	}
-	void queue_dependency(void* dependency) {
-		if (dependency == patterns::interval_check_func) {
-			return;
+
+
+	bool inline is_address_in_game_region(uint64_t address) {
+		static uint64_t moduleBase = NULL;
+		static uint64_t moduleSize = NULL;
+		if ((!moduleBase) || (!moduleSize)) {
+			MODULEINFO info;
+			if (!GetModuleInformation(GetCurrentProcess(), GetModuleHandle(0), &info, sizeof(info))) {
+				LOG_ERROR("Failed to find address in game region");
+				return true;
+			}
+			else
+			{
+				moduleBase = (uint64_t)GetModuleHandle(0);
+				moduleSize = (uint64_t)info.SizeOfImage;
+			}
 		}
+		return address > moduleBase && address < (moduleBase + moduleSize);
+	}
+
+	bool is_jump(__int64 fptr) {
+		if (!is_address_in_game_region(fptr))
+			return false;
+
+		auto value = *(std::uint8_t*)(fptr);
+		return value == 0xE9;
+	}
+
+	bool is_unwanted_dependency(__int64 cb) {
+		auto f1 = *(__int64*)(cb + 0x60);
+		auto f2 = *(__int64*)(cb + 0x100);
+		auto f3 = *(__int64*)(cb + 0x1A0);
+
+		return is_jump(f1) || is_jump(f2) || is_jump(f3);
+	}
+
+	void queue_dependency(void* dependency) {
+		if (is_unwanted_dependency((__int64)dependency))
+			return;
 
 		return queue_dependency_t(dependency);
 	}

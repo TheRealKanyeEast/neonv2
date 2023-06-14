@@ -42,57 +42,59 @@ namespace menu {
     inline float g_panel_spacing = 0.06f;
 
     inline void player_info_panel(Player player) {
-        panel panel(0.14f, 0.03f, 0.03f);
-        panel.start_panel(PLAYER::GET_PLAYER_NAME(player));
-        
-        auto ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(player);
+        if (*patterns::is_session_started) {
+            panel panel(0.14f, 0.03f, 0.03f);
+            panel.start_panel(PLAYER::GET_PLAYER_NAME(player));
 
-        if (ped) {
-            int rank = *script_global(scr_globals::gpbd_fm_1).at(player, scr_globals::size::gpbd_fm_1).at(205).at(6).as<int*>();
-            int cash = *script_global(scr_globals::gpbd_fm_1).at(player, scr_globals::size::gpbd_fm_1).at(205).at(3).as<int*>();
-            int bank = *script_global(scr_globals::gpbd_fm_1).at(player, scr_globals::size::gpbd_fm_1).at(205).at(56).as<int*>() - *script_global(scr_globals::gpbd_fm_1).at(player, scr_globals::size::gpbd_fm_1).at(205).at(3).as<int*>();
+            auto ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(player);
 
-            int health = (int)ENTITY::GET_ENTITY_HEALTH(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(player));
-            int armor = (int)PED::GET_PED_ARMOUR(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(player));
-            float kd_ratio = *script_global(scr_globals::gpbd_fm_1)
-                .at(player, scr_globals::size::gpbd_fm_1)
-                .at(205)
-                .at(26)
-                .as<float*>();
+            if (ped) {
+                int rank = *script_global(scr_globals::gpbd_fm_1).at(player, scr_globals::size::gpbd_fm_1).at(205).at(6).as<int*>();
+                int cash = *script_global(scr_globals::gpbd_fm_1).at(player, scr_globals::size::gpbd_fm_1).at(205).at(3).as<int*>();
+                int bank = *script_global(scr_globals::gpbd_fm_1).at(player, scr_globals::size::gpbd_fm_1).at(205).at(56).as<int*>() - *script_global(scr_globals::gpbd_fm_1).at(player, scr_globals::size::gpbd_fm_1).at(205).at(3).as<int*>();
 
-            std::ostringstream oss;
-            oss << std::fixed << std::setprecision(2) << kd_ratio;
-            std::string kd_ratio_str = oss.str();
+                int health = (int)ENTITY::GET_ENTITY_HEALTH(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(player));
+                int armor = (int)PED::GET_PED_ARMOUR(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(player));
+                float kd_ratio = *script_global(scr_globals::gpbd_fm_1)
+                    .at(player, scr_globals::size::gpbd_fm_1)
+                    .at(205)
+                    .at(26)
+                    .as<float*>();
+
+                std::ostringstream oss;
+                oss << std::fixed << std::setprecision(2) << kd_ratio;
+                std::string kd_ratio_str = oss.str();
 
 
 
 
-            std::string wanted = std::format("{}/5", PLAYER::GET_PLAYER_WANTED_LEVEL(ped));
+                std::string wanted = std::format("{}/5", PLAYER::GET_PLAYER_WANTED_LEVEL(ped));
 
-            std::string ip = std::format("{}.{}.{}.{}", patterns::get_net_player(player)->GetGamerInfo()->m_local_address.m_ip.m_field1, patterns::get_net_player(player)->GetGamerInfo()->m_local_address.m_ip.m_field2, patterns::get_net_player(player)->GetGamerInfo()->m_local_address.m_ip.m_field3, patterns::get_net_player(player)->GetGamerInfo()->m_local_address.m_ip.m_field4);
+                std::string ip = std::format("{}.{}.{}.{}", patterns::get_net_player(player)->GetGamerInfo()->m_external_ip.m_field1, patterns::get_net_player(player)->GetGamerInfo()->m_external_ip.m_field2, patterns::get_net_player(player)->GetGamerInfo()->m_external_ip.m_field3, patterns::get_net_player(player)->GetGamerInfo()->m_external_ip.m_field4);
 
-            std::string device = *script_global(scr_globals::gpbd_fm_1).at(player, scr_globals::size::gpbd_fm_1).at(96).at(29).as<int*>() == 2 ? "Controller" : "Keyboard";
+                std::string device = *script_global(scr_globals::gpbd_fm_1).at(player, scr_globals::size::gpbd_fm_1).at(96).at(29).as<int*>() == 2 ? "Controller" : "Keyboard";
 
-            std::ostringstream oss2;
-            oss2 << "0x" << std::hex << patterns::get_net_player(player)->GetGamerInfo()->m_peer_address;
-            std::string hexAddress = oss2.str();
+                std::ostringstream oss2;
+                oss2 << "0x" << std::hex << patterns::get_net_player(player)->GetGamerInfo()->m_host_token;
+                std::string hexAddress = oss2.str();
 
-            panel.push("Rank", std::to_string(rank));
-            panel.push("Health", std::to_string(health));
-            panel.push("Cash", std::format("${}", std::to_string(cash)));
-            panel.push("Armor", std::to_string(armor));
-            panel.push("Bank", std::format("${}", std::to_string(bank)));
-            panel.push("Wanted Level", wanted);
-            panel.push("K/D Ratio", kd_ratio_str);
-            panel.push("Rockstar ID", std::to_string(patterns::get_net_player(player)->GetGamerInfo()->m_gamer_handle.m_rockstar_id));
-            panel.push("IP", ip);
-            panel.push("Host Token", hexAddress);
-            panel.push("Device", device);
-            panel.push("Ping", "0");
+                panel.push("Rank", std::to_string(rank));
+                panel.push("Health", std::to_string(health));
+                panel.push("Cash", std::format("${}", std::to_string(cash)));
+                panel.push("Armor", std::to_string(armor));
+                panel.push("Bank", std::format("${}", std::to_string(bank)));
+                panel.push("Wanted Level", wanted);
+                panel.push("K/D Ratio", kd_ratio_str);
+                panel.push("Rockstar ID", std::to_string(patterns::get_net_player(player)->GetGamerInfo()->m_gamer_handle.m_rockstar_id));
+                panel.push("IP", ip);
+                panel.push("Host Token", hexAddress);
+                panel.push("Device", device);
+                panel.push("Ping", "0");
+            }
+
+
+            panel.end_panel();
         }
-
-        
-        panel.end_panel();
     }
 
     inline void vehicle_info_panel() {

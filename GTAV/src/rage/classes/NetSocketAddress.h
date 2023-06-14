@@ -10,8 +10,8 @@ namespace rage {
 			uint8_t m_field2; //0x0002
 			uint8_t m_field1; //0x0003
 		};
-	};
-	static_assert(sizeof(rage::netAddress) == 0x04);
+	}; //Size: 0x0004
+	static_assert(sizeof(netAddress) == 0x04);
 	class netSocketAddress {
 	public:
 		union rage::netAddress m_ip; //0x0000

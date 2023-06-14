@@ -4,13 +4,19 @@
 #include "GamerHandle.h"
 
 namespace rage {
-	class rlGamerInfo : public rlPeerInfo {
+#pragma pack(push,8)
+	class rlGamerInfo : public rlPeerInfo
+	{
 	public:
-		uint64_t m_peer_address; //0x00C0
-		uint64_t m_platform_data; //0x00C8
-		rlGamerHandle m_unk_gamer_handle; //0x00D0
-		uint32_t m_ros_privilege; //0x00E0
-		char m_name[20]; //0x00E4
-	}; //Size: 0x00F8
-	static_assert(sizeof(rlGamerInfo) == 0xF8);
+		uint64_t m_host_token;
+		union {
+			rlGamerHandle m_gamer_handle_2;
+			uint32_t m_peer_id_2;
+		};
+
+		uint32_t m_ros_privilege;
+		char m_name[17];
+	}; //Size: 0x0098
+	static_assert(sizeof(rlGamerInfo) == 0xF0);
+#pragma pack(pop)
 }

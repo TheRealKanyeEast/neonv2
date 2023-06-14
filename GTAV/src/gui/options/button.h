@@ -3,6 +3,8 @@
 #include "util/util.h"
 #include "util/log.h"
 #include "gui/renderer.h"
+#include "gui/util/translate.h"
+
 namespace base::gui {
 	class button_option : public base_option<button_option> {
 	private:
@@ -23,8 +25,7 @@ namespace base::gui {
 			set_left_text(text);
 		}
 
-		button_option& add_tooltip(const char* description)
-		{
+		button_option& add_tooltip(const char* description) {
 			base_option::set_tooltip(description);
 			return *this;
 		}
@@ -38,7 +39,17 @@ namespace base::gui {
 			set_action(std::move(function));
 			return *this;
 		}
-	
+
+		button_option& add_hotkey() {
+			add_tooltip("Hotkeys Supported. Press F8 to bind");
+			return *this;
+		}
+
+		button_option& add_translate() {
+			const char* translation = TRANSLATE(base_option::get_left_text());
+			//set_left_text(translation);
+			return *this;
+		}
 
 
 		bool get_flag(eOptionFlag flag) override {

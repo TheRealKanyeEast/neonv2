@@ -3,6 +3,8 @@
 #include "gui/renderer.h"
 #include "gui/util/char_mem_stream.h"
 #include "gui/util/flags.h"
+#include "gui/util/translate.h"
+
 namespace base::gui
 {
 	template <typename DataType, typename PositionType>
@@ -41,6 +43,11 @@ namespace base::gui
 			return *this;
 		}
 
+		scroll_option& add_translate() {
+			const char* translation = TRANSLATE(base::get_left_text());
+			//base::set_left_text(translation);
+			return *this;
+		}
 
 		const char* get_right_text() override {
 			MemoryStringStream stream(base::m_right_text);

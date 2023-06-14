@@ -45,6 +45,8 @@
 #include <winternl.h>
 #include <d3d11.h>
 #include <random>
+#include <span>
+#include <algorithm>
 //include libs
 #pragma comment(lib, "winmm.lib")
 

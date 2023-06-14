@@ -110,9 +110,11 @@ namespace menu {
 		renderer::addSubmenu("Spawner", [](core* core) {
 			
 			core->add_option(submenu_option("Spawn Settings")
+				.add_translate()
 				.set_target("Spawner Settings"));
 
 			core->add_option(submenu_option("Manage Spawned Vehicles")
+				.add_translate()
 				.set_target("Spawner Settings"));
 
 			core->add_option(keyboard_option("Spawn by Name")

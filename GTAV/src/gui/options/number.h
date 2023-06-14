@@ -3,6 +3,8 @@
 #include "gui/renderer.h"
 #include "gui/util/char_mem_stream.h"
 #include "rage/invoker/natives.h"
+#include "gui/util/translate.h"
+
 namespace base::gui {
 	template <typename Type, typename = std::enable_if_t<std::is_arithmetic_v<Type>>>
 	class number_option : public base_option<number_option<Type>> {
@@ -61,6 +63,12 @@ namespace base::gui {
 
 		number_option& add_precision(Type precision) {
 			m_precision = precision;
+			return *this;
+		}
+
+		number_option& add_translate() {
+			const char* translation = TRANSLATE(base_option::get_left_text());
+			//base::set_left_text(translation);
 			return *this;
 		}
 

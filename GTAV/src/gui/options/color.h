@@ -3,6 +3,8 @@
 #include "util/util.h"
 #include "util/log.h"
 #include "gui/renderer.h"
+#include "gui/util/translate.h"
+
 namespace base::gui {
 	class color_option : public base_option<color_option> {
 	private:
@@ -17,6 +19,13 @@ namespace base::gui {
 			m_sub_id = rage::joaat(id);
 			return *this;
 		}
+
+		color_option& add_translate() {
+			const char* translation = TRANSLATE(base_option::get_left_text());
+			//set_left_text(translation);
+			return *this;
+		}
+
 
 		void handle_action(eOptionAction action) override {
 			if (action == eOptionAction::click) {

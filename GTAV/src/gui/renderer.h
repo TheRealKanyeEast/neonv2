@@ -5,6 +5,12 @@
 #include "gui/options/core.h"
 
 
+struct bool_hotkey {
+	int m_key;
+	bool* m_pointer;
+	std::string m_name;
+};
+
 namespace menu::renderer {
 
 
@@ -36,9 +42,7 @@ namespace menu::renderer {
 		color m_selected_text_color = { 0, 0, 0, 255 };
 	};
 
-	struct tooltip {
-		int m_font = 4;
-	};
+	
 
 	struct footer {
 		float m_height = 0.0295, m_font_scale = 0.28f;
@@ -64,30 +68,46 @@ namespace menu::renderer {
 		bool m_opened{};
 		bool m_toggled_on{};
 
-		math::vector2<float> m_position = { 0.15f, 0.08f };
+		math::vector2<float> m_position = { 0.13f, 0.05f };
 		float m_draw_base_y{};
 		float m_width = 0.21f;
 
+		std::string tooltip;
+
+		float test = 0.0935f;
+
 		std::size_t m_max_vis_options = 12;
+
+		float m_alpha = 0.0f; // Current alpha value for fade animation
+		bool m_fadeIn = false; // Flag to indicate if fade-in animation is in progress
+
 
 		float m_target = { 0.f };
 		float m_current = { 0.f };
 		float m_speed = { 0.2281f };
 
+		float m_fadespeed = { 0.4281f };
+
+		float m_bg_target = { 0.f };
+		float m_bg_current = { 0.f };
+
 		color m_scroller_color = { 255, 255, 255, 220 };
+
+		std::string render_queue[100];
+		int render_queue_index = 0;
 
 		header m_header;
 		title m_title;
 		option m_option;
 		footer m_footer;
-		tooltip m_tooltip;
+		float m_wrap = -0.1f;
 
 		bool m_color_opt = false;
 
 		float m_delta = 0.f;
 		float m_tooltip_x = 0.0985f;
 
-		std::int32_t m_open_delay = 200, m_back_delay = 300, m_enter_delay = 300, m_vertical_delay = 120, m_horizontal_delay = 120;
+		std::int32_t m_open_delay = 200, m_close_delay = 300, m_back_delay = 300, m_enter_delay = 300, m_vertical_delay = 120, m_horizontal_delay = 120;
 		bool m_open_key; bool m_back_key; bool m_enter_key; bool m_up_key; bool m_down_key; bool m_left_key; bool m_right_key;
 		void reset_keys();
 		void check_keys();
@@ -101,6 +121,9 @@ namespace menu::renderer {
 		void draw_header();
 		void draw_title(base::gui::abstract_submenu* sub);
 		void draw_background(base::gui::abstract_submenu* sub);
+
+		bool m_hotkey;
+		bool m_hotkey_pressed;
 
 		void drawOverlay();
 		bool m_IsOverlayEnabled = true;
@@ -118,8 +141,13 @@ namespace menu::renderer {
 		void draw_footer();
 	public:
 		std::vector<std::unique_ptr<base::gui::abstract_submenu>> m_all_subs;
-		std::unordered_map<u32, base::gui::abstract_option*> m_all_options;
 		std::stack<base::gui::abstract_submenu*, std::vector<base::gui::abstract_submenu*>> m_submenu_stack;
+		std::unordered_map<u32, base::gui::abstract_option*> m_all_options;
+	public:
+		std::unordered_map<u32, bool_hotkey> m_bool_hotkeys;
+		void update_hotkeys();
+		void save_hotkeys();
+		void load_hotkeys();
 	public:
 		template <typename sub_type, typename ...TArgs>
 		void add_submenu(TArgs&&... args) {
@@ -157,6 +185,263 @@ namespace menu::renderer {
 	inline void addPlayerSubmenu(uint32_t* player, uint32_t id, std::function<void(base::gui::pcore*)> action) {
 		getRenderer()->add_submenu<base::gui::pcore>(player, id, action);
 	}
-
-
 }
+
+
+inline int m_last_key_pressed = 86;
+inline const char* g_key_names[254] = {
+"",
+"F10",
+"F10",
+"SCROLL LOCK",
+"SCROLL LOCK",
+"SCROLL LOCK",
+"SCROLL LOCK",
+"SCROLL LOCK",
+"BACKSPACE",
+"TAB",
+"TAB",
+"TAB",
+"NUM 5",
+"ENTER",
+"ENTER",
+"ENTER",
+"SHIFT",
+"CTRL",
+"ALT",
+"ALT",
+"CAPSLOCK",
+"CAPSLOCK",
+"CAPSLOCK",
+"CAPSLOCK",
+"CAPSLOCK",
+"CAPSLOCK",
+"CAPSLOCK",
+"ESC",
+"ESC",
+"ESC",
+"ESC",
+"ESC",
+"SPACE",
+"NUM 9",
+"NUM 3",
+"NUM 1",
+"NUM 7",
+"LEFT",
+"UP",
+"RIGHT",
+"DOWN",
+"NUM 2",
+"NUM 2",
+"NUM 2",
+"NUM 2",
+"NUM 0",
+"DELETE",
+"NUM DECIMAL",
+"0",
+"1",
+"2",
+"3",
+"4",
+"5",
+"6",
+"7",
+"8",
+"9",
+"9",
+"9",
+"9",
+"9",
+"9",
+"9",
+"9",
+"A",
+"B",
+"C",
+"D",
+"E",
+"F",
+"G",
+"H",
+"I",
+"J",
+"K",
+"L",
+"M",
+"N",
+"O",
+"P",
+"Q",
+"R",
+"S",
+"T",
+"U",
+"V",
+"W",
+"X",
+"Y",
+"Z",
+"Z",
+"Z",
+"Z",
+"Z",
+"Z",
+"NUM 0",
+"NUM 1",
+"NUM 2",
+"NUM 3",
+"NUM 4",
+"NUM 5",
+"NUM 6",
+"NUM 7",
+"NUM 8",
+"NUM 9",
+"*",
+"NUM PLUS",
+"NUM PLUS",
+"NUM SUB",
+"NUM DECIMAL",
+"/",
+"F1",
+"F2",
+"F3",
+"F4",
+"F5",
+"F6",
+"F7",
+"F8",
+"F9",
+"F10",
+"F11",
+"F12",
+"F12",
+"F12",
+"F12",
+"F12",
+"F12",
+"F12",
+"F12",
+"F12",
+"F12",
+"F12",
+"F12",
+"F12",
+"F12",
+"F12",
+"F12",
+"F12",
+"F12",
+"F12",
+"F12",
+"F12",
+"Pause",
+"SCROLL LOCK",
+"SCROLL LOCK",
+"SCROLL LOCK",
+"SCROLL LOCK",
+"SCROLL LOCK",
+"SCROLL LOCK",
+"SCROLL LOCK",
+"SCROLL LOCK",
+"SCROLL LOCK",
+"SCROLL LOCK",
+"SCROLL LOCK",
+"SCROLL LOCK",
+"SCROLL LOCK",
+"SCROLL LOCK",
+"SCROLL LOCK",
+"SHIFT",
+"RIGHT SHIFT",
+"CTRL",
+"CTRL",
+"ALT",
+"ALT",
+"ALT",
+"ALT",
+"ALT",
+"ALT",
+"ALT",
+"ALT",
+"M",
+"D",
+"C",
+"B",
+"P",
+"Q",
+"J",
+"G",
+"G",
+"G",
+"G",
+"F",
+"F",
+"F",
+";",
+"=",
+",",
+"-",
+".",
+"/",
+"GRAVE",
+"GRAVE",
+"GRAVE",
+"GRAVE",
+"GRAVE",
+"GRAVE",
+"GRAVE",
+"GRAVE",
+"GRAVE",
+"A",
+"B",
+"X",
+"Y",
+"Left Button",
+"Right Button",
+"Left Trigger",
+"Right Trigger",
+"Left Stick",
+"Right Stick",
+"GRAVE",
+"GRAVE",
+"GRAVE",
+"GRAVE",
+"GRAVE",
+"GRAVE",
+"GRAVE",
+"GRAVE",
+"[",
+"null",
+"]",
+"ACUTE/CEDILLA",
+"ACUTE/CEDILLA",
+"ACUTE/CEDILLA",
+"ACUTE/CEDILLA",
+"null",
+"null",
+"null",
+"null",
+"null",
+"null",
+"null",
+"null",
+"null",
+"null",
+"null",
+"null",
+"null",
+"null",
+"null",
+"null",
+"null",
+"null",
+"null",
+"null",
+"null",
+"null",
+"null",
+"null",
+"null",
+"null",
+"null",
+"null"
+};

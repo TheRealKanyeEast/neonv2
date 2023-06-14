@@ -12,7 +12,6 @@ namespace features {
 		for (auto& k : m_keys) {
 			if (GetAsyncKeyState(k)) {
 				pressed = true;
-				menu::notify::stacked(std::format("Triggered Hotkey {}", k).c_str());
 			}
 		}
 		return pressed;

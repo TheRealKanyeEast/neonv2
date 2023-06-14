@@ -4,6 +4,7 @@
 #include "framework.h"
 
 extern bool g_running;
+inline bool g_input_disabled{};
 extern HWND g_window;
 
 

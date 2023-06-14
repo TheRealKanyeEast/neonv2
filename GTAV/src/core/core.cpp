@@ -13,6 +13,10 @@
 #include "util/fiber.h"
 #include "util/dirs.h"
 #include "gui/d3d.h"
+#include "gui/util/translate.h"
+#include "gui/util/notify.h"
+#include "memory/pattern.h"
+
 namespace base::core {
 
 
@@ -51,6 +55,9 @@ namespace base::core {
 			}
 		}
 
+		//base::gui::getTranslationManager()->init();
+		base::gui::getTranslationManager()->loadTranslation("english");
+
 		if (!base::hooks::patterns()) {
 			LOG_WARN("Failed to load patterns, unloading...");
 			std::this_thread::sleep_for(6s);
@@ -81,7 +88,7 @@ namespace base::core {
 		LOG_SUCCESS("Loaded in-game hooks");
 
 		g_running = true;
-	
+
 
 		while (g_running) {
 			if (GetAsyncKeyState(VK_END)) {
