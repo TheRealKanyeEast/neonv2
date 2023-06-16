@@ -42,10 +42,10 @@ namespace menu::player::visions::vars {
 
 namespace menu {
 	void player_visions_menu::render() {
-		renderer::addSubmenu("Visions", [](core* core) {
+		renderer::addSubmenu("Visions", "Player Visions", [](core* core) {
 			for (int i = 0; i < visions.size(); i++) {
-				core->add_option(button_option(visions[i].display_name)
-					.add_click([=] { if (i == 0) { GRAPHICS::POP_TIMECYCLE_MODIFIER(); } else { GRAPHICS::SET_TIMECYCLE_MODIFIER(visions[i].real_name); }  }));
+				core->addOption(buttonOption(visions[i].display_name)
+					.addClick([=] { if (i == 0) { GRAPHICS::POP_TIMECYCLE_MODIFIER(); } else { GRAPHICS::SET_TIMECYCLE_MODIFIER(visions[i].real_name); }  }));
 			}
 		});
 	}

@@ -107,24 +107,25 @@ namespace menu {
 	}
 
 	void spawner_menu::render() {
-		renderer::addSubmenu("Spawner", [](core* core) {
+		renderer::addSubmenu("Spawner", "Spawner", [](core* core) {
 			
-			core->add_option(submenu_option("Spawn Settings")
-				.add_translate()
-				.set_target("Spawner Settings"));
+			core->addOption(submenuOption("Spawn Settings")
+				.addTranslate()
+				.setTarget("Spawner Settings"));
 
-			core->add_option(submenu_option("Manage Spawned Vehicles")
-				.add_translate()
-				.set_target("Spawner Settings"));
+			core->addOption(submenuOption("Manage Spawned Vehicles")
+				.addTranslate()
+				.setTarget("Spawner Settings"));
 
-			core->add_option(keyboard_option("Spawn by Name")
+			core->addOption(keyboard_option("Spawn by Name")
 				.add_right_text(m_vars.m_spawn_by_name.c_str()).add_click([] { spawn_by_name(); }));
 
-			core->add_option(break_option("Vehicles"));
+			core->addOption(breakOption("Vehicles"));
+
 			for (std::int32_t i = 0; i < 23; i++) {
-				core->add_option(submenu_option(rage::engine::get_vehicle_class_name(i))
-					.add_click([=] { m_vars.m_selected_vehicle_class = i; })
-					.set_target(rage::engine::get_vehicle_class_name(m_vars.m_selected_vehicle_class)));
+				core->addOption(submenuOption(rage::engine::get_vehicle_class_name(i))
+					.addClick([=] { m_vars.m_selected_vehicle_class = i; })
+					.setTarget(rage::engine::get_vehicle_class_name(m_vars.m_selected_vehicle_class)));
 			}
 		});
 
@@ -153,8 +154,8 @@ namespace menu {
 										ss << "Unknown";
 									}
 								}
-								core->add_option(button_option((ss.str().c_str()))
-									.add_click([=] { spawn_vehicle(*(std::uint32_t*)(info + 0x18)); }));
+								core->addOption(buttonOption((ss.str().c_str()))
+									.addClick([=] { spawn_vehicle(*(std::uint32_t*)(info + 0x18)); }));
 							}
 						}
 					}

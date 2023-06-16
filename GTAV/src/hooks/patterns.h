@@ -9,7 +9,9 @@
 #include "rage/classes/CPedFactory.h"
 #include "rage/invoker/types.h"
 #include "memory/pattern.h"
-
+#include "rage/classes/vfx.h"
+class GenericPool;
+class VehiclePool;
 namespace patterns {
 	extern rage::scrNativeRegistrationTable* native_registration_table;
 	extern rage::scrProgramTable* script_program;
@@ -78,4 +80,24 @@ namespace patterns {
 
 	extern memory::byte_patch* max_wanted_level;
 	extern memory::byte_patch* max_wanted_level_2;
+
+	using fix_vectors_t = void(*)(rage::scrNativeCallContext* call_ctx);
+	extern fix_vectors_t fix_vectors;
+
+	extern GenericPool** ped_pool;
+	extern GenericPool** prop_pool;
+	extern VehiclePool*** vehicle_pool;
+
+	using ptr_to_handle_t = Entity(*)(void*);
+	extern ptr_to_handle_t ptr_to_handle;
+
+	extern int* resolution_x;
+	extern int* resolution_y;
+
+	extern uint64_t allow_weapons_in_vehicle;
+	extern uint64_t get_entity_address;
+	extern uint64_t set_vehicle_gravity;
+
+	extern std::pair<CWheelVfx*, uint8_t> vfx_wheel;
+
 }

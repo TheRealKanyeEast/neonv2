@@ -14,106 +14,106 @@ namespace menu {
 
 	void color_menu::render() {
 
-		renderer::addSubmenu("Color", [](core* core) {	
-			core->add_option(color_option("Header Color", renderer::getRenderer()->m_header.m_color)
-				.set_target("Header Color"));
+		renderer::addSubmenu("Color", "Settings Color", [](core* core) {
+			core->addOption(colorOption("Header Color", renderer::getRenderer()->m_header.m_color)
+				.setTarget("Header Color"));
 
-			core->add_option(color_option("Header Text Color", renderer::getRenderer()->m_header.m_text_color)
-				.set_target("Header Text Color"));
+			core->addOption(colorOption("Header Text Color", renderer::getRenderer()->m_header.m_text_color)
+				.setTarget("Header Text Color"));
 
-			core->add_option(color_option("Title Color", renderer::getRenderer()->m_title.m_color)
-				.set_target("Title Color"));
+			core->addOption(colorOption("Title Color", renderer::getRenderer()->m_title.m_color)
+				.setTarget("Title Color"));
 
-			core->add_option(color_option("Title Text Color", renderer::getRenderer()->m_title.m_text_color)
-				.set_target("Title Text Color"));
+			core->addOption(colorOption("Title Text Color", renderer::getRenderer()->m_title.m_text_color)
+				.setTarget("Title Text Color"));
 
-			core->add_option(color_option("Background Color", renderer::getRenderer()->m_option.m_color)
-				.set_target("Background Color"));
+			core->addOption(colorOption("Background Color", renderer::getRenderer()->m_option.m_color)
+				.setTarget("Background Color"));
 
-			core->add_option(color_option("Scroller Color", renderer::getRenderer()->m_scroller_color)
-				.set_target("Scroller Color"));
+			core->addOption(colorOption("Scroller Color", renderer::getRenderer()->m_scroller_color)
+				.setTarget("Scroller Color"));
 
-			core->add_option(color_option("Scroller Text Color", renderer::getRenderer()->m_option.m_color)
-				.set_target("Scroller Text Color"));
+			core->addOption(colorOption("Scroller Text Color", renderer::getRenderer()->m_option.m_color)
+				.setTarget("Scroller Text Color"));
 
-			core->add_option(color_option("Scroller Selected Text Color", renderer::getRenderer()->m_option.m_selected_text_color)
-				.set_target("Scroller Text Color"));
+			core->addOption(colorOption("Scroller Selected Text Color", renderer::getRenderer()->m_option.m_selected_text_color)
+				.setTarget("Scroller Text Color"));
 
-			core->add_option(color_option("Footer Color", renderer::getRenderer()->m_footer.m_color)
-				.set_target("Footer Color"));
+			core->addOption(colorOption("Footer Color", renderer::getRenderer()->m_footer.m_color)
+				.setTarget("Footer Color"));
 
-			core->add_option(color_option("Footer Text Color", renderer::getRenderer()->m_footer.m_text_color)
-				.set_target("Footer Text Color"));
+			core->addOption(colorOption("Footer Text Color", renderer::getRenderer()->m_footer.m_text_color)
+				.setTarget("Footer Text Color"));
 		});
 
-		renderer::addSubmenu("Footer Color", [](core* core) {
-			core->add_option(number_option<int>("[R]ed")
-				.add_number(&renderer::getRenderer()->m_footer.m_color.r)
-				.add_min(0).add_max(255));
+		renderer::addSubmenu("Footer Color", "Footer Color", [](core* core) {
+			core->addOption(numberOption<int>("[R]ed")
+				.addNumber(&renderer::getRenderer()->m_footer.m_color.r)
+				.addMin(0).addMax(255));
 
-			core->add_option(number_option<int>("[G]reen")
-				.add_number(&renderer::getRenderer()->m_footer.m_color.g)
-				.add_min(0).add_max(255));
+			core->addOption(numberOption<int>("[G]reen")
+				.addNumber(&renderer::getRenderer()->m_footer.m_color.g)
+				.addMin(0).addMax(255));
 
-			core->add_option(number_option<int>("[B]lue")
-				.add_number(&renderer::getRenderer()->m_footer.m_color.b)
-				.add_min(0).add_max(255));
+			core->addOption(numberOption<int>("[B]lue")
+				.addNumber(&renderer::getRenderer()->m_footer.m_color.b)
+				.addMin(0).addMax(255));
 		});
 
-		renderer::addSubmenu("Scroller Color", [](core* core) {
-			core->add_option(number_option<int>("[R]ed")
-				.add_number(&renderer::getRenderer()->m_scroller_color.r)
-				.add_min(0).add_max(255));
+		renderer::addSubmenu("Scroller Color", "Scroller Color", [](core* core) {
+			core->addOption(numberOption<int>("[R]ed")
+				.addNumber(&renderer::getRenderer()->m_scroller_color.r)
+				.addMin(0).addMax(255));
 
-			core->add_option(number_option<int>("[G]reen")
-				.add_number(&renderer::getRenderer()->m_scroller_color.g)
-				.add_min(0).add_max(255));
+			core->addOption(numberOption<int>("[G]reen")
+				.addNumber(&renderer::getRenderer()->m_scroller_color.g)
+				.addMin(0).addMax(255));
 
-			core->add_option(number_option<int>("[B]lue")
-				.add_number(&renderer::getRenderer()->m_scroller_color.b)
-				.add_min(0).add_max(255));
+			core->addOption(numberOption<int>("[B]lue")
+				.addNumber(&renderer::getRenderer()->m_scroller_color.b)
+				.addMin(0).addMax(255));
 		});
 
-		renderer::addSubmenu("Background Color", [](core* core) {
-			core->add_option(number_option<int>("[R]ed")
-				.add_number(&renderer::getRenderer()->m_option.m_color.r)
-				.add_min(0).add_max(255));
+		renderer::addSubmenu("Background Color", "Background Color", [](core* core) {
+			core->addOption(numberOption<int>("[R]ed")
+				.addNumber(&renderer::getRenderer()->m_option.m_color.r)
+				.addMin(0).addMax(255));
 
-			core->add_option(number_option<int>("[G]reen")
-				.add_number(&renderer::getRenderer()->m_option.m_color.g)
-				.add_min(0).add_max(255));
+			core->addOption(numberOption<int>("[G]reen")
+				.addNumber(&renderer::getRenderer()->m_option.m_color.g)
+				.addMin(0).addMax(255));
 
-			core->add_option(number_option<int>("[B]lue")
-				.add_number(&renderer::getRenderer()->m_option.m_color.b)
-				.add_min(0).add_max(255));
+			core->addOption(numberOption<int>("[B]lue")
+				.addNumber(&renderer::getRenderer()->m_option.m_color.b)
+				.addMin(0).addMax(255));
 		});
 
-		renderer::addSubmenu("Title Color", [](core* core) {
-			core->add_option(number_option<int>("[R]ed")
-				.add_number(&renderer::getRenderer()->m_title.m_color.r)
-				.add_min(0).add_max(255));
+		renderer::addSubmenu("Title Color", "Title Color", [](core* core) {
+			core->addOption(numberOption<int>("[R]ed")
+				.addNumber(&renderer::getRenderer()->m_title.m_color.r)
+				.addMin(0).addMax(255));
 
-			core->add_option(number_option<int>("[G]reen")
-				.add_number(&renderer::getRenderer()->m_title.m_color.g)
-				.add_min(0).add_max(255));
+			core->addOption(numberOption<int>("[G]reen")
+				.addNumber(&renderer::getRenderer()->m_title.m_color.g)
+				.addMin(0).addMax(255));
 
-			core->add_option(number_option<int>("[B]lue")
-				.add_number(&renderer::getRenderer()->m_title.m_color.b)
-				.add_min(0).add_max(255));
+			core->addOption(numberOption<int>("[B]lue")
+				.addNumber(&renderer::getRenderer()->m_title.m_color.b)
+				.addMin(0).addMax(255));
 		});
 
-		renderer::addSubmenu("Header Color", [](core* core) {
-			core->add_option(number_option<int>("[R]ed")
-				.add_number(&renderer::getRenderer()->m_header.m_color.r)
-				.add_min(0).add_max(255));
+		renderer::addSubmenu("Header Color", "Header Color", [](core* core) {
+			core->addOption(numberOption<int>("[R]ed")
+				.addNumber(&renderer::getRenderer()->m_header.m_color.r)
+				.addMin(0).addMax(255));
 
-			core->add_option(number_option<int>("[G]reen")
-				.add_number(&renderer::getRenderer()->m_header.m_color.g)
-				.add_min(0).add_max(255));
+			core->addOption(numberOption<int>("[G]reen")
+				.addNumber(&renderer::getRenderer()->m_header.m_color.g)
+				.addMin(0).addMax(255));
 
-			core->add_option(number_option<int>("[B]lue")
-				.add_number(&renderer::getRenderer()->m_header.m_color.b)
-				.add_min(0).add_max(255));
+			core->addOption(numberOption<int>("[B]lue")
+				.addNumber(&renderer::getRenderer()->m_header.m_color.b)
+				.addMin(0).addMax(255));
 		});
 
 	}

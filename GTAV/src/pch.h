@@ -30,7 +30,8 @@ template <typename t>
 	requires std::is_function_v<t>
 using fnptr = std::add_pointer_t<t>;
 
-
+template<typename T, int N>
+constexpr int NUMOF(T(&)[N]) { return N; }
 
 
 namespace rage::types {

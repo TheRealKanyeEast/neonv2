@@ -66,116 +66,116 @@ namespace menu {
 
 
 	void player_menu::render() {
-		renderer::addSubmenu("Player", [](core* core) {
-			core->add_option(submenu_option("Movement")
-				.set_target("Movement"));
+		renderer::addSubmenu("Player", "Player", [](core* core) {
+			core->addOption(submenuOption("Movement")
+				.setTarget("Player Movement"));
 
-			core->add_option(submenu_option("Appearance")
-				.set_target("Appearance"));
+			core->addOption(submenuOption("Appearance")
+				.setTarget("Player Appearance"));
 
-			core->add_option(submenu_option("Animation")
-				.set_target("Animation"));
+			core->addOption(submenuOption("Animation")
+				.setTarget("Player Animation"));
 
-			core->add_option(submenu_option("Particles")
-				.set_target("Particles"));
+			core->addOption(submenuOption("Particles")
+				.setTarget("Player Particles"));
 
-			core->add_option(submenu_option("Visions")
-				.set_target("Visions"));
+			core->addOption(submenuOption("Visions")
+				.setTarget("Player Visions"));
 
-			core->add_option(toggle_option("Godmode")
-				.add_hotkey().add_translate()
-				.add_toggle(&m_vars.m_godmode).add_click([] {
+			core->addOption(toggleOption("Godmode")
+				.addHotkey().addTranslate()
+				.addToggle(&m_vars.m_godmode).addClick([] {
 					if (!m_vars.m_godmode) {
 						ENTITY::SET_ENTITY_INVINCIBLE(PLAYER::PLAYER_PED_ID(), false);
 					}
 				}));
 
-			core->add_option(toggle_option("Auto Heal")
-				.add_hotkey().add_translate()
-				.add_toggle(&m_vars.m_auto_heal));
+			core->addOption(toggleOption("Auto Heal")
+				.addHotkey().addTranslate()
+				.addToggle(&m_vars.m_auto_heal));
 
-			core->add_option(toggle_option("Never Wanted")
-				.add_hotkey().add_translate()
-				.add_toggle(&m_vars.m_disable_police));
+			core->addOption(toggleOption("Never Wanted")
+				.addHotkey().addTranslate()
+				.addToggle(&m_vars.m_disable_police));
 
-			core->add_option(toggle_scroll_option<const char*, std::size_t>("Invisibility")
-				.add_toggle(&m_vars.m_invisible)
-				.add_array(&invisibleNames)
-				.set_position(&invisible_id)
-				.add_click([] {
+			core->addOption(toggleScrollOption<const char*, std::size_t>("Invisibility")
+				.addToggle(&m_vars.m_invisible)
+				.addScroll(&invisibleNames)
+				.setPosition(&invisible_id)
+				.addClick([] {
 					if (!m_vars.m_invisible) {
 						ENTITY::SET_ENTITY_VISIBLE(PLAYER::PLAYER_PED_ID(), true, true);
 						NETWORK::NETWORK_SET_ENTITY_ONLY_EXISTS_FOR_PARTICIPANTS(PLAYER::PLAYER_PED_ID(), false);
 						NETWORK::SET_LOCAL_PLAYER_INVISIBLE_LOCALLY(false);
 					}
-					}));
+				}));
 
-			core->add_option(toggle_option("Fast Respawn")
-				.add_hotkey().add_translate()
-				.add_toggle(&m_vars.m_fast_respawn));
+			core->addOption(toggleOption("Fast Respawn")
+				.addHotkey().addTranslate()
+				.addToggle(&m_vars.m_fast_respawn));
 
-			core->add_option(toggle_option("Disable Ragdoll")
-				.add_hotkey().add_translate()
-				.add_toggle(&m_vars.m_disable_ragdoll));
+			core->addOption(toggleOption("Disable Ragdoll")
+				.addHotkey().addTranslate()
+				.addToggle(&m_vars.m_disable_ragdoll));
 
-			core->add_option(toggle_option("Reduced Collision")
-				.add_hotkey().add_translate()
-				.add_toggle(&m_vars.m_reduced_collision));
+			core->addOption(toggleOption("Reduced Collision")
+				.addHotkey().addTranslate()
+				.addToggle(&m_vars.m_reduced_collision));
 
-			core->add_option(toggle_option("No Collision")
-				.add_hotkey().add_translate()
-				.add_toggle(&m_vars.m_no_collision));
+			core->addOption(toggleOption("No Collision")
+				.addHotkey().addTranslate()
+				.addToggle(&m_vars.m_no_collision));
 
-			core->add_option(toggle_option("Off the Radar")
-				.add_hotkey().add_translate()
-				.add_toggle(&m_vars.m_off_the_radar)
-				.add_click(off_the_radar));
+			core->addOption(toggleOption("Off the Radar")
+				.addHotkey().addTranslate()
+				.addToggle(&m_vars.m_off_the_radar)
+				.addClick(off_the_radar));
 
-			core->add_option(toggle_option("Reveal Hidden Players")
-				.add_hotkey().add_translate()
-				.add_toggle(&m_vars.m_reveal_hidden_players)
-				.add_click(reveal_hidden_players));
+			core->addOption(toggleOption("Reveal Hidden Players")
+				.addHotkey().addTranslate()
+				.addToggle(&m_vars.m_reveal_hidden_players)
+				.addClick(reveal_hidden_players));
 
-			core->add_option(toggle_option("Superman")
-				.add_hotkey().add_translate()
-				.add_toggle(&m_vars.m_superman));
+			core->addOption(toggleOption("Superman")
+				.addHotkey().addTranslate()
+				.addToggle(&m_vars.m_superman));
 
-			core->add_option(toggle_option("Karma")
-				.add_hotkey().add_translate()
-				.add_toggle(&m_vars.m_karma));
+			core->addOption(toggleOption("Karma")
+				.addHotkey().addTranslate()
+				.addToggle(&m_vars.m_karma));
 
-			core->add_option(toggle_option("Shrink")
-				.add_hotkey().add_translate()
-				.add_toggle(&m_vars.m_shrink));
+			core->addOption(toggleOption("Shrink")
+				.addHotkey().addTranslate()
+				.addToggle(&m_vars.m_shrink));
 
-			core->add_option(toggle_option("Forcefield")
-				.add_hotkey().add_translate()
-				.add_toggle(&m_vars.m_forcefield));
+			core->addOption(toggleOption("Forcefield")
+				.addHotkey().addTranslate()
+				.addToggle(&m_vars.m_forcefield));
 
-			core->add_option(toggle_option("Vegetable Mode")
-				.add_hotkey().add_translate()
-				.add_toggle(&m_vars.m_vegetable_mode));
+			core->addOption(toggleOption("Vegetable Mode")
+				.addHotkey().addTranslate()
+				.addToggle(&m_vars.m_vegetable_mode));
 
-			core->add_option(button_option("Sky Dive")
-				.add_click([] {
+			core->addOption(buttonOption("Sky Dive")
+				.addClick([] {
 					if (ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(PLAYER::PLAYER_PED_ID()) < 50.f) {
 						ENTITY::SET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), { ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 1).x, ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 1).y, ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 1).z + 1000.f }, true, true, true, false);
 						TASK::TASK_SKY_DIVE(PLAYER::PLAYER_PED_ID(), TRUE);
 					}
 					}));
 
-			core->add_option(button_option("Max Health & Armour")
-				.add_click([] {
+			core->addOption(buttonOption("Max Health & Armour")
+				.addClick([] {
 					PED::SET_PED_ARMOUR(PLAYER::PLAYER_PED_ID(), 100);
-					ENTITY::SET_ENTITY_HEALTH(PLAYER::PLAYER_PED_ID(), ENTITY::GET_ENTITY_MAX_HEALTH(PLAYER::PLAYER_PED_ID()), 0); 
-				}));
+					ENTITY::SET_ENTITY_HEALTH(PLAYER::PLAYER_PED_ID(), ENTITY::GET_ENTITY_MAX_HEALTH(PLAYER::PLAYER_PED_ID()), 0);
+					}));
 
-			core->add_option(button_option("Clone")
-				.add_click([] { PED::CLONE_PED(PLAYER::PLAYER_PED_ID(), ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), true, false); }));
+			core->addOption(buttonOption("Clone")
+				.addClick([] { PED::CLONE_PED(PLAYER::PLAYER_PED_ID(), ENTITY::GET_ENTITY_HEADING(PLAYER::PLAYER_PED_ID()), true, false); }));
 
-			core->add_option(button_option("Suicide")
-				.add_hotkey().add_translate()
-				.add_click([] { suicide("player_suicide"_AF); }));
+			core->addOption(buttonOption("Suicide")
+				.addHotkey().addTranslate()
+				.addClick([] { suicide("player_suicide"_AF); }));
 		});
 	}
 

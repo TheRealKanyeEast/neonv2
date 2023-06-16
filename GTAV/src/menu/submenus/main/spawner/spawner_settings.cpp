@@ -13,34 +13,34 @@ namespace menu::spawner::settings::vars {
 namespace menu {
 
 	void spawner_settings_menu::render() {
-		renderer::addSubmenu("Spawner Settings", [](core* core) {
-			core->add_option(toggle_option("Notification")
-				.add_toggle(&m_vars.m_notification));
+		renderer::addSubmenu("Spawner Settings", "Spawner Settings", [](core* core) {
+			core->addOption(toggleOption("Notification")
+				.addToggle(&m_vars.m_notification));
 
-			core->add_option(toggle_option("Blip")
-				.add_toggle(&m_vars.m_blip));
+			core->addOption(toggleOption("Blip")
+				.addToggle(&m_vars.m_blip));
 
-			core->add_option(toggle_option("Particle FX")
-				.add_toggle(&m_vars.m_particle_fx));
+			core->addOption(toggleOption("Particle FX")
+				.addToggle(&m_vars.m_particle_fx));
 
-			core->add_option(toggle_option("Teleport Inside")
-				.add_toggle(&m_vars.m_teleport_inside));
+			core->addOption(toggleOption("Teleport Inside")
+				.addToggle(&m_vars.m_teleport_inside));
 
-			core->add_option(toggle_option("Godmode")
-				.add_toggle(&m_vars.m_godmode));
+			core->addOption(toggleOption("Godmode")
+				.addToggle(&m_vars.m_godmode));
 
-			core->add_option(toggle_option("Fade")
-				.add_toggle(&m_vars.m_fade));
+			core->addOption(toggleOption("Fade")
+				.addToggle(&m_vars.m_fade));
 
-			core->add_option(toggle_option("Air Vehicles In Air")
-				.add_toggle(&m_vars.m_air_vehicles_in_air));
+			core->addOption(toggleOption("Air Vehicles In Air")
+				.addToggle(&m_vars.m_air_vehicles_in_air));
 
-			core->add_option(number_option<float>("Air Vehicles Height")
-				.add_number(&m_vars.m_spawn_height).add_step(1.f).add_precision(0)
-				.add_min(0.f).add_max(1000.f));
+			core->addOption(numberOption<float>("Air Vehicles Height")
+				.addNumber(&m_vars.m_spawn_height).addStep(1.f).setPrecision(0)
+				.addMin(0.f).addMax(1000.f));
 
-			core->add_option(toggle_option("Delete Current")
-				.add_toggle(&m_vars.m_delete_current));
+			core->addOption(toggleOption("Delete Current")
+				.addToggle(&m_vars.m_delete_current));
 		});
 	}
 

@@ -6,9 +6,9 @@ using namespace base::gui;
 namespace menu {
 
 	void network_menu::render() {
-		renderer::addSubmenu("Network", [](core* core) {
-			core->add_option(submenu_option("Players")
-				.set_target("Players"));
+		renderer::addSubmenu("Network", "Network", [](core* core) {
+			core->addOption(submenuOption("Players")
+				.setTarget("Network Players"));
 		});
 	}
 

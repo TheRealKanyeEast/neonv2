@@ -47,7 +47,14 @@ namespace rage::engine {
 		return HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(ss.str().c_str()) == "NULL" ? "Unknown Class" : HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(ss.str().c_str());
 	}
 
+	inline uint64_t get_entity_address(Entity entity) {
+		if (entity <= 0) return 0;
+		return caller::call<uint64_t>(patterns::get_entity_address, entity);
+	}
 
+	inline void set_vehicle_gravity(uint64_t address, float gravity) {
+		caller::call<void>(patterns::set_vehicle_gravity, address, gravity);
+	}
 
 	inline float deg_to_rad(float degs) {
 		return degs * 3.141592653589793f / 180.f;

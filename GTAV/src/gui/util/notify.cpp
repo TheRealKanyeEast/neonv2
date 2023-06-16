@@ -91,9 +91,9 @@ namespace menu::notify {
 
 
 	void notify::subtitle(const char* msg) {
-		HUD::BEGIN_TEXT_COMMAND_PRINT("STRING");
-		HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(msg);
-		HUD::END_TEXT_COMMAND_PRINT(3000, true);
+        HUD::BEGIN_TEXT_COMMAND_DISPLAY_HELP("STRING");
+        HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(msg);
+        HUD::END_TEXT_COMMAND_DISPLAY_HELP(0, 0, 1, -1);
 	}
 
 	notify* get_notify() {

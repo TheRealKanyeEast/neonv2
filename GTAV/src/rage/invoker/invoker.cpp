@@ -29,7 +29,8 @@ namespace invoker
             if (!val->second) {
             }
             spoof_call(patterns::jmp_rbx_register, val->second, dynamic_cast<rage::scrNativeCallContext*>(&m_call_context));
-            m_call_context.VectorSpace.CopyReferencedParametersOut();
+            patterns::fix_vectors(&m_call_context);
+          //  m_call_context.VectorSpace.CopyReferencedParametersOut();
  
         }
         else

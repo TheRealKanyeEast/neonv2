@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include "grcTexture.h"
-
+#include "vfx.h"
 namespace rage {
 	class fwShaderEffect {
 	public:
@@ -24,7 +24,10 @@ namespace rage {
 		uint32_t unk_0028; //0x0028
 		uint32_t unk_002C; //0x002C
 		fwShaderEffect* m_shader_effect; //0x0030
+		char _0x0038[0x338]; //0x0000
+		CVehicleStreamRender* m_vehicle_stream_render; //0x0370
+		char _0x0378[0x8B0]; //0x0378
 	}; //Size: 0x0038
-	static_assert(sizeof(fwDrawData) == 0x38);
+	//static_assert(sizeof(fwDrawData) == 0xBF2);
 #pragma pack(pop)
 }

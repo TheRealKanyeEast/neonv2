@@ -7,8 +7,8 @@
 namespace base::gui {
 	class core : public base_submenu<core> {
 	public:
-		explicit core(const char* name, std::function<void(core*)> action) {
-			set_name(name); set_id(rage::joaat(name)); set_action(std::move(action));
+		explicit core(const char* name, const char* target, std::function<void(core*)> action) {
+			set_name(name); set_id(rage::joaat(target)); set_action(std::move(action));
 		}
 	};
 

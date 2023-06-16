@@ -184,7 +184,7 @@ namespace menu::renderer {
 				}
 				update_scroller();
 				draw_footer();
-				render_color_preview(sub->get_option(sub->get_selected_option()));
+				//render_color_preview(sub->get_option(sub->get_selected_option()));
 				render_tooltip();
 
 			}
@@ -447,7 +447,7 @@ namespace menu::renderer {
 
 		if (option->get_flag(eOptionFlag::color_option)) {
 			m_color_opt = true;
-			auto size = render::get_sprite_scale(0.02);
+			auto size = render::get_sprite_scale(0.015);
 
 			render::draw_text(option->get_left_text(), JUSTIFY_LEFT, { m_position.x, y_pos }, m_option.m_font_scale, m_option.m_font, m_option.m_padding, selected ? m_option.m_selected_text_color : m_option.m_text_color);
 			

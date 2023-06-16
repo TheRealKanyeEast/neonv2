@@ -32,7 +32,7 @@ namespace menu::renderer {
 	};
 
 	struct option {
-		float m_height = 0.0315f, m_font_scale = 0.29f;
+		float m_height = 0.032f, m_font_scale = 0.29f;
 		int m_font = 0;
 		math::vector2<float> m_padding = { 2.05f, 2.05f };
 
@@ -174,8 +174,8 @@ namespace menu::renderer {
 		return &instance;
 	}
 	
-	inline void addSubmenu(const char* name, std::function<void(base::gui::core*)> action) {
-		getRenderer()->add_submenu<base::gui::core>(name, action);
+	inline void addSubmenu(const char* name, const char* target, std::function<void(base::gui::core*)> action) {
+		getRenderer()->add_submenu<base::gui::core>(name, target, action);
 	}
 
 	inline void addVehicleSubmenu(int* vehicle, uint32_t id, std::function<void(base::gui::vcore*)> action) {

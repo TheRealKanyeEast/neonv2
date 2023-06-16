@@ -170,50 +170,50 @@ namespace menu {
 	}
 
 	void player_animation_menu::render() {
-		renderer::addSubmenu("Animation", [](core* core) {
-			core->add_option(button_option("Stop Animation")
-				.add_click([] { TASK::CLEAR_PED_TASKS_IMMEDIATELY(PLAYER::PLAYER_PED_ID()); }));
+		renderer::addSubmenu("Animation", "Player Animation", [](core* core) {
+			core->addOption(buttonOption("Stop Animation")
+				.addClick([] { TASK::CLEAR_PED_TASKS_IMMEDIATELY(PLAYER::PLAYER_PED_ID()); }));
 
 
-			core->add_option(toggle_option("Controllable")
-				.add_toggle(&m_vars.m_controllable));
+			core->addOption(toggleOption("Controllable")
+				.addToggle(&m_vars.m_controllable));
 
-			core->add_option(break_option("Animations"));
+			core->addOption(breakOption("Animations"));
 
-			core->add_option(scroll_option<const char*, std::size_t>("Sexual")
-				.add_array(&sexualNames)
-				.set_position(&sexual_id)
-				.add_click([] {
+			core->addOption(scrollOption<const char*, std::size_t>("Sexual")
+				.addScroll(&sexualNames)
+				.setPosition(&sexual_id)
+				.addClick([] {
 					start_animation(std::make_pair(sexual[sexual_id].values.first, sexual[sexual_id].values.second));
 				}));
 
-			core->add_option(scroll_option<const char*, std::size_t>("Animals")
-				.add_array(&animalsNames)
-				.set_position(&animal_id)
-				.add_click([] {
+			core->addOption(scrollOption<const char*, std::size_t>("Animals")
+				.addScroll(&animalsNames)
+				.setPosition(&animal_id)
+				.addClick([] {
 					start_animation(std::make_pair(animals[animal_id].values.first, animals[animal_id].values.second));
 					}));
 
-			core->add_option(scroll_option<const char*, std::size_t>("Actions")
-				.add_array(&actionsNames)
-				.set_position(&actions_id)
-				.add_click([] {
+			core->addOption(scrollOption<const char*, std::size_t>("Actions")
+				.addScroll(&actionsNames)
+				.setPosition(&actions_id)
+				.addClick([] {
 					start_animation(std::make_pair(actions[actions_id].values.first, actions[actions_id].values.second));
 					}));
 
 
-			core->add_option(scroll_option<const char*, std::size_t>("Dance")
-				.add_array(&danceNames)
-				.set_position(&dance_id)
-				.add_click([] {
+			core->addOption(scrollOption<const char*, std::size_t>("Dance")
+				.addScroll(&danceNames)
+				.setPosition(&dance_id)
+				.addClick([] {
 					start_animation(std::make_pair(dance[dance_id].values.first, dance[dance_id].values.second));
 					}));
 
 
-			core->add_option(scroll_option<const char*, std::size_t>("Misc")
-				.add_array(&miscNames)
-				.set_position(&misc_id)
-				.add_click([] {
+			core->addOption(scrollOption<const char*, std::size_t>("Misc")
+				.addScroll(&miscNames)
+				.setPosition(&misc_id)
+				.addClick([] {
 					start_animation(std::make_pair(misc[misc_id].values.first, misc[misc_id].values.second));
 					}));
 		});

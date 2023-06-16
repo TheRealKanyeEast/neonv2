@@ -35,50 +35,50 @@ namespace menu {
 
 	void main_menu::render() {	
 
-		renderer::addSubmenu("Main Menu", [](core* core) {
-			core->add_option(submenu_option("Player")
-				.add_translate()
-				.set_target("Player"));
+		renderer::addSubmenu("Main Menu", "Main Menu", [](core* core) {
+			core->addOption(submenuOption("Player")
+				.addTranslate()
+				.setTarget("Player"));
 
-			core->add_option(submenu_option("Network")
-				.add_translate()
-				.set_target("Network"));
+			core->addOption(submenuOption("Network")
+				.addTranslate()
+				.setTarget("Network"));
 
-			core->add_option(submenu_option("Protections")
-				.add_translate()
-				.set_target("Protections"));
+			core->addOption(submenuOption("Protections")
+				.addTranslate()
+				.setTarget("Protections"));
 
-			core->add_option(submenu_option("Vehicle")
-				.add_translate()
-				.set_target("Vehicle"));
+			core->addOption(submenuOption("Vehicle")
+				.addTranslate()
+				.setTarget("Vehicle"));
 
-			core->add_option(submenu_option("Weapons")
-				.add_translate()
-				.set_target("Weapons"));
+			core->addOption(submenuOption("Weapons")
+				.addTranslate()
+				.setTarget("Weapons"));
 
-			core->add_option(submenu_option("Teleport")
-				.add_translate()
-				.set_target("Teleport"));
+			core->addOption(submenuOption("Teleport")
+				.addTranslate()
+				.setTarget("Teleport"));
 
-			core->add_option(submenu_option("Spawner")
-				.add_translate()
-				.set_target("Spawner"));
+			core->addOption(submenuOption("Spawner")
+				.addTranslate()
+				.setTarget("Spawner"));
 
-			core->add_option(submenu_option("World")
-				.add_translate()
-				.set_target("World"));
+			core->addOption(submenuOption("World")
+				.addTranslate()
+				.setTarget("World"));
 
-			core->add_option(submenu_option("Recovery")
-				.add_translate()
-				.set_target("Recovery"));
+			core->addOption(submenuOption("Recovery")
+				.addTranslate()
+				.setTarget("Recovery"));
 
-			core->add_option(submenu_option("Miscellaneous")
-				.add_translate()
-				.set_target("Miscellaneous"));
+			core->addOption(submenuOption("Miscellaneous")
+				.addTranslate()
+				.setTarget("Miscellaneous"));
 
-			core->add_option(submenu_option("Settings")
-				.add_translate()
-				.set_target("Settings"));
+			core->addOption(submenuOption("Settings")
+				.addTranslate()
+				.setTarget("Settings"));
 
 		});
 

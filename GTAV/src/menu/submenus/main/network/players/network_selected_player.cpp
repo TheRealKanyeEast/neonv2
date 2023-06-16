@@ -14,16 +14,16 @@ namespace menu {
 	void network_selected_player_menu::render() {
 		renderer::addPlayerSubmenu(&players::vars::m_vars.m_selected_player, rage::joaat("selected_player"), [](pcore* core) {
 			player_info_panel(players::vars::m_vars.m_selected_player);
-			g_panel_spacing = 0.22f;
 
-			core->add_option(button_option(PLAYER::GET_PLAYER_NAME(players::vars::m_vars.m_selected_player)));	
 
-			core->add_option(toggle_option("Spectate")
-				.add_toggle(&m_vars.m_spectate));
+			core->addOption(buttonOption(PLAYER::GET_PLAYER_NAME(players::vars::m_vars.m_selected_player)));
 
-			core->add_option(number_option<float>("Wrap")
-				.add_tooltip("Hotkeys Supported. Press F12 to bind. Test test estsetssssssss testestes tse setse tsetes tse test sets etset estset setsetsetests").add_number(&g_panel_spacing).add_min(-1).add_max(1)
-				.add_step(0.001f).add_precision(3));
+			core->addOption(toggleOption("Spectate")
+				.addToggle(&m_vars.m_spectate));
+
+			core->addOption(numberOption<float>("Wrap")
+				.addTooltip("Hotkeys Supported. Press F12 to bind. Test test estsetssssssss testestes tse setse tsetes tse test sets etset estset setsetsetests").addNumber(&g_panel_spacing).addMin(-1).addMax(1)
+				.addStep(0.001f).setPrecision(3));
 		});
 	}
 

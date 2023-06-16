@@ -8,23 +8,24 @@
 using namespace base::gui;
 
 namespace menu {
+
 	void settings_menu::render() {
-		renderer::addSubmenu("Settings", [](core* core) {
-			core->add_option(submenu_option("Hotkeys")
-				.add_translate()
-				.set_target("Hotkeys"));
+		renderer::addSubmenu("Settings", "Settings", [](core* core) {
+			core->addOption(submenuOption("Hotkeys")
+				.addTranslate()
+				.setTarget("Hotkeys"));
 
-			core->add_option(submenu_option("Position")
-				.add_translate()
-				.set_target("Position"));
+			core->addOption(submenuOption("Position")
+				.addTranslate()
+				.setTarget("Settings Position"));
 
-			core->add_option(submenu_option("Color")
-				.add_translate()
-				.set_target("Color"));
+			core->addOption(submenuOption("Color")
+				.addTranslate()
+				.setTarget("Settings Color"));
 
-			core->add_option(button_option("Unload")
-				.add_translate()
-				.add_click([] { g_running = false; }));
+			core->addOption(buttonOption("Unload")
+				.addTranslate()
+				.addClick([] { g_running = false; }));
 		});
 	}
 

@@ -5,40 +5,40 @@
 #include "gui/util/translate.h"
 
 namespace base::gui {
-	class toggle_option : public base_option<toggle_option> {
+	class toggleOption : public base_option<toggleOption> {
 	private:
 		bool* m_Bool = nullptr;
 		bool m_DisplayInverted = false;
 		std::function<void()> m_action = [] {};
 		std::string m_name = "";
 	public:
-		explicit toggle_option(const char* const text) {
+		explicit toggleOption(const char* const text) {
 			m_name = text;
 			base_option::set_left_text(m_name.c_str());
 		}
 
-		toggle_option& add_tooltip(const char* const text) {
+		toggleOption& addTooltip(const char* const text) {
 			base_option::set_tooltip(text);
 			return *this;
 		}
 
-		toggle_option& add_click(std::function<void()> action = [] {}) {
+		toggleOption& addClick(std::function<void()> action = [] {}) {
 			m_action = action;
 			base_option::set_action(std::move(m_action));
 			return *this;
 		}
 
-		toggle_option& add_toggle(bool* const b00l) {
+		toggleOption& addToggle(bool* const b00l) {
 			m_Bool = b00l;
 			return *this;
 		}
 
-		toggle_option& add_hotkey() {
-			add_tooltip("Hotkeys Supported. Press F8 to bind");
+		toggleOption& addHotkey() {
+			addTooltip("Hotkeys Supported. Press F8 to bind");
 			return *this;
 		}
 
-		toggle_option& add_translate() {
+		toggleOption& addTranslate() {
 			const char* translation = TRANSLATE(base_option::get_left_text());
 			//set_left_text(translation);
 			return *this;
@@ -67,7 +67,7 @@ namespace base::gui {
 	};
 
 	template <typename Type, typename = std::enable_if_t<std::is_arithmetic_v<Type>>>
-	class toggle_number_option : public base_option<toggle_number_option<Type>> {
+	class toggleNumberOption : public base_option<toggleNumberOption<Type>> {
 	private:
 		Type* m_number = nullptr;
 		bool* m_bool = nullptr;
@@ -76,50 +76,50 @@ namespace base::gui {
 		Type m_step = 1;
 		std::size_t m_precision = 3;
 		std::function<void()> m_function;
-		using base = base_option<toggle_number_option<Type>>;
+		using base = base_option<toggleNumberOption<Type>>;
 		using display_type = std::conditional_t<sizeof(Type) == 1, std::uint32_t, Type>;
 	public:
-		explicit toggle_number_option(const char* text) {
+		explicit toggleNumberOption(const char* text) {
 			base::set_left_text(text);
 		}
 
-		toggle_number_option& add_description(const char* const text)
+		toggleNumberOption& addTooltip(const char* const text)
 		{
 			base::set_tooltip(text);
 			return *this;
 		}
 
-		toggle_number_option& add_function(std::function<void()> action = [] {}) {
+		toggleNumberOption& addClick(std::function<void()> action = [] {}) {
 			base::set_action(std::move(action));
 			return *this;
 		}
 
-		toggle_number_option& add_toggle(bool* const b00l) {
+		toggleNumberOption& addToggle(bool* const b00l) {
 			m_bool = b00l;
 			return *this;
 		}
 
-		toggle_number_option& add_number(Type* number) {
+		toggleNumberOption& addNumber(Type* number) {
 			m_number = number;
 			return *this;
 		}
 
-		toggle_number_option& add_min(Type min) {
+		toggleNumberOption& addMin(Type min) {
 			m_min = min;
 			return *this;
 		}
 
-		toggle_number_option& add_max(Type max) {
+		toggleNumberOption& addMax(Type max) {
 			m_max = max;
 			return *this;
 		}
 
-		toggle_number_option& add_step(Type step) {
+		toggleNumberOption& addStep(Type step) {
 			m_step = step;
 			return *this;
 		}
 
-		toggle_number_option& add_precision(Type precision) {
+		toggleNumberOption& setPrecision(Type precision) {
 			m_precision = precision;
 			return *this;
 		}
@@ -166,7 +166,7 @@ namespace base::gui {
 	};
 
 	template <typename DataType, typename PositionType>
-	class toggle_scroll_option : public base_option<toggle_scroll_option<DataType, PositionType>>
+	class toggleScrollOption : public base_option<toggleScrollOption<DataType, PositionType>>
 	{
 	private:
 		const DataType* m_data{};
@@ -174,29 +174,29 @@ namespace base::gui {
 		PositionType* m_position{};
 		std::function<void()> m_function;
 		bool* m_Bool = nullptr;
-		using base = base_option<toggle_scroll_option<DataType, PositionType>>;
+		using base = base_option<toggleScrollOption<DataType, PositionType>>;
 	public:
-		explicit toggle_scroll_option(const char* text) {
+		explicit toggleScrollOption(const char* text) {
 			base::set_left_text(text);
 		}
 		template <PositionType N>
-		toggle_scroll_option& add_array(DataType(*array)[N]) {
+		toggleScrollOption& addScroll(DataType(*array)[N]) {
 			m_data = *array;
 			m_data_size = N;
 			return *this;
 		}
 
-		toggle_scroll_option& set_position(PositionType* position) {
+		toggleScrollOption& setPosition(PositionType* position) {
 			m_position = position;
 			return *this;
 		}
 
-		toggle_scroll_option& add_toggle(bool* const b00l) {
+		toggleScrollOption& addToggle(bool* const b00l) {
 			m_Bool = b00l;
 			return *this;
 		}
 
-		toggle_scroll_option& add_click(std::function<void()>&& function) {
+		toggleScrollOption& addClick(std::function<void()>&& function) {
 			m_function = std::move(function);
 			return *this;
 		}

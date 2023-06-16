@@ -57,4 +57,21 @@ namespace patterns {
 
 	memory::byte_patch* max_wanted_level;
 	memory::byte_patch* max_wanted_level_2;
+
+	fix_vectors_t fix_vectors;
+
+	ptr_to_handle_t ptr_to_handle;
+
+	 GenericPool** ped_pool;
+	 GenericPool** prop_pool;
+	 VehiclePool*** vehicle_pool;
+
+	 int* resolution_x;
+	 int* resolution_y;
+
+	 uint64_t allow_weapons_in_vehicle;
+	 uint64_t get_entity_address;
+	 uint64_t set_vehicle_gravity;
+
+	 std::pair<CWheelVfx*, uint8_t> vfx_wheel;
 }

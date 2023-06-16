@@ -317,109 +317,109 @@ namespace menu::player::appearance::vars {
 namespace menu {
 
 	void player_appearance_menu::render() {
-		renderer::addSubmenu("Appearance", [](core* core) {
-			core->add_option(submenu_option("Wardrobe")
-				.set_target("Wardrobe"));
+		renderer::addSubmenu("Appearance", "Player Appearance", [](core* core) {
+			core->addOption(submenuOption("Wardrobe")
+				.setTarget("Wardrobe"));
 
-			core->add_option(submenu_option("Model")
-				.set_target("Model"));
+			core->addOption(submenuOption("Model")
+				.setTarget("Player Model"));
 
-			core->add_option(break_option("Modifiers"));
+			core->addOption(breakOption("Modifiers"));
 
-			core->add_option(scroll_option<const char*, int>("Clothing")
-				.add_array(&comp_names).set_position(&m_vars.m_clothing)
-				.add_click([=] {
+			core->addOption(scrollOption<const char*, int>("Clothing")
+				.addScroll(&comp_names).setPosition(&m_vars.m_clothing)
+				.addClick([=] {
 					m_vars.m_clothing_model = PED::GET_PED_DRAWABLE_VARIATION(PLAYER::PLAYER_PED_ID(), components[m_vars.m_clothing].m_result.first);
 					m_vars.m_clothing_variation = PED::GET_PED_TEXTURE_VARIATION(PLAYER::PLAYER_PED_ID(), components[m_vars.m_clothing].m_result.first);
 					}));
 
-			core->add_option(number_option<int>("Clothing Model")
-				.add_number(&m_vars.m_clothing_model).add_min(-1).add_max(PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), components[m_vars.m_clothing].m_result.first) - 1)
-				.add_click([=] {
+			core->addOption(numberOption<int>("Clothing Model")
+				.addNumber(&m_vars.m_clothing_model).addMin(-1).addMax(PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), components[m_vars.m_clothing].m_result.first) - 1)
+				.addClick([=] {
 					PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), components[m_vars.m_clothing].m_result.first, m_vars.m_clothing_model, PED::GET_PED_TEXTURE_VARIATION(PLAYER::PLAYER_PED_ID(), components[m_vars.m_clothing].m_result.first), 0);
 					m_vars.m_clothing_variation = PED::GET_PED_TEXTURE_VARIATION(PLAYER::PLAYER_PED_ID(), components[m_vars.m_clothing].m_result.first);
 					}));
 
-			core->add_option(number_option<int>("Clothing Variation")
-				.add_number(&m_vars.m_clothing_variation).add_min(-1).add_max(PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), components[m_vars.m_clothing].m_result.first, m_vars.m_clothing_model))
-				.add_click([=] {
+			core->addOption(numberOption<int>("Clothing Variation")
+				.addNumber(&m_vars.m_clothing_variation).addMin(-1).addMax(PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), components[m_vars.m_clothing].m_result.first, m_vars.m_clothing_model))
+				.addClick([=] {
 					PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), components[m_vars.m_clothing].m_result.first, m_vars.m_clothing_model, m_vars.m_clothing_variation, 0);
 					}));
 
-			core->add_option(scroll_option<const char*, int>("Accessory")
-				.add_array(&acc_names).set_position(&m_vars.m_accessory)
-				.add_click([=] {
+			core->addOption(scrollOption<const char*, int>("Accessory")
+				.addScroll(&acc_names).setPosition(&m_vars.m_accessory)
+				.addClick([=] {
 					m_vars.m_accessory_model = PED::GET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), accessories[m_vars.m_accessory].m_result.first);
 					m_vars.m_accessory_variation = PED::GET_PED_PROP_TEXTURE_INDEX(PLAYER::PLAYER_PED_ID(), accessories[m_vars.m_accessory].m_result.first);
 					}));
 
-			core->add_option(number_option<int>("Accessory Model")
-				.add_number(&m_vars.m_accessory_model).add_min(-1).add_max(PED::GET_NUMBER_OF_PED_PROP_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), accessories[m_vars.m_accessory].m_result.first))
-				.add_click([=] {
+			core->addOption(numberOption<int>("Accessory Model")
+				.addNumber(&m_vars.m_accessory_model).addMin(-1).addMax(PED::GET_NUMBER_OF_PED_PROP_DRAWABLE_VARIATIONS(PLAYER::PLAYER_PED_ID(), accessories[m_vars.m_accessory].m_result.first))
+				.addClick([=] {
 					PED::SET_PED_PROP_INDEX(PLAYER::PLAYER_PED_ID(), accessories[m_vars.m_accessory].m_result.first, m_vars.m_accessory_model, 0, true);
 					m_vars.m_accessory_variation = PED::GET_PED_PROP_TEXTURE_INDEX(PLAYER::PLAYER_PED_ID(), accessories[m_vars.m_accessory].m_result.first);
 					}));
 
-			core->add_option(number_option<int>("Accessory Variation")
-				.add_number(&m_vars.m_accessory_variation).add_min(-1).add_max(PED::GET_NUMBER_OF_PED_PROP_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), accessories[m_vars.m_accessory].m_result.first, m_vars.m_accessory_variation))
-				.add_click([=] {
+			core->addOption(numberOption<int>("Accessory Variation")
+				.addNumber(&m_vars.m_accessory_variation).addMin(-1).addMax(PED::GET_NUMBER_OF_PED_PROP_TEXTURE_VARIATIONS(PLAYER::PLAYER_PED_ID(), accessories[m_vars.m_accessory].m_result.first, m_vars.m_accessory_variation))
+				.addClick([=] {
 					PED::SET_PED_COMPONENT_VARIATION(PLAYER::PLAYER_PED_ID(), components[m_vars.m_clothing].m_result.first, m_vars.m_clothing_model, m_vars.m_clothing_variation, 0);
 					}));
 		});
 
-		renderer::addSubmenu("Model", [](core* core) {
-			core->add_option(scroll_option<const char*, int>("Popular")
-				.add_array(&g_ped_model_popular).set_position(&g_ped_model_popular_id)
-				.add_click([=] {
+		renderer::addSubmenu("Model", "Player Model", [](core* core) {
+			core->addOption(scrollOption<const char*, int>("Popular")
+				.addScroll(&g_ped_model_popular).setPosition(&g_ped_model_popular_id)
+				.addClick([=] {
 					if (Util::is_key_pressed(VK_RETURN)) {
 						apply_model(g_ped_model_popular[g_ped_model_popular_id]);
 					}
 				}));
 
-			core->add_option(scroll_option<const char*, int>("Story")
-				.add_array(&g_ped_model_story).set_position(&g_ped_model_story_id)
-				.add_click([=] {
+			core->addOption(scrollOption<const char*, int>("Story")
+				.addScroll(&g_ped_model_story).setPosition(&g_ped_model_story_id)
+				.addClick([=] {
 					if (Util::is_key_pressed(VK_RETURN)) {
 						apply_model(g_ped_model_story[g_ped_model_story_id]);
 					}
 				}));
 
-			core->add_option(scroll_option<const char*, int>("Animals")
-				.add_array(&g_ped_model_animal).set_position(&g_ped_model_animal_id)
-				.add_click([=] {
+			core->addOption(scrollOption<const char*, int>("Animals")
+				.addScroll(&g_ped_model_animal).setPosition(&g_ped_model_animal_id)
+				.addClick([=] {
 					if (Util::is_key_pressed(VK_RETURN)) {
 						apply_model(g_ped_model_animal[g_ped_model_animal_id]);
 					}
 				}));
 
-			core->add_option(scroll_option<const char*, int>("Emergency")
-				.add_array(&g_ped_model_emergency).set_position(&g_ped_model_emergency_id)
-				.add_click([=] {
+			core->addOption(scrollOption<const char*, int>("Emergency")
+				.addScroll(&g_ped_model_emergency).setPosition(&g_ped_model_emergency_id)
+				.addClick([=] {
 					if (Util::is_key_pressed(VK_RETURN)) {
 						apply_model(g_ped_model_emergency[g_ped_model_emergency_id]);
 					}
 				}));
 
-			core->add_option(scroll_option<const char*, int>("Role")
-				.add_array(&g_ped_model_role).set_position(&g_ped_model_role_id)
-				.add_click([=] {
+			core->addOption(scrollOption<const char*, int>("Role")
+				.addScroll(&g_ped_model_role).setPosition(&g_ped_model_role_id)
+				.addClick([=] {
 					if (Util::is_key_pressed(VK_RETURN)) {
 						apply_model(g_ped_model_role[g_ped_model_role_id]);
 					}
 				}));
 
-			core->add_option(scroll_option<const char*, int>("Ambient")
-				.add_array(&g_ped_model_ambient).set_position(&g_ped_model_ambient_id)
-				.add_click([=] {
+			core->addOption(scrollOption<const char*, int>("Ambient")
+				.addScroll(&g_ped_model_ambient).setPosition(&g_ped_model_ambient_id)
+				.addClick([=] {
 					if (Util::is_key_pressed(VK_RETURN)) {
 						apply_model(g_ped_model_ambient[g_ped_model_ambient_id]);
 					}
 				}));
 
 
-			core->add_option(scroll_option<const char*, int>("Misc")
-				.add_array(&g_ped_model_misc).set_position(&g_ped_model_misc_id)
-				.add_click([=] {
+			core->addOption(scrollOption<const char*, int>("Misc")
+				.addScroll(&g_ped_model_misc).setPosition(&g_ped_model_misc_id)
+				.addClick([=] {
 					if (Util::is_key_pressed(VK_RETURN)) {
 						apply_model(g_ped_model_misc[g_ped_model_misc_id]);
 					}

@@ -26,38 +26,38 @@ namespace menu::player::movement::vars {
 namespace menu {
 
 	void player_movement_menu::render() {
-		renderer::addSubmenu("Movement", [](core* core) {
-			core->add_option(toggle_number_option<float>("No Clip")
-				.add_toggle(&m_vars.m_no_clip).add_number(&m_vars.m_no_clip_speed)
-				.add_min(1.0f).add_max(100.f).add_step(0.1f).add_precision(2));
+		renderer::addSubmenu("Movement", "Player Movement", [](core* core) {
+			core->addOption(toggleNumberOption<float>("No Clip")
+				.addToggle(&m_vars.m_no_clip).addNumber(&m_vars.m_no_clip_speed)
+				.addMin(1.0f).addMax(100.f).addStep(0.1f).setPrecision(2));
 
-			core->add_option(toggle_number_option<float>("Run Speed")
-				.add_toggle(&m_vars.m_run_speed).add_number(&m_vars.m_run_multiplier)
-				.add_min(1.0f).add_max(100.f).add_step(0.01f).add_precision(2));
+			core->addOption(toggleNumberOption<float>("Run Speed")
+				.addToggle(&m_vars.m_run_speed).addNumber(&m_vars.m_run_multiplier)
+				.addMin(1.0f).addMax(100.f).addStep(0.01f).setPrecision(2));
 
-			core->add_option(toggle_number_option<float>("Swim Speed ")
-				.add_toggle(&m_vars.m_swim_speed).add_number(&m_vars.m_swim_multiplier)
-				.add_min(1.0f).add_max(100.f).add_step(0.1f).add_precision(2));
+			core->addOption(toggleNumberOption<float>("Swim Speed ")
+				.addToggle(&m_vars.m_swim_speed).addNumber(&m_vars.m_swim_multiplier)
+				.addMin(1.0f).addMax(100.f).addStep(0.1f).setPrecision(2));
 
-			core->add_option(toggle_option("Slide Run")
-				.add_hotkey().add_translate()
-				.add_toggle(&m_vars.m_slide_run));
+			core->addOption(toggleOption("Slide Run")
+				.addHotkey().addTranslate()
+				.addToggle(&m_vars.m_slide_run));
 
-			core->add_option(toggle_option("Super Jump")
-				.add_hotkey().add_translate()
-				.add_toggle(&m_vars.m_beast_jump));
+			core->addOption(toggleOption("Super Jump")
+				.addHotkey().addTranslate()
+				.addToggle(&m_vars.m_beast_jump));
 
-			core->add_option(toggle_option("Swim in Air")
-				.add_hotkey().add_translate()
-				.add_toggle(&m_vars.m_swim_in_air));
+			core->addOption(toggleOption("Swim in Air")
+				.addHotkey().addTranslate()
+				.addToggle(&m_vars.m_swim_in_air));
 
-			core->add_option(toggle_option("Walk on Air")
-				.add_hotkey().add_translate()
-				.add_toggle(&m_vars.m_walk_on_air));
+			core->addOption(toggleOption("Walk on Air")
+				.addHotkey().addTranslate()
+				.addToggle(&m_vars.m_walk_on_air));
 
-			core->add_option(toggle_option("Freeze")
-				.add_hotkey().add_translate()
-				.add_toggle(&m_vars.m_freeze));
+			core->addOption(toggleOption("Freeze")
+				.addHotkey().addTranslate()
+				.addToggle(&m_vars.m_freeze));
 		});
 	}
 

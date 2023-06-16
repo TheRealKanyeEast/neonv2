@@ -8,7 +8,7 @@
 namespace base::gui
 {
 	template <typename DataType, typename PositionType>
-	class scroll_option : public base_option<scroll_option<DataType, PositionType>>
+	class scrollOption : public base_option<scrollOption<DataType, PositionType>>
 	{
 	private:
 		const DataType* m_data{};
@@ -16,34 +16,34 @@ namespace base::gui
 		PositionType* m_position{};
 		std::function<void()> m_function;
 		std::function<void()> m_on_hover = []() {};
-		using base = base_option<scroll_option<DataType, PositionType>>;
+		using base = base_option<scrollOption<DataType, PositionType>>;
 	public:
-		explicit scroll_option(const char* text) {
+		explicit scrollOption(const char* text) {
 			base::set_left_text(text);
 		}
 		template <PositionType N>
-		scroll_option& add_array(DataType(*array)[N]) {
+		scrollOption& addScroll(DataType(*array)[N]) {
 			m_data = *array;
 			m_data_size = N;
 			return *this;
 		}
 
-		scroll_option& set_position(PositionType* position) {
+		scrollOption& setPosition(PositionType* position) {
 			m_position = position;
 			return *this;
 		}
 
-		scroll_option& add_click(std::function<void()> action = [] {}) {
+		scrollOption& addClick(std::function<void()> action = [] {}) {
 			base::set_action(std::move(action));
 			return *this;
 		}
 
-		scroll_option& add_hover(std::function<void()> function) {
+		scrollOption& addHover(std::function<void()> function) {
 			m_on_hover = function;
 			return *this;
 		}
 
-		scroll_option& add_translate() {
+		scrollOption& addTranslate() {
 			const char* translation = TRANSLATE(base::get_left_text());
 			//base::set_left_text(translation);
 			return *this;

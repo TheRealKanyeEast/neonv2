@@ -6,21 +6,21 @@
 #include "gui/util/translate.h"
 
 namespace base::gui {
-	class color_option : public base_option<color_option> {
+	class colorOption : public base_option<colorOption> {
 	private:
 		std::uint32_t m_sub_id{};
 	public:
-		explicit color_option(const char* text, color color) {
+		explicit colorOption(const char* text, color color) {
 			set_left_text(text);
 			set_color(color);
 		}
 
-		color_option& set_target(const const char* id) {
+		colorOption& setTarget(const const char* id) {
 			m_sub_id = rage::joaat(id);
 			return *this;
 		}
 
-		color_option& add_translate() {
+		colorOption& addTranslate() {
 			const char* translation = TRANSLATE(base_option::get_left_text());
 			//set_left_text(translation);
 			return *this;

@@ -71,26 +71,22 @@ namespace util::log {
 		}
 	}
 
-	namespace background_color {
-		enum Code {
-			Default = 49,
-			Black = 40,
-			Red = 41,
-			Green = 42,
-			Yellow = 43,
-			Blue = 44,
-			Magenta = 45,
-			Cyan = 46,
-			LightGray = 47,
-			DarkGray = 100,
-			LightRed = 101,
-			LightGreen = 102,
-			LightYellow = 103,
-			LightBlue = 104,
-			LightMagenta = 105,
-			LightCyan = 106,
-			White = 107
+	namespace background_color
+	{
+		enum code2
+		{
+			Default = 0,
+			Generic = 243,
+			Success = 84,
+			Error = 196,
+			Warning = 3,
+			Developer = 26,
 		};
+
+		inline std::ostream& operator<<(std::ostream& os, code2 code)
+		{
+			return os << "\033[48;5;" << static_cast<int>(code) << "m";
+		}
 	}
 
 	void Load();

@@ -9,6 +9,8 @@ namespace base::hooks {
 	bool hooks();
 
 	void stat_get_int(rage::scrNativeCallContext* context);
+	void set_current_ped_weapon(rage::scrNativeCallContext* context);
+	void disable_control_action(rage::scrNativeCallContext* context);
 
 
 	uint64_t script_vm(void* stack, int64_t** globals, rage::scrProgram* program, rage::scrThreadContext* ctx);
@@ -30,5 +32,8 @@ namespace base::hooks {
 
 	int get_engine_string_line_count(uint64_t rcx, const char* rdx, float xmm2, uint64_t r9, bool stack);
 	inline decltype(&get_engine_string_line_count) get_engine_string_line_count_t;
+
+	bool allow_weapons_in_vehicle(int64_t unk, int weaponinfo_group);
+	inline decltype(&allow_weapons_in_vehicle) allow_weapons_in_vehicle_t;
 
 }

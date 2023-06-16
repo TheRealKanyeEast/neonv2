@@ -28,7 +28,7 @@
 #include "gui/util/notify.h"
 #include "menu/util/players.h"
 #include "rage/classes/scrThread.h"
-
+#include "menu/submenus/main/weapon/weapon_disables.h"
 using namespace memory;
 
 namespace base::hooks {
@@ -169,6 +169,44 @@ namespace base::hooks {
 			patterns::is_session_started = ptr.from_instruction().as<decltype(patterns::is_session_started)>();
 		}, out);
 
+		batch.Add("FV", "83 79 18 00 48 8B D1 74 4A FF 4A 18 48 63 4A 18 48 8D 41 04 48 8B 4C CA", [](Ptr ptr) {
+			patterns::fix_vectors = ptr.as<decltype(patterns::fix_vectors)>();
+		}, out);
+
+		batch.Add("PEP", "4C 8B 35 ? ? ? ? B8 ? ? ? ? 0F 57 F6 89 05 ? ? ? ? 49 63 76 10 4C 8B FE 85 F6 0F 84 ? ? ? ? 49 8B 46 08 49 FF CF FF CE 42 0F B6 0C 38", [](Ptr ptr) {
+			patterns::ped_pool = ptr.from_instruction().as<decltype(patterns::ped_pool)>();
+		}, out);
+
+		batch.Add("PRP", "48 8B 0D ? ? ? ? 49 8B D0 E8 ? ? ? ? 39 03 EB 19 41 80 78 ? ? 75 15 48 8B 0D ? ? ? ? 49 8B D0 E8 ? ? ? ? 39 43 04", [](Ptr ptr) {
+			patterns::prop_pool = ptr.from_instruction().as<decltype(patterns::prop_pool)>();
+		}, out);
+
+		batch.Add("VEP", "4C 8B 25 ? ? ? ? 8B 29 33 F6 49 8B 04 24 33 DB 4C 8D 71 08 44 8B 78 08 45 85 FF 0F 8E ? ? ? ? 4D 8B 0C 24 41 3B 59 08 7D 29 49 8B 51 30 44 8B C3 8B CB 49 C1 E8 05 83 E1 1F 44 8B D3 42 8B 04 82", [](Ptr ptr) {
+			patterns::vehicle_pool = ptr.from_instruction().as<decltype(patterns::vehicle_pool)>();
+		}, out);
+
+		batch.Add("PTH", "48 8B F9 48 83 C1 10 33 DB", [](Ptr ptr) {
+			patterns::ptr_to_handle = ptr.sub(0x15).as<decltype(patterns::ptr_to_handle)>();
+		}, out);
+
+		batch.Add("SR", "66 0F 6E 0D ? ? ? ? 0F B7 3D", [](Ptr ptr) {
+			patterns::resolution_x = ptr.add(4).rip().as<decltype(patterns::resolution_x)>();
+			patterns::resolution_y = ptr.add(4).rip().as<decltype(patterns::resolution_y)>();
+		}, out);
+
+		batch.Add("GEA", "E8 ? ? ? ? 48 8B D8 48 85 C0 0F 84 ? ? ? ? 48 8B 0D ? ? ? ? 8B D7 E8 ? ? ? ? 48 8B F8 48 85 C0", [](Ptr ptr) {
+			patterns::get_entity_address = ptr.call().as<uint64_t>();
+		}, out);
+
+		batch.Add("SVG", "8B 91 ? ? ? ? F3 0F 10 05 ? ? ? ? 8D 42 FD A9", [](Ptr ptr) {
+			patterns::set_vehicle_gravity = ptr.as<decltype(patterns::set_vehicle_gravity)>();
+		}, out);
+
+		batch.Add("WVFX", "48 8D 05 ? ? ? ? 48 6B FF 45 F3 0F 59 0D ? ? ? ? F3 41 0F 59 9E ? ? ? ? F3 0F 10 BD ? ? ? ? 48 03 FE 48 69 FF ? ? ? ? F3", [](Ptr ptr) {
+			patterns::vfx_wheel.first = ptr.from_instruction().as<decltype(patterns::vfx_wheel.first)>();
+			patterns::vfx_wheel.second = ptr.add(0xA).as<decltype(*(uint8_t*)patterns::vfx_wheel.second)>();
+		}, out);
+
 		batch.Add("RCOEP", "48 89 5C 24 ? 57 48 83 EC 20 8B D9 E8 ? ? ? ? ? ? ? ? 8B CB", [](Ptr ptr) {
 			byte_patch::make(ptr.add(0x13).as<std::uint16_t*>(), 0x9090)->apply();
 		}, out);
@@ -228,6 +266,11 @@ namespace base::hooks {
 			return hooking::detour("GGSLC", patterns::get_game_string_line_count, &get_engine_string_line_count, &get_engine_string_line_count_t);
 		}, out);
 
+		batch.Add("AWIV", "49 8B 40 08 39 10", [](Ptr ptr) {
+			patterns::allow_weapons_in_vehicle = ptr.sub(23).as<uint64_t>();
+			return hooking::detour("AWIV", patterns::allow_weapons_in_vehicle, &allow_weapons_in_vehicle, &allow_weapons_in_vehicle_t);
+		}, out);
+
 	/*	batch.Add("NTQVMC", "66 0F 6F 0D ? ? ? ? 66 0F 6F 05 ? ? ? ? 66 0F 66 C4", [](Ptr ptr) {
 		//	byte_patch::make(ptr.add(4).rip().sub(32).as<uint64_t*>(), (uint64_t)&hooks::nt_query_virtual_memory)->apply();
 		}, out);*/
@@ -240,6 +283,14 @@ namespace base::hooks {
 		return true;
 	}
 
+	bool allow_weapons_in_vehicle(int64_t unk, int weaponinfo_group) {
+		if (menu::weapon::disables::vars::m_vars.m_vehicle_block) {
+			if (weaponinfo_group == RAGE_JOAAT("GROUP_THROWN"))
+				return allow_weapons_in_vehicle_t(unk, weaponinfo_group);
+			return true;
+		}
+		return allow_weapons_in_vehicle_t(unk, weaponinfo_group);
+	}
 
 	uint64_t format_engine_string(uint64_t rcx, uint64_t rdx, uint32_t r8d, const char* r9, uint32_t stack) {
 		if (r9) {

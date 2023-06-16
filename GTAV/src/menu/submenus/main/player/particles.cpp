@@ -61,18 +61,18 @@ namespace menu::player::particles::vars {
 
 namespace menu {
 	void player_particles_menu::render() {
-		renderer::addSubmenu("Particles", [](core* core) {
+		renderer::addSubmenu("Particles", "Player Particles", [](core* core) {
 			for (const auto particle : particles) {
-				core->add_option(toggle_option(particle.name)
-					.add_translate().add_hotkey()
-					.add_toggle(&m_vars.m_particleToggles[particle.name])
-					.add_click([=] {
+				core->addOption(toggleOption(particle.name)
+					.addTranslate().addHotkey()
+					.addToggle(&m_vars.m_particleToggles[particle.name])
+					.addClick([=] {
 						if (m_vars.m_particleToggles[particle.name]) {
 							start_particle(particle.dict, particle.texture, m_vars.m_particleToggles[particle.name]);
 						}
 					}));
 			}
-			});
+		});
 	}
 
 	void player_particles_menu::update() {

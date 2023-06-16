@@ -7,66 +7,66 @@
 
 namespace base::gui {
 	template <typename Type, typename = std::enable_if_t<std::is_arithmetic_v<Type>>>
-	class number_option : public base_option<number_option<Type>> {
+	class numberOption : public base_option<numberOption<Type>> {
 	private:
 		Type* m_number = nullptr;
 		Type m_min = 0;
 		Type m_max = 1;
 		Type m_step = 1;
 		std::size_t m_precision = 3;
-		using base = base_option<number_option<Type>>;
+		using base = base_option<numberOption<Type>>;
 		using display_type = std::conditional_t<sizeof(Type) == 1, std::uint32_t, Type>;
 		std::function<void()> m_function;
 		std::function<void()> m_on_hover = []() {};
 		std::string m_name = "";
 	public:
-		explicit number_option(const char* text) {
+		explicit numberOption(const char* text) {
 			m_name = text;
 			base::set_left_text(m_name.c_str());
 		}
 
-		number_option& add_tooltip(const char* const text)
+		numberOption& addTooltip(const char* const text)
 		{
 			base::set_tooltip(text);
 			return *this;
 		}
 
-		number_option& add_click(std::function<void()> action = [] {}) {
+		numberOption& addClick(std::function<void()> action = [] {}) {
 			base::set_action(std::move(action));
 			return *this;
 		}
 
-		number_option& add_hover(std::function<void()> function) {
+		numberOption& addHover(std::function<void()> function) {
 			m_on_hover = function;
 			return *this;
 		}
 
-		number_option& add_number(Type* number) {
+		numberOption& addNumber(Type* number) {
 			m_number = number;
 			return *this;
 		}
 
-		number_option& add_min(Type min) {
+		numberOption& addMin(Type min) {
 			m_min = min;
 			return *this;
 		}
 
-		number_option& add_max(Type max) {
+		numberOption& addMax(Type max) {
 			m_max = max;
 			return *this;
 		}
 
-		number_option& add_step(Type step) {
+		numberOption& addStep(Type step) {
 			m_step = step;
 			return *this;
 		}
 
-		number_option& add_precision(Type precision) {
+		numberOption& setPrecision(Type precision) {
 			m_precision = precision;
 			return *this;
 		}
 
-		number_option& add_translate() {
+		numberOption& addTranslate() {
 			const char* translation = TRANSLATE(base_option::get_left_text());
 			//base::set_left_text(translation);
 			return *this;

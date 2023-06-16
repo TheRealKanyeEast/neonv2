@@ -56,20 +56,17 @@ const char* remove_weapons[] = {
 
 namespace menu {
 	void weapon_menu::render() {
-		renderer::addSubmenu("Weapons", [](core* core) {
+		renderer::addSubmenu("Weapons", "Weapons", [](core* core) {
 
-			core->add_option(submenu_option("Weapon Mods")
-				.add_translate()
-				.set_target("Weapon Mods"));
+			core->addOption(submenuOption("Weapon Mods")
+				.addTranslate()
+				.setTarget("Weapon Mods"));
 
-			core->add_option(submenu_option("Weapon Mangement"));
-			core->add_option(submenu_option("Tint Mangement"));
+			core->addOption(breakOption("Quick Access"));
 
-			core->add_option(break_option("Quick Access"));
-
-			core->add_option(button_option("Give All Weapons")
-				.add_translate()
-				.add_click([] {
+			core->addOption(buttonOption("Give All Weapons")
+				.addTranslate()
+				.addClick([] {
 					for (const auto& weapon : lists::g_weapons) {
 						give_weapon(PLAYER::PLAYER_PED_ID(), weapon.id, true, false);
 					}
@@ -79,10 +76,10 @@ namespace menu {
 			WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &m_weapon_hash, false);
 			auto curWeapon = WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &m_weapon_hash, false);
 
-			core->add_option(scroll_option<const char*, std::size_t>("Remove Weapons")
-				.add_translate()
-				.add_array(&remove_weapons).set_position(&remove_weapons_id)
-				.add_click([=] {
+			core->addOption(scrollOption<const char*, std::size_t>("Remove Weapons")
+				.addTranslate()
+				.addScroll(&remove_weapons).setPosition(&remove_weapons_id)
+				.addClick([=] {
 					uint32_t hash;
 					switch (remove_weapons_id) {
 					case 0:
@@ -98,10 +95,10 @@ namespace menu {
 					}
 				}));
 
-			core->add_option(scroll_option<const char*, std::size_t>("Give Ammo")
-				.add_translate()
-				.add_array(&give_ammo).set_position(&give_ammo_id)
-				.add_click([=] {
+			core->addOption(scrollOption<const char*, std::size_t>("Give Ammo")
+				.addTranslate()
+				.addScroll(&give_ammo).setPosition(&give_ammo_id)
+				.addClick([=] {
 					uint32_t hash;
 					int ammo = -1;
 					WEAPON::GET_MAX_AMMO(PLAYER::PLAYER_PED_ID(), curWeapon, &ammo);
@@ -122,10 +119,10 @@ namespace menu {
 					}
 				}));
 
-			core->add_option(scroll_option<const char*, std::size_t>("Remove Ammo")
-				.add_translate()
-				.add_array(&remove_ammo).set_position(&remove_ammo_id)
-				.add_click([=] {
+			core->addOption(scrollOption<const char*, std::size_t>("Remove Ammo")
+				.addTranslate()
+				.addScroll(&remove_ammo).setPosition(&remove_ammo_id)
+				.addClick([=] {
 					uint32_t hash;
 					int ammo = -1;
 					WEAPON::GET_MAX_AMMO(PLAYER::PLAYER_PED_ID(), curWeapon, &ammo);
@@ -147,10 +144,10 @@ namespace menu {
 					}
 				}));
 
-			core->add_option(scroll_option<const char*, std::size_t>("Upgrade Components")
-				.add_translate()
-				.add_array(&give_components).set_position(&give_components_id)
-				.add_click([=] {
+			core->addOption(scrollOption<const char*, std::size_t>("Upgrade Components")
+				.addTranslate()
+				.addScroll(&give_components).setPosition(&give_components_id)
+				.addClick([=] {
 					uint32_t hash;
 					int ammo = -1;
 					WEAPON::GET_MAX_AMMO(PLAYER::PLAYER_PED_ID(), curWeapon, &ammo);
@@ -172,10 +169,10 @@ namespace menu {
 					}
 				}));
 
-			core->add_option(scroll_option<const char*, std::size_t>("Downgrade Components")
-				.add_translate()
-				.add_array(&remove_components).set_position(&remove_components_id)
-				.add_click([=] {
+			core->addOption(scrollOption<const char*, std::size_t>("Downgrade Components")
+				.addTranslate()
+				.addScroll(&remove_components).setPosition(&remove_components_id)
+				.addClick([=] {
 					uint32_t hash;
 					int ammo = -1;
 					WEAPON::GET_MAX_AMMO(PLAYER::PLAYER_PED_ID(), curWeapon,&ammo);

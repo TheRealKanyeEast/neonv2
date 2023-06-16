@@ -29,6 +29,8 @@ namespace menu {
 			bool m_seatbelt;
 		};
 
+		void run_task(Vehicle veh, std::function<void(Vehicle)> callback);
+
 		extern variables m_vars;
 	}
 }

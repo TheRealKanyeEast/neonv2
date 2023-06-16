@@ -87,6 +87,9 @@ namespace script {
 
 	native_hooks::native_hooks() {
 		add_native_detour("main_persistent"_joaat, 0x767FBC2AC802EF3D, base::hooks::stat_get_int);
+		add_native_detour(0xADF692B254977C0C, base::hooks::set_current_ped_weapon);
+		add_native_detour(0xFE99B66D079CF6BC, base::hooks::disable_control_action);
+
 
 		for (auto& entry : *patterns::script_program)
 			if (entry.m_program)

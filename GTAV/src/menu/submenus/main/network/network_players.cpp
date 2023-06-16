@@ -20,20 +20,20 @@ const char* sort_types[] = {
 namespace menu {
 
 	void network_players_menu::render() {
-		renderer::addSubmenu("Players", [](core* core) {
-			core->add_option(scroll_option<const char*, std::size_t>("Sort Players")
-				.add_array(&sort_types).set_position(&sort_types_id));
+		renderer::addSubmenu("Players", "Network Players", [](core* core) {
+			core->addOption(scrollOption<const char*, std::size_t>("Sort Players")
+				.addScroll(&sort_types).setPosition(&sort_types_id));
 
-			core->add_option(break_option("Players"));
+			core->addOption(breakOption("Players"));
 
 			for (uint32_t i = 0; i < 32; i++) {
 				if (auto ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i)) {
 					if (ENTITY::DOES_ENTITY_EXIST(ped)) {
 						std::string name = PLAYER::GET_PLAYER_NAME(i);
 
-						core->add_option(submenu_option(PLAYER::GET_PLAYER_NAME(i))
-							.add_click([=] { m_vars.m_selected_player = i; })
-							.set_target("selected_player"));
+						core->addOption(submenuOption(PLAYER::GET_PLAYER_NAME(i))
+							.addClick([=] { m_vars.m_selected_player = i; })
+							.setTarget("selected_player"));
 					}
 				}
 			}

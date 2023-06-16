@@ -3,9 +3,9 @@
 #include "gui/render.h"
 
 namespace base::gui {
-	class break_option : public base_option<break_option> {
+	class breakOption : public base_option<breakOption> {
 	public:
-		explicit break_option(const char* text) {
+		explicit breakOption(const char* text) {
 			set_left_text(text);
 		}
 		bool get_flag(eOptionFlag flag) override {

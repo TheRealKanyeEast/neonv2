@@ -60,9 +60,9 @@ namespace util::log {
 		char tag[64] = {};
 		snprintf(tag, sizeof(tag) - 1, "[%s] ", type);
 
-		std::cout << forgound_color::Code(color) << tag << buffer.get() << std::endl;
+		std::cout << background_color::code2(color) << " " << background_color::Default << forgound_color::Code(color) << " " << tag << buffer.get() << std::endl;
 
-		m_file << forgound_color::Code(color) << tag << buffer.get() << std::endl;
+		m_file << tag << buffer.get() << std::endl;
 		//m_console << forgound_color::Code(color) << tag << buffer.get() << std::endl;
 	}
 }

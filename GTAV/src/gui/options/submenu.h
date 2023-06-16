@@ -44,7 +44,7 @@ namespace base::gui {
 		}
 
 		template<typename T>
-		inline base_submenu& add_option(T&& option) {
+		inline base_submenu& addOption(T&& option) {
 			auto ptr = std::make_unique<std::remove_reference_t<T>>(option);
 			m_options.push_back(std::move(ptr));
 			return *this;

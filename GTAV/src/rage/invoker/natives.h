@@ -4391,8 +4391,8 @@ namespace PED {
 	ntveDecl void SET_PED_MOVE_RATE_OVERRIDE(Ped ped, float value) { ntveCall<void>(0x085BF80FA50A39D1, ped, value); } // 0x085BF80FA50A39D1 0x900008C6 b323
 	ntveDecl void SET_PED_MOVE_RATE_IN_WATER_OVERRIDE(Any p0, Any p1) { ntveCall<void>(0x0B3E35AC043707D9, p0, p1); } // 0x0B3E35AC043707D9  b573
 	ntveDecl BOOL PED_HAS_SEXINESS_FLAG_SET(Ped ped, int flag) { return ntveCall<BOOL>(0x46B05BCAE43856B0, ped, flag); } // 0x46B05BCAE43856B0 0x79543043 b323
-	ntveDecl int GET_PED_NEARBY_VEHICLES(Ped ped, Any* sizeAndVehs) { return ntveCall<int>(0xCFF869CBFA210D82, ped, sizeAndVehs); } // 0xCFF869CBFA210D82 0xCB716F68 b323
-	ntveDecl int GET_PED_NEARBY_PEDS(Ped ped, Any* sizeAndPeds, int ignore) { return ntveCall<int>(0x23F8F5FC7E8C4A6B, ped, sizeAndPeds, ignore); } // 0x23F8F5FC7E8C4A6B 0x4D3325F4 b323
+	ntveDecl int GET_PED_NEARBY_VEHICLES(Ped ped, Vehicle* sizeAndVehs) { return ntveCall<int>(0xCFF869CBFA210D82, ped, sizeAndVehs); } // 0xCFF869CBFA210D82 0xCB716F68 b323
+	ntveDecl int GET_PED_NEARBY_PEDS(Ped ped, Ped* sizeAndPeds, int ignore) { return ntveCall<int>(0x23F8F5FC7E8C4A6B, ped, sizeAndPeds, ignore); } // 0x23F8F5FC7E8C4A6B 0x4D3325F4 b323
 	ntveDecl BOOL HAVE_ALL_STREAMING_REQUESTS_COMPLETED(Ped ped) { return ntveCall<BOOL>(0x7350823473013C02, ped); } // 0x7350823473013C02 0xF9FB4B71 b323
 	ntveDecl BOOL IS_PED_USING_ACTION_MODE(Ped ped) { return ntveCall<BOOL>(0x00E73468D085F745, ped); } // 0x00E73468D085F745 0x5AE7EDA2 b323
 	ntveDecl void SET_PED_USING_ACTION_MODE(Ped ped, BOOL p1, int p2, const char* action) { ntveCall<void>(0xD75ACCF5E0FB5367, ped, p1, p2, action); } // 0xD75ACCF5E0FB5367 0x8802F696 b323
