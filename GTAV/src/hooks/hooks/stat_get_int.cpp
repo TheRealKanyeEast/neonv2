@@ -9,6 +9,7 @@
 #include "menu/submenus/main/network.h"
 #include "menu/submenus/main/weapon.h"
 #include "menu/submenus/main/vehicle.h"
+#include "menu/submenus/main/teleport.h"
 #include "util/fiber.h"
 #include "features/features.h"
 #include "gui/util/fonts.h"
@@ -142,6 +143,7 @@ namespace base::hooks {
 						menu::getNetworkMenu()->update();
 						menu::getWeaponMenu()->update();
 						menu::getVehicleMenu()->update();
+						menu::getTeleportMenu()->update();
 					});	
 
 					util::fiber::add("F_UTIL", [] {

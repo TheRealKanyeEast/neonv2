@@ -8,7 +8,34 @@
 #include "rage/classes/scrProgram.h"
 #include "rage/classes/joaat.h"
 namespace hooking {
+
+
+	void restoreIRC()
+	{
+		// Patch bytes for the "IRC" pattern
+		std::vector<BYTE> patchBytes = {
+			0x80, 0x3D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0F, 0x85, 0xA7, 0x00, 0x00, 0x00, 0x48, 0x8B, 0x05
+		};
+
+		// Restore the "IRC" patch
+		memory::restorePatch(patterns::invalid_resource_check, patchBytes);
+	}
+
+	void restoreICP1()
+	{
+		// Patch bytes for the "ICP-1" pattern
+		std::vector<BYTE> patchBytes = {
+			0x48, 0x83, 0xEC, 0x48, 0x48, 0x83, 0x64, 0x24, 0x00, 0x00, 0x83, 0x4C, 0x24
+		};
+
+		// Restore the "ICP-1" patch
+		memory::restorePatch(patterns::integ_check_1, patchBytes);
+	}
+
 	void Detour::remove_detour() {
+		restoreIRC();
+		restoreICP1();
+
 		for (DetourContext& detour : m_detours) {
 			MH_QueueDisableHook((void*)detour.m_address);
 			LOG_CUSTOM_SUCCESS("Hook", "Unhooked %s", detour.m_name);

@@ -10,6 +10,12 @@
 #include "rage/invoker/types.h"
 #include "memory/pattern.h"
 #include "rage/classes/vfx.h"
+#include "rage/classes/CBlipList.h"
+#include "rage/classes/atArray.h"
+#include "rage/classes/CNetworkPlayerMgr.h"
+#include "rage/classes/scrThread.h"
+#include "rage/classes/Network.h"
+
 class GenericPool;
 class VehiclePool;
 namespace patterns {
@@ -27,10 +33,6 @@ namespace patterns {
 	extern void* jmp_rbx_register;
 
 	extern PVOID set_this_thread_networked;
-	extern uint64_t queue_dependency;
-	extern PVOID interval_check_func;
-
-	extern uint64_t send_network_event;
 
 	extern uint32_t* game_state;
 	extern uint32_t* frame_count;
@@ -99,5 +101,25 @@ namespace patterns {
 	extern uint64_t set_vehicle_gravity;
 
 	extern std::pair<CWheelVfx*, uint8_t> vfx_wheel;
+	extern CBlipList* blip_list;
 
+	extern uint64_t invalid_resource_check;
+	extern uint64_t ac_patch_1;//48 8B C4 48 89 58 18 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 48 8D 8D ? ? ? ? 0F 29 70 B8 E8 ? ? ? ? 48 8D 8D ? ? ? ? E8 ? ? ? ? 4C 8D 05 (detected, has self healing vtables)
+	extern uint64_t ac_patch_2;//48 89 5C 24 ?? 55 48 8D AC 24 ?? ?? ?? ?? 48 81 EC ?? ?? ?? ?? 48 8B D9 48 8D 0D 
+	extern uint64_t integ_check_1;
+	extern uint64_t add_event_to_list;
+	extern uint64_t send_network_event;
+	extern uint64_t send_http_request;
+	extern uint64_t check_crc;
+	extern uint64_t report_myself;
+	extern uint64_t cash_spawn;
+	extern uint64_t queue_dependency;
+	extern PVOID interval_check_func;
+
+	extern rage::atArray<GtaThread*>* script_threads;
+	extern CNetworkPlayerMgr** network_player_mgr;
+	extern uint64_t start_get_session_by_gamer_handle;
+
+	extern Network** network;
+	extern uint64_t encode_session_info;
 }

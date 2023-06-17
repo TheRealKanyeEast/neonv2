@@ -19,11 +19,6 @@ namespace patterns {
 	rage::weapon_hash_list* weapon_info;
 	CPedFactory** ped_factory;
 
-	uint64_t queue_dependency;
-	PVOID interval_check_func;
-
-	uint64_t send_network_event;
-
 	PVOID set_this_thread_networked;
 	int64_t** script_globals;
 	uint64_t get_font_id;
@@ -74,4 +69,23 @@ namespace patterns {
 	 uint64_t set_vehicle_gravity;
 
 	 std::pair<CWheelVfx*, uint8_t> vfx_wheel;
+	 CBlipList* blip_list;
+
+
+	 uint64_t invalid_resource_check; //80 3D ?? ?? ?? ?? ?? 0F 85 A7 00 00 00 48 8B 05
+	 uint64_t integ_check_1; //48 83 EC 48 48 83 64 24 ? ? 83 4C 24
+	 uint64_t add_event_to_list; //4C 8B D1 48 63 49 18
+	 uint64_t check_crc; // 48 8B C4 48 89 58 08 48 89 68 10 48 89 70 18 48 89 78 20 41 56 48 83 EC 30 44 8B F1 48 8B 0D
+	 uint64_t report_myself; // 40 53 48 83 EC 40 83 B9 ? ? ? ? ? 48 8B D9 75 67 48 83 64 24 ? ? 48 83 64 24 ? ? 48 8D 54 24 ? 48 81 C1
+	 uint64_t cash_spawn; // 48 89 5C 24 08 57 48 83 EC 20 33 FF 48 8B D9 48 85 C9 74 0B
+	 uint64_t send_http_request;
+	 uint64_t queue_dependency;
+	 uint64_t send_network_event;
+	 PVOID interval_check_func;
+
+	 rage::atArray<GtaThread*>* script_threads;
+	 CNetworkPlayerMgr** network_player_mgr;
+	 uint64_t start_get_session_by_gamer_handle;
+	 Network** network;
+	 uint64_t encode_session_info;
 }

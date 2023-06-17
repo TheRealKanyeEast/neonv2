@@ -90,6 +90,12 @@ public:
 	bool empty() {
 		return x == 0.f && y == 0.f && z == 0.f;
 	}
+	float get_distance(Vector3 value) {
+		return ((float)sqrt(pow(value.x - x, 2) + pow(value.y - y, 2) * 1.0));
+	}
+	static Vector3 to_padded(Vector3 value) {
+		return Vector3(value.x, value.y, value.z);
+	}
 public:
 	Vector3 operator*(const float amount) {
 		return { x * amount, y * amount, z * amount };
@@ -123,6 +129,7 @@ public:
 	bool empty() {
 		return x == 0.f && y == 0.f && z == 0.f && w == 0.f;
 	}
+
 public:
 	Vector4 operator*(const float amount) {
 		return { x * amount, y * amount, z * amount, w * amount };

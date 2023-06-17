@@ -41,6 +41,12 @@ namespace menu {
     inline float g_panel_base_2 = 0.f;
     inline float g_panel_spacing = 0.06f;
 
+    inline void teleport_info_panel(Vector3 coords) {
+        panel panel(0.17f, 0.03f, 0.03f);
+        panel.start_panel("Teleport Location Info");
+        panel.end_panel();
+    }
+
     inline void player_info_panel(Player player) {
         if (*patterns::is_session_started) {
             panel panel(0.14f, 0.03f, 0.03f);

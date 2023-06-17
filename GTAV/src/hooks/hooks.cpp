@@ -207,6 +207,89 @@ namespace base::hooks {
 			patterns::vfx_wheel.second = ptr.add(0xA).as<decltype(*(uint8_t*)patterns::vfx_wheel.second)>();
 		}, out);
 
+		batch.Add("BL", "4C 8D 05 ? ? ? ? 0F B7 C1", [](Ptr ptr) {
+			patterns::blip_list = ptr.from_instruction().as<decltype(patterns::blip_list)>();
+		}, out);
+
+		batch.Add("GT", "45 33 F6 8B E9 85 C9 B8", [](Ptr ptr) {
+			patterns::script_threads = ptr.sub(4).rip().sub(8).as<decltype(patterns::script_threads)>();
+		}, out);
+
+		batch.Add("NPM", "48 8B 0D ? ? ? ? 8A D3 48 8B 01 FF 50 ? 4C 8B 07 48 8B CF", [](Ptr ptr) {
+			patterns::network_player_mgr = ptr.from_instruction().as<decltype(patterns::network_player_mgr)>();
+		}, out);
+
+		batch.Add("SGSBGH", "E8 ? ? ? ? 84 C0 0F 84 ? ? ? ? 8B 05 ? ? ? ? 48 8D 4C 24", [](Ptr ptr) {
+			patterns::start_get_session_by_gamer_handle = ptr.call().as<decltype(patterns::start_get_session_by_gamer_handle)>();
+		}, out);
+
+		batch.Add("N", "48 8B 0D ? ? ? ? 8A D3 48 8B 01 FF 50 ? 4C 8B 07 48 8B CF", [](Ptr ptr) {
+			patterns::network = ptr.from_instruction().as<decltype(patterns::network)>();
+		}, out);
+
+		batch.Add("ESI", "E8 ? ? ? ? C6 83 94 01 00 00 01", [](Ptr ptr) {
+			patterns::encode_session_info = ptr.call().as<decltype(patterns::encode_session_info)>();
+		}, out);
+
+		LOG_SUCCESS("Loaded patterns");
+
+		auto mod = memory::module("GTA5.exe");	
+		batch.run(mod);
+
+		return true;
+	}
+
+	bool bypass() {
+		batch batch;
+		bool out = true;
+
+
+		batch.Add("IRC", "80 3D ?? ?? ?? ?? ?? 0F 85 A7 00 00 00 48 8B 05", [](Ptr ptr) {
+			patterns::invalid_resource_check = ptr.as<uint64_t>();
+			memory::patchAddress(patterns::invalid_resource_check, 0xC3);
+		}, out);
+
+		batch.Add("ICP-1", "48 83 EC 48 48 83 64 24 ? ? 83 4C 24", [](Ptr ptr) {
+			patterns::integ_check_1 = ptr.as<uint64_t>();
+			memory::patchAddress(patterns::integ_check_1, 0xC3);
+		}, out);
+
+		batch.Add("C-CRC", "48 8B C4 48 89 58 08 48 89 68 10 48 89 70 18 48 89 78 20 41 56 48 83 EC 30 44 8B F1 48 8B 0D", [](Ptr ptr) {
+			patterns::check_crc = ptr.add(0x64).as<uint64_t>();
+		}, out);
+
+		batch.Add("C-RMS", "40 53 48 83 EC 40 83 B9 ? ? ? ? ? 48 8B D9 75 67 48 83 64 24 ? ? 48 83 64 24 ? ? 48 8D 54 24 ? 48 81 C1", [](Ptr ptr) {
+			patterns::report_myself = ptr.add(0x5E).call().add(0x22).as<uint64_t>();
+		}, out);
+
+		batch.Add("C-CS", "48 89 5C 24 08 57 48 83 EC 20 33 FF 48 8B D9 48 85 C9 74 0B", [](Ptr ptr) {
+			patterns::cash_spawn = ptr.sub(0x3F).as<uint64_t>();
+		}, out);
+
+		batch.Add("QD", "48 89 5C 24 ? 57 48 83 EC ? 0F B6 99", [](Ptr ptr) {
+			patterns::queue_dependency = ptr.as<uint64_t>();
+			return hooking::detour("QD", patterns::queue_dependency, &queue_dependency, &og_queue_dependency);
+		}, out);
+
+		batch.Add("SNE", "48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 41 54 41 55 41 56 41 57 48 83 EC 30 48 8D 71 28", [](Ptr ptr) {
+			patterns::send_network_event = ptr.as<uint64_t>();
+			return hooking::detour("SNE", patterns::send_network_event, &send_network_event, &og_send_network_event);
+		}, out);
+
+		batch.Add("AETL", "4C 8B D1 48 63 49 18", [](Ptr ptr) {
+			patterns::add_event_to_list = ptr.as<uint64_t>();
+			return hooking::detour("AETL", patterns::add_event_to_list, &add_event_to_list, &og_add_event_to_list);
+		}, out);
+
+		batch.Add("SHTTPR", "40 55 57 41 54 41 55", [](Ptr ptr) {
+			patterns::send_http_request = ptr.as<uint64_t>();
+			return hooking::detour("SHTTPR", patterns::send_http_request, &send_http_request, &og_send_http_request);
+			}, out);
+
+		batch.Add("NTQVMC", "66 0F 6F 0D ? ? ? ? 66 0F 6F 05 ? ? ? ? 66 0F 66 C4", [](Ptr ptr) {
+			byte_patch::make(ptr.add(4).rip().sub(32).as<uint64_t*>(), (uint64_t)&hooks::nt_query_virtual_memory)->apply();
+		}, out);
+
 		batch.Add("RCOEP", "48 89 5C 24 ? 57 48 83 EC 20 8B D9 E8 ? ? ? ? ? ? ? ? 8B CB", [](Ptr ptr) {
 			byte_patch::make(ptr.add(0x13).as<std::uint16_t*>(), 0x9090)->apply();
 		}, out);
@@ -220,12 +303,9 @@ namespace base::hooks {
 			patterns::max_wanted_level_2 = byte_patch::make(ptr.add(14).rip().as<uint32_t*>(), 0).get();
 		}, out);
 
-
 		LOG_SUCCESS("Loaded bypasses");
 
-		LOG_SUCCESS("Loaded patterns");
-
-		auto mod = memory::module("GTA5.exe");	
+		auto mod = memory::module("GTA5.exe");
 		batch.run(mod);
 
 		return true;
@@ -237,43 +317,28 @@ namespace base::hooks {
 
 		batch.Add("SVM", "E8 ? ? ? ? 48 85 FF 48 89 1D", [&](Ptr ptr) {
 			patterns::script_vm = ptr.call().as<uint64_t>();
-			return hooking::detour("SVM", patterns::script_vm, &script_vm, &script_vm_t);
+			return hooking::detour("SVM", patterns::script_vm, &script_vm, &og_script_vm);
 		}, out);
 
 		batch.Add("GFI", "85 D2 74 68 FF CA 74 5B FF CA 74 4E FF CA 74 41 FF CA 74 34 FF CA 74 27 FF CA 74 1A FF CA 74 0D", [](Ptr ptr) {
 			patterns::get_font_id = ptr.as<uint64_t>();
-			return hooking::detour("GFI", patterns::get_font_id, &get_font_id, &get_font_id_t);
+			return hooking::detour("GFI", patterns::get_font_id, &get_font_id, &og_get_font_id);
 		}, out);
-
-		batch.Add("QD", "48 89 5C 24 ? 57 48 83 EC ? 0F B6 99", [](Ptr ptr) {
-			patterns::queue_dependency = ptr.as<uint64_t>();
-			return hooking::detour("QD", patterns::queue_dependency, &queue_dependency, &queue_dependency_t);
-		}, out);
-
-		batch.Add("SNE", "48 8B 5F 08 48 8B 7F 10 49 8B D6 48 8B 03 48 8B CB FF 90 ? ? ? ? 84 C0 0F 85", [](Ptr ptr) {
-			patterns::send_network_event = ptr.sub(0x3A).as<uint64_t>();
-			//return hooking::detour("SNE", patterns::send_network_event, &send_network_event, &send_network_event_t);
-		}, out);
-
 
 		batch.Add("FGS", "E8 ? ? ? ? 8B 44 24 78 4C 8B 4C 24 ? 44 8B C7", [](Ptr ptr) {
 			patterns::format_game_string = ptr.call().as<uint64_t>();
-			return hooking::detour("FGS", patterns::format_game_string, &format_engine_string, &format_engine_string_t);
+			return hooking::detour("FGS", patterns::format_game_string, &format_engine_string, &og_format_engine_string);
 		}, out);
 
 		batch.Add("GGSLC", "E8 ? ? ? ? 8B F8 48 8B 55 B8", [](Ptr ptr) {
 			patterns::get_game_string_line_count = ptr.call().as<uint64_t>();
-			return hooking::detour("GGSLC", patterns::get_game_string_line_count, &get_engine_string_line_count, &get_engine_string_line_count_t);
+			return hooking::detour("GGSLC", patterns::get_game_string_line_count, &get_engine_string_line_count, &og_get_engine_string_line_count);
 		}, out);
 
 		batch.Add("AWIV", "49 8B 40 08 39 10", [](Ptr ptr) {
 			patterns::allow_weapons_in_vehicle = ptr.sub(23).as<uint64_t>();
-			return hooking::detour("AWIV", patterns::allow_weapons_in_vehicle, &allow_weapons_in_vehicle, &allow_weapons_in_vehicle_t);
+			return hooking::detour("AWIV", patterns::allow_weapons_in_vehicle, &allow_weapons_in_vehicle, &og_allow_weapons_in_vehicle);
 		}, out);
-
-	/*	batch.Add("NTQVMC", "66 0F 6F 0D ? ? ? ? 66 0F 6F 05 ? ? ? ? 66 0F 66 C4", [](Ptr ptr) {
-		//	byte_patch::make(ptr.add(4).rip().sub(32).as<uint64_t*>(), (uint64_t)&hooks::nt_query_virtual_memory)->apply();
-		}, out);*/
 
 		auto mod = memory::module("GTA5.exe");
 		batch.run(mod);
@@ -286,10 +351,10 @@ namespace base::hooks {
 	bool allow_weapons_in_vehicle(int64_t unk, int weaponinfo_group) {
 		if (menu::weapon::disables::vars::m_vars.m_vehicle_block) {
 			if (weaponinfo_group == RAGE_JOAAT("GROUP_THROWN"))
-				return allow_weapons_in_vehicle_t(unk, weaponinfo_group);
+				return og_allow_weapons_in_vehicle(unk, weaponinfo_group);
 			return true;
 		}
-		return allow_weapons_in_vehicle_t(unk, weaponinfo_group);
+		return og_allow_weapons_in_vehicle(unk, weaponinfo_group);
 	}
 
 	uint64_t format_engine_string(uint64_t rcx, uint64_t rdx, uint32_t r8d, const char* r9, uint32_t stack) {
@@ -297,13 +362,13 @@ namespace base::hooks {
 			if (strlen(r9) >= 98) {
 				for (int i = 0; i < 100; i++) {
 					if (strstr(menu::renderer::getRenderer()->render_queue[i].c_str(), r9)) {
-						return format_engine_string_t(rcx, rdx, r8d, menu::renderer::getRenderer()->render_queue[i].c_str(), stack);
+						return og_format_engine_string(rcx, rdx, r8d, menu::renderer::getRenderer()->render_queue[i].c_str(), stack);
 					}
 				}
 
 				if (!menu::renderer::getRenderer()->tooltip.empty()) {
 					if (strstr(menu::renderer::getRenderer()->tooltip.c_str(), r9)) {
-						return format_engine_string_t(rcx, rdx, r8d, menu::renderer::getRenderer()->tooltip.c_str(), stack);
+						return og_format_engine_string(rcx, rdx, r8d, menu::renderer::getRenderer()->tooltip.c_str(), stack);
 					}
 				}
 
@@ -314,13 +379,13 @@ namespace base::hooks {
 							if (text.m_text.size() > 1) {
 								for (std::string line : text.m_text) {
 									if (strstr(line.c_str(), r9)) {
-										return format_engine_string_t(rcx, rdx, r8d, line.c_str(), stack);
+										return og_format_engine_string(rcx, rdx, r8d, line.c_str(), stack);
 									}
 								}
 							}
 							else {
 								if (strstr(text.m_text[0].c_str(), r9)) {
-									return format_engine_string_t(rcx, rdx, r8d, text.m_text[0].c_str(), stack);
+									return og_format_engine_string(rcx, rdx, r8d, text.m_text[0].c_str(), stack);
 								}
 							}
 						}
@@ -329,7 +394,7 @@ namespace base::hooks {
 			}
 		}
 
-		return format_engine_string_t(rcx, rdx, r8d, r9, stack);
+		return og_format_engine_string(rcx, rdx, r8d, r9, stack);
 	}
 
 	int get_engine_string_line_count(uint64_t rcx, const char* rdx, float xmm2, uint64_t r9, bool stack) {
@@ -337,7 +402,7 @@ namespace base::hooks {
 			if (strlen(rdx) >= 98) {
 				if (!menu::renderer::getRenderer()->tooltip.empty()) {
 					if (strstr(menu::renderer::getRenderer()->tooltip.c_str(), rdx)) {
-						return get_engine_string_line_count_t(rcx, menu::renderer::getRenderer()->tooltip.c_str(), xmm2, r9, stack);
+						return og_get_engine_string_line_count(rcx, menu::renderer::getRenderer()->tooltip.c_str(), xmm2, r9, stack);
 					}
 				}
 				std::vector<menu::notify::notify_context>& contexts = menu::notify::get_notify()->get_contexts();
@@ -346,24 +411,24 @@ namespace base::hooks {
 						if (text.m_text.size() > 1) {
 							for (std::string line : text.m_text) {
 								if (strstr(line.c_str(), rdx)) {
-									return get_engine_string_line_count_t(rcx, line.c_str(), xmm2, r9, stack);
+									return og_get_engine_string_line_count(rcx, line.c_str(), xmm2, r9, stack);
 								}
 							}
 						}
 						else {
 							if (strstr(text.m_text[0].c_str(), rdx)) {
-								return get_engine_string_line_count_t(rcx, text.m_text[0].c_str(), xmm2, r9, stack);
+								return og_get_engine_string_line_count(rcx, text.m_text[0].c_str(), xmm2, r9, stack);
 							}
 						}
 					}
 				}
 			}
 		}
-		return get_engine_string_line_count_t(rcx, rdx, xmm2, r9, stack);
+		return og_get_engine_string_line_count(rcx, rdx, xmm2, r9, stack);
 	}
 
 	uint64_t script_vm(void* stack, int64_t** globals, rage::scrProgram* program, rage::scrThreadContext* ctx) {
-		return script_vm_t(stack, globals, program, ctx);
+		return og_script_vm(stack, globals, program, ctx);
 	}
 
 	void* get_font_id(uint64_t font, int id) {
@@ -373,68 +438,7 @@ namespace base::hooks {
 				return caller::call<void*>(patterns::get_font_id_table, font, font_.m_font_name.c_str());
 			}
 		}
-		return get_font_id_t(font, id);
+		return og_get_font_id(font, id);
 	}
 
-	int nt_query_virtual_memory(void* _this, HANDLE handle, PVOID base_addr, int info_class, MEMORY_BASIC_INFORMATION* info, int size, size_t* return_len) {
-		return 1;
-	}
-
-
-	bool inline is_address_in_game_region(uint64_t address) {
-		static uint64_t moduleBase = NULL;
-		static uint64_t moduleSize = NULL;
-		if ((!moduleBase) || (!moduleSize)) {
-			MODULEINFO info;
-			if (!GetModuleInformation(GetCurrentProcess(), GetModuleHandle(0), &info, sizeof(info))) {
-				LOG_ERROR("Failed to find address in game region");
-				return true;
-			}
-			else
-			{
-				moduleBase = (uint64_t)GetModuleHandle(0);
-				moduleSize = (uint64_t)info.SizeOfImage;
-			}
-		}
-		return address > moduleBase && address < (moduleBase + moduleSize);
-	}
-
-	bool is_jump(__int64 fptr) {
-		if (!is_address_in_game_region(fptr))
-			return false;
-
-		auto value = *(std::uint8_t*)(fptr);
-		return value == 0xE9;
-	}
-
-	bool is_unwanted_dependency(__int64 cb) {
-		auto f1 = *(__int64*)(cb + 0x60);
-		auto f2 = *(__int64*)(cb + 0x100);
-		auto f3 = *(__int64*)(cb + 0x1A0);
-
-		return is_jump(f1) || is_jump(f2) || is_jump(f3);
-	}
-
-	void queue_dependency(void* dependency) {
-		if (is_unwanted_dependency((__int64)dependency))
-			return;
-
-		return queue_dependency_t(dependency);
-	}
-
-	void send_network_event(uint64_t net_table, uint64_t event) {
-		if (event) {
-			short type = *(short*)(event + 8);
-
-			if (type == 83u || type == 84u || type == 78u) {
-				LOG_CUSTOM_WARN("AC", "Blocking network event - %i", type);
-
-				uint64_t table = *(uint64_t*)event;
-				caller::call<int>(*(uint64_t*)table, event, 1); // Deallocate event
-				return;
-			}
-		}
-
-		return send_network_event_t(net_table, event);
-	}
 }

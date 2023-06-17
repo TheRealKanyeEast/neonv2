@@ -64,6 +64,12 @@ namespace base::core {
 			unload(handle);
 		}
 
+		if (!base::hooks::bypass()) {
+			LOG_WARN("Failed to load bypasses, unloading...");
+			std::this_thread::sleep_for(6s);
+			unload(handle);
+		}
+
 		while (*patterns::game_state != 0) {
 			std::this_thread::sleep_for(3s);
 			std::this_thread::yield();
@@ -83,6 +89,7 @@ namespace base::core {
 		}
 
 		auto script_hooks = std::make_unique<script::native_hooks>();
+		
 
 		LOG_SUCCESS("Loaded in-game patterns");
 		LOG_SUCCESS("Loaded in-game hooks");

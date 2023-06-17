@@ -383,6 +383,7 @@ namespace menu::renderer {
 			}
 		}
 
+
 		if (g_is_mouse_enabled && is_point_in_rect(get_mouse_pos(), { m_position.x, render::get_rect_base(m_option.m_height) }, { m_width, m_option.m_height })) {
 			auto sub = m_submenu_stack.top();
 			sub->set_selected_option(sub->get_id());

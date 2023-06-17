@@ -36,6 +36,7 @@ namespace menu {
 	void main_menu::render() {	
 
 		renderer::addSubmenu("Main Menu", "Main Menu", [](core* core) {
+
 			core->addOption(submenuOption("Player")
 				.addTranslate()
 				.setTarget("Player"));

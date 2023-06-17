@@ -418,4 +418,49 @@ namespace memory {
 			return a->m_address == b->m_address;
 		};
 	};
+
+	template<typename ValueType, typename AddressType>
+	static void patchAddress(AddressType address, ValueType value) {
+		DWORD oldProtect;
+		VirtualProtect((void*)address, sizeof(value), PAGE_EXECUTE_READWRITE, &oldProtect);
+
+		memcpy((void*)address, &value, sizeof(value));
+
+		VirtualProtect((void*)address, sizeof(value), oldProtect, &oldProtect);
+	}
+
+	template<typename AddressType>
+	static void patchAddress(AddressType address, std::vector<DWORD> offsets) {
+		for (int i = 0; i < offsets.size(); i++) {
+			DWORD oldProtect;
+			DWORD value = offsets[i];
+			VirtualProtect((void*)(address + i), sizeof(value), PAGE_EXECUTE_READWRITE, &oldProtect);
+
+			memcpy((void*)(address + i), &value, sizeof(value));
+
+			VirtualProtect((void*)(address + i), sizeof(value), oldProtect, &oldProtect);
+		}
+	}
+
+	template <typename ValueType, typename AddressType>
+	void restorePatch(AddressType address, ValueType value)
+	{
+		DWORD oldProtect;
+		VirtualProtect((void*)address, sizeof(value), PAGE_EXECUTE_READWRITE, &oldProtect);
+
+		memcpy((void*)address, &value, sizeof(value));
+
+		VirtualProtect((void*)address, sizeof(value), oldProtect, &oldProtect);
+	}
+
+	template <typename AddressType>
+	void restorePatch(AddressType address, const std::vector<BYTE>& patchBytes)
+	{
+		DWORD oldProtect;
+		VirtualProtect((void*)address, patchBytes.size(), PAGE_EXECUTE_READWRITE, &oldProtect);
+
+		memcpy((void*)address, patchBytes.data(), patchBytes.size());
+
+		VirtualProtect((void*)address, patchBytes.size(), oldProtect, &oldProtect);
+	}
 }
