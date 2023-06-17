@@ -558,6 +558,9 @@
     <ClInclude Include="src\rage\classes\snSession.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\menu\util\translation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -795,6 +798,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\menu\submenus\main\network\session\network_session_block_join.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\menu\util\translation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

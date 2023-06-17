@@ -2,6 +2,8 @@
 #include "pch.h"
 #include "../util/flags.h"
 #include "gui/types.h"
+#include "menu/util/translation.h"
+
 namespace base::gui {
 	class abstract_option {
 	public:

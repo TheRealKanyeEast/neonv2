@@ -15,6 +15,7 @@ namespace menu {
     public:
         void start_panel(std::string title);
         void push(std::string left, std::string right);
+        void push_double(std::string left_left, std::string left_right, std::string right_left, std::string right_right);
         void end_panel();
         void set_next();
 

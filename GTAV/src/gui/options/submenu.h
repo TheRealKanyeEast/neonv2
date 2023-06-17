@@ -51,7 +51,7 @@ namespace base::gui {
 		}
 
 		T& set_name(const char* name) {
-			std::strncpy(&m_name[0], name, sizeof(m_name) - 1);
+			std::strncpy(&m_name[0], trans(name).c_str(), sizeof(m_name) - 1);
 			return static_cast<T&>(*this);
 		}
 

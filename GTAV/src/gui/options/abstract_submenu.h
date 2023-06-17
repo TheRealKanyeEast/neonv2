@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "abstract_option.h"
+#include "menu/util/translation.h"
 
 namespace base::gui {
 	class abstract_submenu {

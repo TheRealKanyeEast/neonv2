@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "abstract_option.h"
 #include "gui/types.h"
+#include "menu/util/translation.h"
 namespace base::gui {
 	template <typename T>
 	class base_option : public abstract_option {
@@ -54,7 +55,7 @@ namespace base::gui {
 
 		T& set_tooltip(const char* text) {
 			if (text)
-				std::strncpy(&m_description[0], text, sizeof(m_description) - 1);
+				std::strncpy(&m_description[0], trans(text).c_str(), sizeof(m_description) - 1);
 			return static_cast<T&>(*this);
 		}
 		T& set_action(std::function<void()> action) {
