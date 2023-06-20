@@ -402,11 +402,6 @@ namespace base::hooks {
 		}, out);
 
 
-		batch.Add({ "AC_RCOEP", "48 89 5C 24 ? 57 48 83 EC 20 8B D9 E8 ? ? ? ? ? ? ? ? 8B CB" }, [](Ptr ptr) {
-			byte_patch::make(ptr.add(0x13).as<std::uint16_t*>(), 0x9090)->apply();
-		}, out);
-
-
 		batch.Add({ "MWL", "8B 43 6C 89 05" }, [](Ptr ptr) {
 			patterns::max_wanted_level = byte_patch::make(ptr.add(5).rip().as<uint32_t*>(), 0).get();
 			patterns::max_wanted_level_2 = byte_patch::make(ptr.add(14).rip().as<uint32_t*>(), 0).get();
