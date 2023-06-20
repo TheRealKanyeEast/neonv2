@@ -10,6 +10,13 @@
 
 #include "rage/classes/script_handler.h"
 #include "rage/classes/CNetworkPlayerMgr.h"
+
+#include "rage/classes/netShopping.h"
+#include "util/log.h"
+#include "util/math.h"
+
+#include <vector>
+#include <array>
 namespace rage::engine {
 	inline rage::types::store_module* get_store_module_extension(const char* extension) {
 		return caller::call<rage::types::store_module*>(patterns::get_store_module_extension, &patterns::store_manager->m_module, extension);
@@ -59,6 +66,10 @@ namespace rage::engine {
 
 	inline void set_vehicle_gravity(uint64_t address, float gravity) {
 		caller::call<void>(patterns::set_vehicle_gravity, address, gravity);
+	}
+
+	inline void handle_rotation_values_from_order(math::matrix<float>* matrix, math::vector3_<float>* rotation, int order) {
+		caller::call<void>(patterns::handle_rotation, matrix, rotation, order);
 	}
 
 	inline float deg_to_rad(float degs) {
@@ -235,6 +246,24 @@ namespace rage::engine {
 		return true;
 	}
 
+	inline void set_fm_event_index(int index)
+	{
+		int idx = index / 32;
+		int bit = index % 32;
+		set_bit(menu::scr_globals::gsbd_fm_events.at(11).at(361).at(idx, 1).as<int*>(), bit);
+		set_bit(menu::scr_globals::gsbd_fm_events.at(11).at(353).at(idx, 1).as<int*>(), bit);
+		set_bit((int*)&menu::scr_globals::gpbd_fm_3.as<GPBD_FM_3*>()->Entries[PLAYER::PLAYER_ID()].BossGoon.ActiveFreemodeEvents[idx], bit);
+	}
+
+	inline void clear_fm_event_index(int index)
+	{
+		int idx = index / 32;
+		int bit = index % 32;
+		clear_bit(menu::scr_globals::gsbd_fm_events.at(11).at(361).at(idx, 1).as<int*>(), bit);
+		clear_bit(menu::scr_globals::gsbd_fm_events.at(11).at(353).at(idx, 1).as<int*>(), bit);
+		clear_bit((int*)&menu::scr_globals::gpbd_fm_3.as<GPBD_FM_3*>()->Entries[PLAYER::PLAYER_ID()].BossGoon.ActiveFreemodeEvents[idx], bit);
+	}
+
 	inline void session_script(int script_id) {
 		util::fiber::pool::add([=] {
 			static auto check_players_in_state = [](GtaThread* launcher, int state) -> bool {
@@ -387,6 +416,36 @@ namespace rage::engine {
 			}
 
 			SCRIPT::SET_SCRIPT_WITH_NAME_HASH_AS_NO_LONGER_NEEDED(hash);
+		});
+	}
+
+
+	inline void send_basket_transaction(rage::joaat_t category, rage::joaat_t item_hash, rage::joaat_t action_type_hash, int value, int flag) {
+		execute_as_script(rage::joaat("shop_controller"), [&] {
+			if (NETSHOPPING::NET_GAMESERVER_BASKET_IS_ACTIVE()) {
+				NETSHOPPING::NET_GAMESERVER_BASKET_END();
+			}
+			int transaction_id{};
+
+			if (caller::call<bool>(patterns::begin_service, patterns::net_shop_mgr, &transaction_id, 0xBC537E0D, category, item_hash, action_type_hash, value, flag)) {
+				NETSHOPPING::NET_GAMESERVER_CHECKOUT_START(transaction_id);
+			}
+		});
+	}
+
+	inline void add_basket_transaction(rage::joaat_t category, rage::joaat_t action_type_hash, int flag, std::vector<std::array<int, 5>> items) {
+		execute_as_script(rage::joaat("shop_controller"), [&] {
+			if (NETSHOPPING::NET_GAMESERVER_BASKET_IS_ACTIVE()) {
+				NETSHOPPING::NET_GAMESERVER_BASKET_END();
+			}
+
+			int transaction_id = -1;
+			if (caller::call<bool>(patterns::construct_basket, patterns::net_shop_mgr, &transaction_id, category, action_type_hash, flag)) {
+				for (auto& item : items) {
+					caller::call<void>(patterns::add_item_to_basket, patterns::net_shop_mgr, (int*)&item);
+				}
+				NETSHOPPING::NET_GAMESERVER_CHECKOUT_START(transaction_id);
+			}
 		});
 	}
 

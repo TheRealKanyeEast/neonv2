@@ -34,6 +34,26 @@ template<typename T, int N>
 constexpr int NUMOF(T(&)[N]) { return N; }
 
 
+struct protectionContext {
+    int m_var = 0;
+
+    bool block() {
+        return m_var == 2 || m_var == 3 || m_var == 5 || m_var == 7;
+    }
+
+    bool notify() {
+        return m_var == 1 || m_var == 3 || m_var == 6 || m_var == 7;
+    }
+
+    bool redirect() {
+        return m_var >= 4;
+    }
+
+    bool enabled() {
+        return m_var > 0;
+    }
+};
+
 namespace rage::types {
 
     struct guid_pool {
@@ -109,4 +129,23 @@ namespace rage {
     };
 }
 
+
+namespace util {
+    template<typename T>
+    inline bool is_valid_ptr(T ptr) {
+        uint64_t address = (uint64_t)ptr;
+        if (address < 0x5000) return false;
+        if ((address & 0xFFFFFFFF) == 0xFFFFFFFF) return false;
+        if ((address & 0xFFFFFFFF) <= 0xFF) return false;
+
+        if (*(uint8_t*)((uint64_t)&address + 6) != 0 || *(uint8_t*)((uint64_t)&address + 7) != 0) return false;
+
+        return true;
+    }
+}
+
+
+
 #endif 
+
+

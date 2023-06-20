@@ -10,6 +10,8 @@
 #include "menu/submenus/main/weapon.h"
 #include "menu/submenus/main/vehicle.h"
 #include "menu/submenus/main/teleport.h"
+#include "menu/submenus/main/protections.h"
+#include "menu/submenus/main/recovery.h"
 #include "util/fiber.h"
 #include "features/features.h"
 #include "gui/util/fonts.h"
@@ -20,6 +22,8 @@
 #include "gui/util/notify.h"
 #include "menu/util/players.h"
 #include "menu/submenus/main/weapon/weapon_disables.h"
+#include "menu/submenus/main/network/network_session.h"
+#include "menu/submenus/main/network/spoofing/network_spoofing_name.h"
 
 namespace base::hooks {
 
@@ -33,6 +37,25 @@ namespace base::hooks {
 		WEAPON::SET_CURRENT_PED_WEAPON(ped, hash, context->get_arg<int>(2));
 
 	}
+
+	void network_session_host(rage::scrNativeCallContext* context) {
+		if (menu::network::session::vars::m_vars.join_queued) {
+			caller::call<uint64_t>(patterns::join_session_by_info, *patterns::network, &menu::network::session::vars::m_vars.info, 1, 1 | 2, nullptr, 0);
+			menu::network::session::vars::m_vars.join_queued = false;
+			context->set_return_value<BOOL>(TRUE);
+		}
+		context->set_return_value<BOOL>(NETWORK::NETWORK_SESSION_HOST(context->get_arg<int>(0), context->get_arg<int>(1), context->get_arg<BOOL>(2)));
+	}
+
+	void set_player_name(rage::scrNativeCallContext* context) {
+		const auto playerId = context->get_arg<Player>(0);
+		context->set_return_value(PLAYER::GET_PLAYER_NAME(playerId));
+		const auto network_player_mgr = (*patterns::network_player_mgr);
+		if (menu::network::spoofing::name::vars::m_vars.m_spoof && network_player_mgr && network_player_mgr->m_local_net_player && playerId == network_player_mgr->m_local_net_player->m_player_id) {
+			context->set_return_value(menu::network::spoofing::name::vars::m_vars.m_name.c_str());
+		}
+	}
+
 
 	void disable_control_action(rage::scrNativeCallContext* context)
 	{
@@ -144,6 +167,8 @@ namespace base::hooks {
 						menu::getWeaponMenu()->update();
 						menu::getVehicleMenu()->update();
 						menu::getTeleportMenu()->update();
+						menu::getProtectionsMenu()->update();
+						menu::getRecoveryMenu()->update();
 					});	
 
 					util::fiber::add("F_UTIL", [] {

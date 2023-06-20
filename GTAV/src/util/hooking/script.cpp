@@ -89,6 +89,8 @@ namespace script {
 		add_native_detour("main_persistent"_joaat, 0x767FBC2AC802EF3D, base::hooks::stat_get_int);
 		add_native_detour(0xADF692B254977C0C, base::hooks::set_current_ped_weapon);
 		add_native_detour(0xFE99B66D079CF6BC, base::hooks::disable_control_action);
+		add_native_detour(0x6D0DE6A7B5DA71F8, base::hooks::set_player_name);
+		add_native_detour(RAGE_JOAAT("maintransition"), 0x6F3D4ED9BEE4E61D, base::hooks::network_session_host);
 
 
 		for (auto& entry : *patterns::script_program)

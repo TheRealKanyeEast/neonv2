@@ -16,6 +16,7 @@
 #include "gui/util/translate.h"
 #include "gui/util/notify.h"
 #include "memory/pattern.h"
+#include "gui/util/translate.h"
 
 namespace base::core {
 
@@ -56,7 +57,6 @@ namespace base::core {
 		}
 
 		//base::gui::getTranslationManager()->init();
-		base::gui::getTranslationManager()->loadTranslation("english");
 
 		if (!base::hooks::patterns()) {
 			LOG_WARN("Failed to load patterns, unloading...");
@@ -96,6 +96,11 @@ namespace base::core {
 
 		g_running = true;
 
+
+		LOG("Web Reconstruction init");
+
+		//translation::get()->enable();
+		translation::get()->load();
 
 		while (g_running) {
 			if (GetAsyncKeyState(VK_END)) {

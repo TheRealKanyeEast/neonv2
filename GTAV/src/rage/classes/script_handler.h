@@ -1,16 +1,13 @@
 #pragma once
-#include "joaat.h"
-#include "CNetGamePlayer.h"
-#include <cstdint>
-#include "script_id.h"
+#include "fwddec.h"
 #include "base.h"
-class scrThread;
-class scriptHandlerObject;
+#include "script_id.h"
+
+#include <cstdint>
 
 #pragma pack(push, 1)
 namespace rage
 {
-	class scriptHandler;
 	class scriptResource
 	{
 	public:

@@ -46,7 +46,7 @@ namespace base::gui {
 		}
 
 		buttonOption& addTranslate() {
-			const char* translation = TRANSLATE(base_option::get_left_text());
+
 			//set_left_text(translation);
 			return *this;
 		}
@@ -60,25 +60,25 @@ namespace base::gui {
 		}
 	};
 
-	class keyboard_option : public base_option<keyboard_option> {
+	class keyboardOption : public base_option<keyboardOption> {
 	private:
 		std::function<void()> m_function;
 	public:
-		explicit keyboard_option(const char* text) {
+		explicit keyboardOption(const char* text) {
 			set_left_text(text);
 		}
 
-		keyboard_option& add_tooltip(const char* description) {
+		keyboardOption& addToolTip(const char* description) {
 			base_option::set_tooltip(description);
 			return *this;
 		}
 
-		keyboard_option& add_right_text(const char* text) {
+		keyboardOption& addRightText(const char* text) {
 			base_option::set_right_text(text);
 			return *this;
 		}
 
-		keyboard_option& add_click(std::function<void()>&& function) {
+		keyboardOption& addClick(std::function<void()>&& function) {
 			set_action(std::move(function));
 			return *this;
 		}

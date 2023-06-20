@@ -21,7 +21,6 @@ namespace base::gui {
 		}
 
 		colorOption& addTranslate() {
-			const char* translation = TRANSLATE(base_option::get_left_text());
 			//set_left_text(translation);
 			return *this;
 		}

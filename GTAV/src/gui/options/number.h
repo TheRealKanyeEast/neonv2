@@ -101,19 +101,19 @@ namespace base::gui {
 			}
 			else if (action == eOptionAction::click) {
 				static bool active = false;
-				MISC::DISPLAY_ONSCREEN_KEYBOARD(true, (char*)"Input", (char*)"", (char*)"", (char*)"", (char*)"", (char*)"", 20);
-				while (MISC::UPDATE_ONSCREEN_KEYBOARD() == 0) {
-					active = true;
-					menu::renderer::getRenderer()->reset_keys();
-					util::fiber::go_to_main();
-				}
-				active = false;
-				if (!MISC::GET_ONSCREEN_KEYBOARD_RESULT())
-					return;
+					MISC::DISPLAY_ONSCREEN_KEYBOARD(true, (char*)"Input", (char*)"", (char*)"", (char*)"", (char*)"", (char*)"", 20);
+					while (MISC::UPDATE_ONSCREEN_KEYBOARD() == 0) {
+						active = true;
+						menu::renderer::getRenderer()->reset_keys();
+						util::fiber::go_to_main();
+					}
+					active = false;
+					if (!MISC::GET_ONSCREEN_KEYBOARD_RESULT())
+						return;
 
-				*m_number = std::atoi(MISC::GET_ONSCREEN_KEYBOARD_RESULT());
-				if (base::m_action)
-					std::invoke(base::m_action);
+					*m_number = std::atoi(MISC::GET_ONSCREEN_KEYBOARD_RESULT());
+					if (base::m_action)
+						std::invoke(base::m_action);
 			}
 			base::handle_action(action);
 		}

@@ -18,7 +18,8 @@ namespace rage {
 		bool m_wants_to_delete; //0x004D
 		char pad_004E[1]; //0x004E
 		bool m_should_not_be_deleted; //0x004F
-		char pad_0050[32]; //0x0050
+		uint64_t m_entity;
+		char pad_0050[0x18]; //0x0050
 		uint32_t m_players_acked; //0x0070
 		char pad_0074[116]; //0x0074
 

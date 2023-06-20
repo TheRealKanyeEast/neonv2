@@ -7,6 +7,7 @@
 #define VALID_TEXTURE_EXT(ext) ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".bmp" || ext == ".gif")
 namespace menu {
 
+	//WE LOVE VALI :SPEAK: :FIRE:
 	void add_dictionary_to_pool(rage::pgDictionary* dictionary, std::string name) {
 		if (auto grcTextureStore = patterns::texture_store; grcTextureStore) {
 			uint32_t hash{ rage::joaat(name) };

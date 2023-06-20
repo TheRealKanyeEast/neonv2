@@ -40,11 +40,12 @@ namespace menu {
 
 		*(unsigned short*)patterns::set_this_thread_networked = 0x9090; // we set this thread as networked so we can spawn the vehicle / u can add rage classes and use excute under thread instead of this
 		Vehicle the_vehicle = VEHICLE::CREATE_VEHICLE(hash, { coords.x + x, coords.y + y, coords.z }, heading, NETWORK::NETWORK_IS_SESSION_ACTIVE(), false, false);
-		std::int32_t net_id = NETWORK::VEH_TO_NET(the_vehicle);
 		*(unsigned short*)patterns::set_this_thread_networked = 0x0574; // We restore it so we don't get detected 
 		if (menu::spawner::settings::vars::m_vars.m_fade) {
 			NETWORK::NETWORK_FADE_IN_ENTITY(the_vehicle, true, false);
 		}
+		
+		std::int32_t net_id = NETWORK::VEH_TO_NET(the_vehicle);
 		NETWORK::SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(net_id, TRUE);
 
 		if (menu::spawner::settings::vars::m_vars.m_blip) {
@@ -102,8 +103,7 @@ namespace menu {
 		if (!MISC::GET_ONSCREEN_KEYBOARD_RESULT())
 			return;
 
-		m_vars.m_spawn_by_name = MISC::GET_ONSCREEN_KEYBOARD_RESULT();
-		spawn_vehicle(rage::joaat(m_vars.m_spawn_by_name));
+		spawn_vehicle(rage::joaat(MISC::GET_ONSCREEN_KEYBOARD_RESULT()));
 	}
 
 	void spawner_menu::render() {
@@ -117,8 +117,8 @@ namespace menu {
 				.addTranslate()
 				.setTarget("Spawner Settings"));
 
-			core->addOption(keyboard_option("Spawn by Name")
-				.add_right_text(m_vars.m_spawn_by_name.c_str()).add_click([] { spawn_by_name(); }));
+			core->addOption(keyboardOption("Spawn by Name")
+				.addClick([] { spawn_by_name(); }));
 
 			core->addOption(breakOption("Vehicles"));
 

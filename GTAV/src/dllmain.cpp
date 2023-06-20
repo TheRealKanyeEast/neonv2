@@ -9,7 +9,7 @@ BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID reserve) {
             CloseHandle(hThread);
         }
         break;
-
+    
     case DLL_PROCESS_DETACH:
 
         break;

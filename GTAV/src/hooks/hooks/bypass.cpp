@@ -3,43 +3,80 @@
 #include "hooks/patterns.h"
 #include "util/caller.h"
 
+// maxi small cock momento?
+//yoinked from orbit
+struct arxanReportItem {
+        DWORD m_0x00;     // 0x0000
+        DWORD m_0x04;     // 0x0004
+        DWORD m_0x08;     // 0x0008
+        DWORD m_0x0C;     // 0x000C
+        DWORD m_0x10;     // 0x0010
+        DWORD m_0x14;     // 0x0014
+        DWORD m_0x18;     // 0x0018
+        DWORD m_0x1C;     // 0x001C
+        DWORD m_0x20;     // 0x0020
+        DWORD m_0x24;     // 0x0024
+        DWORD m_0x28;     // 0x0028
+        DWORD m_0x2C;     // 0x002C
+        DWORD m_0x30;     // 0x0030
+        DWORD m_0x34;     // 0x0034
+
+        bool isFrameflagReport() const { return this->m_0x18 == 0x18; }
+};
+static_assert(sizeof(arxanReportItem) == 0x38);
+
+struct arxanContext {
+	arxanReportItem m_reportItems[1024]; // 0x0000
+	DWORD m_reportIndex;                 // 0xE000
+	DWORD m_reportedItems;                 // 0xE004
+	DWORD m_reportQueue;                 // 0xE008
+};
+static_assert(sizeof(arxanContext) == 0xE00C);
+
+inline arxanContext* g_ArxanContextClass;
+
+//Sig: 4C 8B D2 44 3B D9 0F 8D ? ? ? ? 45 8B 81 ? ? ? ? 33 C0 41 FF C0 (aka Arxan::AddDetection)
+
+
 namespace base::hooks {
 
-	bool send_http_request(CHttpRequest* request) {
-		if (request->RequestData && request->RequestData->Data) {
-		//	LOG("Request to %s://%s%s:\n%s\n%s", request->Scheme, request->Host, request->Path, request->RequestHeaders ? request->RequestHeaders : "No headers available.", request->RequestData && request->RequestData->Data && strcmp(request->Scheme, "https") == 0 ? request->RequestData->Data : "null");
-			
+	//Andy has a big cock!?
+	bool hooks::sendHTTPRequestHook(CHttpRequest* request) {
+
+		if (request->RequestData && request->RequestData->Data) {			
 			const auto path = std::string(request->Path);
 			for (auto blockedApi : { "SubmitCompressed", "SubmitRealTime", "Bonus" }) {
 				if (path.find(blockedApi) != std::string::npos) {
 					request->Host = const_cast<char*>("google.com");
-					return og_send_http_request(request);
+					return ogSendHTTPRequestHook(request);
 				}
 			}
 		}
-
-		return og_send_http_request(request);
+		return ogSendHTTPRequestHook(request);
 	}
-
-	uint64_t add_event_to_list(uint64_t event_pool) {
+	//Andy has a big cock!?
+	uint64_t hooks::addEventToListHook(uint64_t event_pool) {
 		uint64_t caller = (uint64_t)_ReturnAddress();
 
 		if (caller == patterns::report_myself) {
 			LOG_CUSTOM_WARN("AC", "Prevented REPORT_MYSELF_EVENT creation");
+			return false;
 		}
 
 		if (caller == patterns::check_crc) {
 			LOG_CUSTOM_WARN("AC", "Prevented NETWORK_CHECK_CODE_CRCS_EVENT creation");
+			return false;
 		}
 
 		if (caller == patterns::cash_spawn) {
 			LOG_CUSTOM_WARN("AC", "Prevented REPORT_CASH_SPAWN_EVENT creation");
+			return false;
 		}
 
-		return og_add_event_to_list(event_pool);
+		return ogAddEventToListHook(event_pool);
 	}
 
-	void send_network_event(uint64_t net_table, uint64_t event) {
+	void hooks::sendNetworkEventHook(uint64_t net_table, uint64_t event) {
 		if (event) {
 			short type = *(short*)(event + 8);
 
@@ -52,10 +89,10 @@ namespace base::hooks {
 			}
 		}
 
-		return og_send_network_event(net_table, event);
+		return ogSendNetworkEventHook(net_table, event);
 	}
 
-	int nt_query_virtual_memory(void* _this, HANDLE handle, PVOID base_addr, int info_class, MEMORY_BASIC_INFORMATION* info, int size, size_t* return_len) {
+	int hooks::ntQueryVirtualMemoryHook(void* _this, HANDLE handle, PVOID base_addr, int info_class, MEMORY_BASIC_INFORMATION* info, int size, size_t* return_len) {
 		return 1;
 	}
 
@@ -93,11 +130,12 @@ namespace base::hooks {
 		return is_jump(f1) || is_jump(f2) || is_jump(f3);
 	}
 
-	void queue_dependency(void* dependency) {
-		if (is_unwanted_dependency((__int64)dependency))
+	void hooks::queueDependencyHook(void* dependency) {
+		if (is_unwanted_dependency((__int64)dependency)) {
 			return;
+		}
 
-		return og_queue_dependency(dependency);
+		return ogQueueDependencyHook(dependency);
 	}
 
 }

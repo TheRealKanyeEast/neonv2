@@ -39,7 +39,6 @@ namespace base::gui {
 		}
 
 		toggleOption& addTranslate() {
-			const char* translation = TRANSLATE(base_option::get_left_text());
 			//set_left_text(translation);
 			return *this;
 		}
@@ -205,7 +204,7 @@ namespace base::gui {
 			MemoryStringStream stream(base::m_right_text);
 			if (m_data) {
 				stream << m_data[*m_position];
-				stream << " ~c~[" << *m_position + 1 << " / " << m_data_size << "]";
+				stream << " ~c~[" << *m_position + 1 << "/" << m_data_size << "]";
 			}
 			else {
 				stream << "Unknown ~c~[0 / 0]";

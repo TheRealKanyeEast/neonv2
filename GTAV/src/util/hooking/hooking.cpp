@@ -33,9 +33,6 @@ namespace hooking {
 	}
 
 	void Detour::remove_detour() {
-		restoreIRC();
-		restoreICP1();
-
 		for (DetourContext& detour : m_detours) {
 			MH_QueueDisableHook((void*)detour.m_address);
 			LOG_CUSTOM_SUCCESS("Hook", "Unhooked %s", detour.m_name);

@@ -79,8 +79,8 @@ namespace menu {
 
 			core->addOption(submenuOption("Settings")
 				.addTranslate()
-				.setTarget("Settings"));
-
+				.setTarget("Settings"));		
+			
 		});
 
 	}

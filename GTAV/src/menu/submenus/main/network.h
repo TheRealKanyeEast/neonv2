@@ -19,4 +19,14 @@ namespace menu {
 		static network_menu instance;
 		return &instance;
 	}
+
+	namespace network::vars {
+		struct variables {
+			bool m_bst;
+			bool m_toggle_ping;
+		};
+
+		extern variables m_vars;
+	}
+
 }

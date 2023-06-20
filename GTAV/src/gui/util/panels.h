@@ -20,6 +20,8 @@ namespace menu {
         void set_next();
 
         void setRenderTitle(bool value) { m_render_title = value; }
+
+
     private:
         float m_width;
         float m_title_height;
@@ -32,7 +34,7 @@ namespace menu {
         float m_font_scale = 0.25f;
         math::vector2<float> m_padding = { 3.1f, 2.1f };
         bool m_render_title;
-    };
+    }; inline panel* g_panel;
 
 
 
@@ -42,9 +44,12 @@ namespace menu {
     inline float g_panel_base_2 = 0.f;
     inline float g_panel_spacing = 0.06f;
 
-    inline void teleport_info_panel(Vector3 coords) {
+    inline void teleport_info_panel() {
         panel panel(0.17f, 0.03f, 0.03f);
         panel.start_panel("Teleport Location Info");
+        panel.push("Txl", "Gay");
+        panel.push_double("Stash", "Mega Gay", "Andy", "little Gay");
+        panel.push("Scarface", "No Gay");
         panel.end_panel();
     }
 

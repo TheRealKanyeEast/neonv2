@@ -29,6 +29,7 @@ namespace util::fiber {
 	};
 
 	fiber_manager* get_fiber_manager();
+	fiber_manager* get_fiber_manager_shv();
 
 	inline void load() {
 		get_fiber_manager()->load();
@@ -52,5 +53,30 @@ namespace util::fiber {
 
 	inline void cleanup() {
 		get_fiber_manager()->cleanup();
+		get_fiber_manager_shv()->cleanup();
+	}
+
+	inline void load_shv() {
+		get_fiber_manager_shv()->load();
+	}
+
+	inline void update_shv() {
+		get_fiber_manager_shv()->update();
+	}
+
+	inline void add_shv(std::string name, std::function<void()> function) {
+		get_fiber_manager_shv()->add(name, function);
+	}
+
+	inline void sleep_shv(uint32_t time) {
+		get_fiber_manager_shv()->sleep(time);
+	}
+
+	inline void go_to_main_shv() {
+		get_fiber_manager_shv()->go_to_main();
+	}
+
+	inline std::vector<fiber_context>& get_fibers() {
+		return get_fiber_manager_shv()->get_fibers();
 	}
 }

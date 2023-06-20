@@ -1,48 +1,85 @@
 #pragma once
 #include <cstdint>
+#include <initializer_list>
+#include <ostream>
+#include <vector>
 
-namespace rage {
-	template <typename T>
-	class atArray {
-	public:
-		T* begin() { return m_data; }
-		T* end() { return m_data + m_size; }
-		const T* begin() const { return m_data; }
-		const T* end() const { return m_data + m_size; }
-		T* data() { return m_data; }
-		const T* data() const { return m_data; }
-		uint16_t size() const { return m_size; }
-		uint16_t capacity() const { return m_capacity; }
-		T& operator[](uint16_t index) { return m_data[index]; }
-		const T& operator[](uint16_t index) const { return m_data[index]; }
-		void set(uint16_t index, T ptr) {
-			m_data[index] = ptr;
-		}
-		T at(uint16_t index) {
-			return m_data[index];
-		}
-	private:
-		T* m_data; //0x0000
-		uint16_t m_size; //0x0008
-		uint16_t m_capacity; //0x0010
-	}; //Size: 0x0010
-	static_assert(sizeof(rage::atArray<void*>) == 0x10);
-	template <typename T, uint16_t arraySize>
-	class atFixedArray {
-	public:
-		T* begin() { return m_data; }
-		T* end() { return m_data + m_size; }
-		const T* begin() const { return m_data; }
-		const T* end() const { return m_data + m_size; }
-		T* data() { return m_data; }
-		const T* data() const { return m_data; }
-		uint16_t size() const { return m_size; }
-		uint16_t capacity() const { return m_capacity; }
-		T& operator[](uint16_t index) { return m_data[index]; }
-		const T& operator[](uint16_t index) const { return m_data[index]; }
-	private:
-		T* m_data; //0x0000
-		uint16_t m_size = arraySize; //0x0008
-		uint16_t m_capacity = arraySize; //0x0010
-	};
+#include "sysMemAllocator.h"
+
+namespace rage
+{
+#pragma pack(push, 8)
+    template <typename T>
+    class atArray
+    {
+    public:
+        atArray() :
+            m_data(nullptr),
+            m_size(0),
+            m_count(0)
+        {
+
+        }
+
+        atArray(void* data_ptr, std::uint16_t size, std::uint16_t count) :
+            m_data(data_ptr),
+            m_size(size),
+            m_count(count)
+        {
+
+        }
+
+        T* begin() const
+        {
+            return &m_data[0];
+        }
+
+        T* end() const
+        {
+            return &m_data[m_size];
+        }
+
+        T* data() const
+        {
+            return m_data;
+        }
+
+        std::uint16_t size() const
+        {
+            return m_size;
+        }
+
+        std::uint16_t count() const
+        {
+            return m_count;
+        }
+
+        T& operator[](std::uint16_t index) const
+        {
+            return m_data[index];
+        }
+
+        friend std::ostream& operator<<(std::ostream& o, const atArray<T>& j)
+        {
+            o << "Array Size: " << j.size() << std::endl;
+            for (int i = 0; i < j.size(); i++)
+            {
+                T item = j[i];
+                if (std::is_pointer<T>())
+                    o << "\tArray Pointer: " << std::hex << std::uppercase << item << std::nouppercase << std::dec << " Item: [" << std::hex << std::uppercase << (*(T*)item) << std::nouppercase << std::dec << "]";
+                else
+                    o << "\tArray Item: " << item;
+                if (i != j.size() - 1)
+                    o << std::endl;
+            }
+            return o;
+        }
+
+    private:
+        T* m_data;
+        std::uint16_t m_size;
+        std::uint16_t m_count;
+    };
+    static_assert(sizeof(rage::atArray<std::uint32_t>) == 0x10, "rage::atArray is not properly sized");
+#pragma pack(pop)
 }

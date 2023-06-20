@@ -1,30 +1,25 @@
 #pragma once
-#include "util/json.h"
-#include "timer.h"
-#include "rage/classes/joaat.h"
-#include "util/util.h"
+#include "pch.h"
 
-namespace base::gui
-{
-	class translationManager
-	{
+namespace base {
+	class translation {
 	public:
-		void init();
-
-		void loadTranslation(const char* name);
-		const char* getTranslation(uint32_t label);
-
-		
-	private:
-		std::unordered_map<std::uint32_t, std::string> m_translations;
-		std::filesystem::path m_path{ Util::GetDocumentsPath() };
+		static void enable();
+		static void disbale();
+		static void load();
+	public:
+		static std::string get(std::string string);
+		static void push(std::string string);
+	public:
+		static translation* get() {
+			static translation i{};
+			return &i;
+		}
+	public:
+		std::unordered_map<u32, std::string> m_translation_table;
+		std::vector<std::string> m_files{};
+		bool m_translate;
 	};
 
-	static translationManager* getTranslationManager() {
-		static translationManager instance;
-		return &instance;
-	}
+	extern std::string trans(std::string string);
 }
-
-#define TRANSLATE_IMPL(label) (::base::gui::getTranslationManager()->getTranslation(rage::joaat(label)))
-#define TRANSLATE(label) TRANSLATE_IMPL(label)

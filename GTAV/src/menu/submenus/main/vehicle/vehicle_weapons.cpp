@@ -8,6 +8,7 @@
 #include "menu/util/control.h"
 #include "menu/util/raycast.h"
 #include "gui/util/notify.h"
+#include "gui/util/timer.h"
 
 using namespace base::gui;
 using namespace menu::vehicle::weapons::vars;

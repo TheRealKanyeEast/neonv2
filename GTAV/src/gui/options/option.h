@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "abstract_option.h"
 #include "gui/types.h"
-#include "menu/util/translation.h"
+#include "gui/util/translate.h"
 namespace base::gui {
 	template <typename T>
 	class base_option : public abstract_option {

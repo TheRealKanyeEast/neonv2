@@ -6539,14 +6539,14 @@ namespace WEAPON {
 	ntveDecl void SET_CAN_PED_SELECT_INVENTORY_WEAPON(Ped ped, Hash weaponHash, BOOL toggle) { ntveCall<void>(0xB4771B9AAF4E68E4, ped, weaponHash, toggle); } // 0xB4771B9AAF4E68E4  b1103
 	ntveDecl void SET_CAN_PED_SELECT_ALL_WEAPONS(Ped ped, BOOL toggle) { ntveCall<void>(0xEFF296097FF1E509, ped, toggle); } // 0xEFF296097FF1E509  b1103
 }
-namespace ZONE {
-	ntveDecl int GET_ZONE_AT_COORDS(Vector3 vec) { return ntveCall<int>(0x27040C25DE6CB2F4, vec.x, vec.y, vec.z); } // 0x27040C25DE6CB2F4 0xC9018181 b323
-	ntveDecl int GET_ZONE_FROM_NAME_ID(const char* zoneName) { return ntveCall<int>(0x98CD1D2934B76CC1, zoneName); } // 0x98CD1D2934B76CC1 0x8EC68304 b323
-	ntveDecl int GET_ZONE_POPSCHEDULE(int zoneId) { return ntveCall<int>(0x4334BC40AA0CB4BB, zoneId); } // 0x4334BC40AA0CB4BB 0x20AB2FC9 b323
-	ntveDecl const char* GET_NAME_OF_ZONE(Vector3 vec) { return ntveCall<const char*>(0xCD90657D4C30E1CA, vec.x, vec.y, vec.z); } // 0xCD90657D4C30E1CA 0x7875CE91 b323
-	ntveDecl void SET_ZONE_ENABLED(int zoneId, BOOL toggle) { ntveCall<void>(0xBA5ECEEA120E5611, zoneId, toggle); } // 0xBA5ECEEA120E5611 0x04E21B03 b323
-	ntveDecl int GET_ZONE_SCUMMINESS(int zoneId) { return ntveCall<int>(0x5F7B268D15BA0739, zoneId); } // 0x5F7B268D15BA0739 0xB2FB5C4C b323
-	ntveDecl void OVERRIDE_POPSCHEDULE_VEHICLE_MODEL(int scheduleId, Hash vehicleHash) { ntveCall<void>(0x5F7D596BAC2E7777, scheduleId, vehicleHash); } // 0x5F7D596BAC2E7777 0x3F0A3680 b323
-	ntveDecl void CLEAR_POPSCHEDULE_OVERRIDE_VEHICLE_MODEL(int scheduleId) { ntveCall<void>(0x5C0DE367AA0D911C, scheduleId); } // 0x5C0DE367AA0D911C 0x7A72A24E b323
-	ntveDecl Hash GET_HASH_OF_MAP_AREA_AT_COORDS(Vector3 vec) { return ntveCall<Hash>(0x7EE64D51E8498728, vec.x, vec.y, vec.z); } // 0x7EE64D51E8498728 0xB5C5C99B b323
+namespace zone {
+ntveDecl int get_zone_at_coords(Vector3 vec) { return ntveCall<int>(0x27040C25DE6CB2F4, vec.x, vec.y, vec.z); } // 0x27040C25DE6CB2F4 0xC9018181 b323
+    ntveDecl int get_zone_from_name_id(const char* zoneName) { return ntveCall<int>(0x98CD1D2934B76CC1, zoneName); } // 0x98CD1D2934B76CC1 0x8EC68304 b323
+    ntveDecl int get_zone_popschedule(int zoneId) { return ntveCall<int>(0x4334BC40AA0CB4BB, zoneId); } // 0x4334BC40AA0CB4BB 0x20AB2FC9 b323
+    ntveDecl const char* get_name_of_zone(Vector3 vec) { return ntveCall<const char*>(0xCD90657D4C30E1CA, vec.x, vec.y, vec.z); } // 0xCD90657D4C30E1CA 0x7875CE91 b323
+    ntveDecl void set_zone_enabled(int zoneId, BOOL toggle) { ntveCall<void>(0xBA5ECEEA120E5611, zoneId, toggle); } // 0xBA5ECEEA120E5611 0x04E21B03 b323
+    ntveDecl int get_zone_scumminess(int zoneId) { return ntveCall<int>(0x5F7B268D15BA0739, zoneId); } // 0x5F7B268D15BA0739 0xB2FB5C4C b323
+    ntveDecl void override_popschedule_vehicle_model(int scheduleId, Hash vehicleHash) { ntveCall<void>(0x5F7D596BAC2E7777, scheduleId, vehicleHash); } // 0x5F7D596BAC2E7777 0x3F0A3680 b323
+    ntveDecl void clear_popschedule_override_vehicle_model(int scheduleId) { ntveCall<void>(0x5C0DE367AA0D911C, scheduleId); } // 0x5C0DE367AA0D911C 0x7A72A24E b323
+    ntveDecl Hash get_hash_of_map_area_at_coords(Vector3 vec) { return ntveCall<Hash>(0x7EE64D51E8498728, vec.x, vec.y, vec.z); } // 0x7EE64D51E8498728 0xB5C5C99B b323
 }

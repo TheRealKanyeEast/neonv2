@@ -2,8 +2,8 @@
 #include "util/log.h"
 #include "pattern.h"
 namespace memory {
-	void batch::Add(std::string name, pattern pattern, std::function<void(Ptr)> callback, bool& out) {
-	    m_entries.emplace_back(std::move(name), std::move(pattern), std::move(callback), std::move(out));
+	void batch::Add(std::pair<const char*, pattern> entry, std::function<void(Ptr)> callback, bool& out) {
+		m_entries.emplace_back(entry.first, std::move(entry.second), std::move(callback), std::move(out));
 	}
 	std::string bytesToString(const std::vector<std::optional<std::uint8_t>>& m_bytes) {
 		std::ostringstream oss;

@@ -27,6 +27,10 @@ namespace menu {
 			bool join_queued = false;
 			rage::rlSessionInfo info;
 			uint64_t rid_to_join;
+			bool host_token_correction;
+			bool peer_token_correction;
+
+			bool m_force_session_host;
 		};
 
 		extern variables m_vars;

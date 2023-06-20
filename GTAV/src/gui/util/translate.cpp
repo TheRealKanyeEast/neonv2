@@ -1,55 +1,75 @@
 #include "pch.h"
 #include "translate.h"
+#include "rage/classes/joaat.h"
 #include "util/log.h"
+#include "util/json.h"
 #include "util/util.h"
-namespace base::gui {
 
-	void translationManager::loadTranslation(const char* name) {
-		m_translations.clear();
+namespace base {
 
-		try {
-			m_path.append("neon").append("translations");
-			if (std::filesystem::exists(m_path)) {
-				std::filesystem::directory_iterator it{ m_path };
-				for (auto&& entry : it) {
-					if (entry.is_regular_file()) {
-						auto path{ entry.path()};
-						std::ifstream file(path.filename().c_str());
+	using jsonf = nlohmann::json;
+	jsonf g_loader;
 
-						if (file.good()) {
-							std::stringstream str;
-							std::string line;
-							while (std::getline(file, line)) {
-								str << line << '\n';
-							}
-
-							nlohmann::json json = nlohmann::json::parse(str, nullptr, false);
-							auto objects = json.get<std::unordered_map<std::string, nlohmann::json>>();
-
-							for (auto&& [key, value] : objects) {
-								m_translations.emplace(rage::joaat(key.c_str()), value.get<std::string>());
-							}
-							LOG("loaded %s", name);
-						}
-					}
-				}
-			}
-		}
-		catch (nlohmann::detail::exception const&) {
-			LOG_WARN("failed to parse %s", name);
-		}
-
+	void translation::enable() {
+		translation::get()->m_translate = true;
 	}
 
-	const char* translationManager::getTranslation(uint32_t label) {
-		if (auto it = m_translations.find(label); it != m_translations.end()) {
+	void translation::disbale() {
+		translation::get()->m_translate = false;
+	}
+
+	void translation::push(std::string string) {
+		static bool saved_once;
+		using jsonf = nlohmann::json;
+		static jsonf save;
+		auto cheat_path = std::filesystem::path(Util::GetDocumentsPath()).append("neon").append("translation.json");
+		std::ofstream file(cheat_path, std::ios::out | std::ios::trunc);
+
+		save[string.c_str()]["Replacement"] = string.c_str();
+
+		std::ofstream json_file(cheat_path);
+		json_file << std::setw(4) << save << std::endl;
+		json_file.close();
+	}
+
+	std::string translation::get(std::string string) {
+		if (!translation::get()->m_translate) { // enable it to push stuff
+			return string;
+		}
+		if (auto it = translation::get()->m_translation_table.find(rage::joaat(string));  it != translation::get()->m_translation_table.end()) {
 			return &(it->second)[0];
 		}
 		else {
-			static char buf[64];
-			std::fill(std::begin(buf), std::end(buf), '\0');
-			std::snprintf(&buf[0], sizeof(buf) - 1, "Error (0x%08X)", label);
-			return &buf[0];
+			translation::push(string); // pushes each string into the file we can send this file to resellers / chat gpt to translate it into diff lang, but we still need font support
+			return string;
 		}
+	}
+
+	void translation::load() {
+		auto config_path = std::filesystem::path(Util::GetDocumentsPath()).append("neon").append("translation.json");
+
+		std::ifstream file(config_path);
+
+		if (file.good()) {
+			file >> g_loader;
+		}
+		else {
+			return;
+		}
+		for (auto& item : g_loader.items()) {
+			const std::string& key = item.key();
+			try {
+				std::string value = g_loader[key]["Replacement"];
+				translation::get()->m_translation_table.insert({ rage::joaat(key), value });
+			}
+			catch (const std::exception& e) { // catch any exception derived from std::exception
+				LOG(e.what());
+			}
+		}
+	//	LOG("Found {} Saved Options", g_loader.size());
+	}
+
+	std::string trans(std::string string) {
+		return translation::get(string);
 	}
 }

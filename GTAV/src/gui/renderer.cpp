@@ -394,6 +394,7 @@ namespace menu::renderer {
 
 		if (option->get_flag(eOptionFlag::simple_option)) {
 			render::draw_text(option->get_left_text(), JUSTIFY_LEFT, { m_position.x, y_pos }, m_option.m_font_scale, m_option.m_font, m_option.m_padding, selected ? m_option.m_selected_text_color : m_option.m_text_color);
+			render::draw_text(option->get_right_text(), JUSTIFY_RIGHT, { m_position.x + (m_width / m_option.m_padding.x), y_pos}, m_option.m_font_scale, m_option.m_font, m_option.m_padding, selected ? m_option.m_selected_text_color : m_option.m_text_color);
 		}
 
 		if (option->get_flag(eOptionFlag::indicator)) {

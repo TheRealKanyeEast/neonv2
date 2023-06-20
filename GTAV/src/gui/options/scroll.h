@@ -44,7 +44,6 @@ namespace base::gui
 		}
 
 		scrollOption& addTranslate() {
-			const char* translation = TRANSLATE(base::get_left_text());
 			//base::set_left_text(translation);
 			return *this;
 		}

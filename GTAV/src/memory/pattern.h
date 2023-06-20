@@ -305,7 +305,7 @@ namespace memory {
 		explicit batch() = default;
 		~batch() noexcept = default;
 
-		void Add(std::string name, pattern pattern, std::function<void(memory::Ptr)> callback, bool& out);
+		void Add(std::pair<const char*, pattern> entry, std::function<void(Ptr)> callback, bool& out);
 		void run(range region);
 
 		struct entry {

@@ -1,7 +1,7 @@
 #pragma once
 #include "abstract_option.h"
 #include "abstract_submenu.h"
-
+#include "gui/util/translate.h"
 namespace base::gui {
 	template <typename T>
 	class base_submenu : public abstract_submenu {
