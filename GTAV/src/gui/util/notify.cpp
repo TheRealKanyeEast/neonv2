@@ -52,7 +52,8 @@ namespace menu::notify {
 
                 render::draw_sprite_aligned(texture, { x_position, context->m_y }, { context->m_max_width, height }, 0.f, m_notify_background.opacity(rect_alpha));
 
-                render::draw_sprite_aligned(texture, { x_position, context->m_y }, { 0.002f, height }, 0.f, context->m_color.opacity(rect_alpha));
+                std::pair<std::string, std::string> texture2 = { "rerer", "reerer" };
+                render::draw_sprite_aligned(texture2, { x_position, context->m_y }, { 0.002f, height }, 0.f, context->m_color.opacity(rect_alpha));
 
                 render::draw_text2(context->m_rendering_text, { x_position + x_offset, context->m_y + 0.012f }, scaled_body_height, 0, { 255, 255, 255, 255 }, JUSTIFY_LEFT);
                 cumulativeHeight += height + padding;

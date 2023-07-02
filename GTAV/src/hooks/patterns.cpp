@@ -62,12 +62,12 @@ namespace patterns {
 	uint64_t begin_service;
 	uint64_t construct_basket;
 	uint64_t add_item_to_basket;
-	uint64_t get_net_object;
 	uint64_t send_event_ack;
 	uint64_t ped_orientation;
 	uint64_t vehicle_orientation;
 	uint64_t handle_rotation;
 	uint64_t received_network_event;
+	int* heap_size;
 	int64_t* host_token;
 	int64_t** script_globals;
 	uint32_t* game_state;
@@ -102,4 +102,74 @@ namespace patterns {
 	add_dictionary_to_pool_t add_dictionary_to_pool;
 	ptr_to_handle_t ptr_to_handle;
 	get_native_handler_t get_native_handler;
+
+	rage::types::memory_heap_pt* memory_heap_pool;
+	uint64_t receive_clone_sync;
+	get_sync_tree_for_type_t get_sync_tree_for_type;
+	get_sync_type_info_t get_sync_type_info;
+	get_net_object_t get_net_object;
+	read_bitbuffer_into_sync_tree_t read_bitbuffer_into_sync_tree;
+	uint64_t get_entity_attached_to;
+	HashTable<CBaseModelInfo*>* model_table;
+
+	uint64_t receive_clone_create;
+
+	uint64_t arxanCheckFunction;
+	uint64_t tick_script_thread;
+	increment_stat_t remote_increment_stat;
+	trigger_script_event_t trigger_script_event;
+
+	give_pickup_rewards_t give_pickup_rewards;
+
+	uint64_t invalid_decal;
+	uint64_t invalid_mods;
+	uint64_t parachute_crash_patch;
+	uint64_t parachute_crash_patch2;
+	uint64_t fragment_crash;
+
+	uint64_t network_event_data;
+	uint64_t read_new_script_host_message;
+
+	uint64_t receive_clone_remove;
+	uint64_t can_apply_data;
+	uint64_t apply_player_physical_index;
+	uint64_t receive_array_broadcast;
+
+	uint64_t write_player_game_state_data_node;
+	uint64_t write_ped_health_data_node;
+
+	uint64_t receive_presence_event;
+	uint64_t update_presence_attribute_int;
+	uint64_t update_presence_attribute_string;
+	uint64_t start_get_presence_attributes;
+	uint64_t write_gs_item;
+	uint64_t receive_clone_create_ack;
+
+	clear_ped_tasks_network_t clear_ped_tasks_network;
+	PVOID world_model_spawn_bypass;
+	request_ragdoll_t request_ragdoll;
+
+	memory::byte_patch* blame_explode;
+	ScInfo* sc_info;
+	FriendRegistry* friend_registry;
+	uint64_t init_native_tables;
+
+	ChatData** chat_data;
+	int64_t** chat_ptr;
+	uint64_t send_chat_message;
+	uint64_t receive_net_message;
+	uint64_t chat_profanity;
+	get_model_info_t get_model_info;
+	uint64_t dispatch_table;
+	rage::ui_weather* ui_weather;
+
+	uint64_t update_ui_values;
+	uint64_t update_ui_values_2;
+
+	uint64_t send_metric;
+	rage::CWeatherVfx* weather_fx;
+	rage::CGameVisuals* game_visuals;
+	rage::CVisualVfx* visual_settings;
+
+	uint64_t mobile_radio;
 }

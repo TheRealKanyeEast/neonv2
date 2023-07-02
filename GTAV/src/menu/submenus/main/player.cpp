@@ -17,35 +17,59 @@ using namespace menu::player::vars;
 namespace menu::player::vars {
 	variables m_vars;
 
+	bool get_player_otr(Player player) {
+		return *script_global(2657704).at(1 + (player * 463)).at(213).as<int*>();
+	}
+
+	void local_set_player_otr_flag(bool toggle) {
+		*script_global(2657704).at(PLAYER::PLAYER_ID(), 463).at(213).as<int*>() = toggle;
+	}
+
+	void local_set_player_otr_time(int time) {
+		*script_global(2672524).at(58).as<int*>() = time;
+	}
+
+	int get_character() {
+		return *script_global(1574918).as<int*>();
+	}
+
+
+	static bool was_otr_radar_on;
 	void cops_turn_blind_eye() {
 		if (m_vars.m_cops_turn_blind_eye) {
-			*menu::script_global::script_global(scr_globals::mechanic_global).at(4654).as<std::int32_t*>() = 1;
-			*menu::script_global::script_global(scr_globals::mechanic_global).at(4657).as<std::int32_t*>() = NETWORK::GET_NETWORK_TIME() + 638000;
+			*script_global(2794162).at(4661).as<std::int32_t*>() = 1;
+			*script_global(2794162).at(4664).as<std::int32_t*>() = NETWORK::GET_NETWORK_TIME() + 638000;
 		}
 		else {
-			*menu::script_global::script_global(scr_globals::mechanic_global).at(4654).as<std::int32_t*>() = 0;
-			*menu::script_global::script_global(scr_globals::mechanic_global).at(4657).as<std::int32_t*>() = NETWORK::GET_NETWORK_TIME();
+			*script_global(2794162).at(4661).as<std::int32_t*>() = 0;
+			*script_global(2794162).at(4664).as<std::int32_t*>() = NETWORK::GET_NETWORK_TIME();
 		}
 	}
 
+
 	void off_the_radar() {
 		if (m_vars.m_off_the_radar) {
-			scr_globals::globalplayer_bd.as<GlobalPlayerBD*>()->Entries[PLAYER::PLAYER_ID()].OffRadarActive = true;
-			*scr_globals::offradar_time.at(57).as<int*>() = NETWORK::GET_NETWORK_TIME() + 758000;
+			*menu::script_global(2657704).at(PLAYER::PLAYER_ID(), 463).at(210).as<int*>() = 1;
+			*menu::script_global(2672524).at(57).as<int*>() = NETWORK::GET_NETWORK_TIME() + 758000;
 		}
 		else {
-			scr_globals::globalplayer_bd.as<GlobalPlayerBD*>()->Entries[PLAYER::PLAYER_ID()].OffRadarActive = false;
+			*menu::script_global(2657704).at(PLAYER::PLAYER_ID(), 463).at(210).as<int*>() = 0;
+			*menu::script_global(2672524).at(57).as<int*>() = NETWORK::GET_NETWORK_TIME();
 		}
 	}
 
 	void reveal_hidden_players() {
-		if (m_vars.m_reveal_hidden_players) {
-			scr_globals::globalplayer_bd.as<GlobalPlayerBD*>()->Entries[PLAYER::PLAYER_ID()].RevealPlayersActive = true;
-			*scr_globals::offradar_time.at(58).as<int*>() = NETWORK::GET_NETWORK_TIME() + 758000;
+		if (!m_vars.m_off_the_radar) {
+			if (was_otr_radar_on)
+			{
+				local_set_player_otr_flag(false);
+				was_otr_radar_on = false;
+			}
+			return;
 		}
-		else {
-			scr_globals::globalplayer_bd.as<GlobalPlayerBD*>()->Entries[PLAYER::PLAYER_ID()].RevealPlayersActive = false;
-		}
+		was_otr_radar_on = true;
+		local_set_player_otr_flag(true);
+		local_set_player_otr_time(NETWORK::GET_NETWORK_TIME() + 758000);
 	}
 
 	void ApplyForceToEntity(Entity entity, float x, float y, float z, float offX, float offY, float offZ) {
@@ -135,6 +159,11 @@ namespace menu {
 				.addHotkey().addTranslate()
 				.addToggle(&m_vars.m_reveal_hidden_players)
 				.addClick(reveal_hidden_players));
+
+			core->addOption(toggleOption("Cops turn Blind Eye")
+				.addHotkey().addTranslate()
+				.addToggle(&m_vars.m_cops_turn_blind_eye)
+				.addClick(cops_turn_blind_eye));
 
 			core->addOption(toggleOption("Superman")
 				.addHotkey().addTranslate()

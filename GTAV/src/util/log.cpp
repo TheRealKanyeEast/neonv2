@@ -15,7 +15,7 @@ namespace util::log {
 		SetConsoleMode(GetStdHandle(-11), ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 
 		m_path.append(Util::GetDocumentsPath());
-		m_path.append("neon");
+		m_path.append("aether");
 
 		if (!std::filesystem::exists(m_path)) {
 			std::filesystem::create_directory(m_path);

@@ -13,7 +13,7 @@ namespace base::hooks {
 			math::matrix<float> m_transform;
 		}; orientation* _orientation = (orientation*)rcx;
 
-		uint64_t entity = ((rage::netObject*)((uint64_t)rcx - 0xC8))->m_entity;
+		uint64_t entity = 0;
 		if (entity) {
 			memcpy(&_orientation->m_transform, (math::matrix<float>*)(entity + 0x60), sizeof(_orientation->m_transform));
 		}

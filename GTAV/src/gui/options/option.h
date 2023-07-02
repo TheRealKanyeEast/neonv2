@@ -44,6 +44,10 @@ namespace base::gui {
 		void set_value(double text) override {}
 		void set_value(std::string text) {}
 
+		T& handle_hover() {
+			return static_cast<T&>(*this);
+		}
+
 		T& set_left_text(const char* text) {
 			std::strncpy(&m_left_text[0], text, sizeof(m_left_text) - 1);
 			return static_cast<T&>(*this);

@@ -24,6 +24,7 @@ namespace menu {
 	namespace players::selected::vars {
 		struct variables {
 			bool m_spectate;
+			const char* msg_to_send = "aether.lol";
 		};
 
 		extern variables m_vars;

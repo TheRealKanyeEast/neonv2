@@ -369,7 +369,7 @@ namespace menu {
 			core->addOption(buttonOption("Teleport to Waypoint")
 				.addClick(teleport_to_waypoint));
 
-			core->addOption(buttonOption("Teleport to Object")
+			core->addOption(buttonOption("Teleport to Objective")
 				.addClick(teleport_to_objective));
 
 			core->addOption(buttonOption("Teleport to Last Vehicle")
@@ -411,7 +411,8 @@ namespace menu {
 		renderer::addSubmenu("Settings", "Teleport Settings", [](core* core) {
 			core->addOption(toggleOption("Teleport Animation")
 				.addTranslate().addHotkey()
-				.addToggle(&m_vars.m_transition));
+				.addToggle(&m_vars.m_transition)
+				.addTooltip("Might break in online"));
 
 			core->addOption(toggleOption("Auto Teleport to Waypoint")
 				.addTranslate().addHotkey()

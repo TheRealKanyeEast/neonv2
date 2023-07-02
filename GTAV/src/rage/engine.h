@@ -17,6 +17,8 @@
 
 #include <vector>
 #include <array>
+
+#include "rage/classes/enums.h"
 namespace rage::engine {
 	inline rage::types::store_module* get_store_module_extension(const char* extension) {
 		return caller::call<rage::types::store_module*>(patterns::get_store_module_extension, &patterns::store_manager->m_module, extension);
@@ -289,7 +291,7 @@ namespace rage::engine {
 					return;
 				}
 
-				launcher->m_context.m_state = rage::eThreadState::unk_3;
+				launcher->m_context.m_state = eThreadState::unk_3;
 
 				if (check_players_in_state(launcher, 5)) {
 					for (int i = 0; check_players_in_state(launcher, 5); i++) {
@@ -333,7 +335,7 @@ namespace rage::engine {
 				*menu::script_local(launcher->m_stack, 232).at(PLAYER::PLAYER_ID(), 3).at(2).as<int*>() = 6;
 				*menu::scr_globals::launcher_global.at(3).at(1).as<int*>() = script_id;
 
-				launcher->m_context.m_state = rage::eThreadState::running;
+				launcher->m_context.m_state = eThreadState::running;
 			}
 			else {
 			}

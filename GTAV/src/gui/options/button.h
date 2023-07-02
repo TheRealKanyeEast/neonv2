@@ -60,6 +60,37 @@ namespace base::gui {
 		}
 	};
 
+	class vehicleOption : public base_option<vehicleOption> {
+	private:
+		std::function<void()> m_function;
+	public:
+		explicit vehicleOption(const char* text) {
+			set_left_text(text);
+		}
+
+		vehicleOption& addToolTip(const char* description) {
+			base_option::set_tooltip(description);
+			return *this;
+		}
+
+		vehicleOption& addRightText(const char* text) {
+			base_option::set_right_text(text);
+			return *this;
+		}
+
+		vehicleOption& addClick(std::function<void()>&& function) {
+			set_action(std::move(function));
+			return *this;
+		}
+
+		bool get_flag(eOptionFlag flag) override {
+			if (flag == eOptionFlag::vehicle_option) {
+				return true;
+			}
+			return base_option::get_flag(flag);
+		}
+	};
+
 	class keyboardOption : public base_option<keyboardOption> {
 	private:
 		std::function<void()> m_function;

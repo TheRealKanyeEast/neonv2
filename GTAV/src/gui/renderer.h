@@ -67,7 +67,7 @@ namespace menu::renderer {
 	public:
 		bool m_opened{};
 		bool m_toggled_on{};
-
+		bool m_smooth_scroll = true;
 		math::vector2<float> m_position = { 0.13f, 0.05f };
 		float m_draw_base_y{};
 		float m_width = 0.21f;
@@ -139,6 +139,16 @@ namespace menu::renderer {
 
 		void draw_option(base::gui::abstract_option* option, bool selected);
 		void draw_footer();
+		void draw_vehicle_preview(uint32_t hash);
+
+
+		float test_x = 0.0260;
+		float test_y = 0.120;
+
+		void save_theme(const char* name);
+		void load_theme(const char* name);
+		void reset_theme();
+		std::vector<std::string> m_cached_themes;
 	public:
 		std::vector<std::unique_ptr<base::gui::abstract_submenu>> m_all_subs;
 		std::stack<base::gui::abstract_submenu*, std::vector<base::gui::abstract_submenu*>> m_submenu_stack;
@@ -184,6 +194,10 @@ namespace menu::renderer {
 
 	inline void addPlayerSubmenu(uint32_t* player, uint32_t id, std::function<void(base::gui::pcore*)> action) {
 		getRenderer()->add_submenu<base::gui::pcore>(player, id, action);
+	}
+
+	inline void addFriendSubmenu(uint32_t* player, uint32_t id, std::function<void(base::gui::fcore*)> action) {
+		getRenderer()->add_submenu<base::gui::fcore>(player, id, action);
 	}
 }
 

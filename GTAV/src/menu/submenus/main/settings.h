@@ -19,4 +19,15 @@ namespace menu {
 		static settings_menu instance;
 		return &instance;
 	}
+
+	namespace settings::vars {
+		struct variables {
+			std::size_t m_selected_theme;
+			bool m_auto_save;
+			const char* theme_to_save = "";
+		};
+
+
+		extern variables m_vars;
+	}
 }

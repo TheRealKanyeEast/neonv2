@@ -90,7 +90,11 @@ namespace script {
 		add_native_detour(0xADF692B254977C0C, base::hooks::set_current_ped_weapon);
 		add_native_detour(0xFE99B66D079CF6BC, base::hooks::disable_control_action);
 		add_native_detour(0x6D0DE6A7B5DA71F8, base::hooks::set_player_name);
+		add_native_detour(0x158C16F5E4CF41F8, base::hooks::return_true);
+
+		add_native_detour(RAGE_JOAAT("shop_controller"), 0x34616828CD07F1A1, base::hooks::return_false);
 		add_native_detour(RAGE_JOAAT("maintransition"), 0x6F3D4ED9BEE4E61D, base::hooks::network_session_host);
+		add_native_detour("freemode"_joaat, 0x1090044AD1DA76FA, base::hooks::terminate_this_thread);
 
 
 		for (auto& entry : *patterns::script_program)

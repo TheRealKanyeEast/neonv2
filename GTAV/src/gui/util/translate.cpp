@@ -22,7 +22,7 @@ namespace base {
 		static bool saved_once;
 		using jsonf = nlohmann::json;
 		static jsonf save;
-		auto cheat_path = std::filesystem::path(Util::GetDocumentsPath()).append("neon").append("translation.json");
+		auto cheat_path = std::filesystem::path(Util::GetDocumentsPath()).append("aether").append("translation.json");
 		std::ofstream file(cheat_path, std::ios::out | std::ios::trunc);
 
 		save[string.c_str()]["Replacement"] = string.c_str();
@@ -46,7 +46,7 @@ namespace base {
 	}
 
 	void translation::load() {
-		auto config_path = std::filesystem::path(Util::GetDocumentsPath()).append("neon").append("translation.json");
+		auto config_path = std::filesystem::path(Util::GetDocumentsPath()).append("aether").append("translation.json");
 
 		std::ifstream file(config_path);
 

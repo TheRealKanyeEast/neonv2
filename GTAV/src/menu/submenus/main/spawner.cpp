@@ -129,6 +129,7 @@ namespace menu {
 			}
 		});
 
+
 		renderer::addVehicleSubmenu(&m_vars.m_selected_vehicle_class, rage::joaat(rage::engine::get_vehicle_class_name(m_vars.m_selected_vehicle_class)), [](vcore* core) {
 			if (patterns::hash_list != nullptr) {
 				for (std::int32_t i = 0; i < patterns::hash_list->capacity; i++) {
@@ -142,19 +143,15 @@ namespace menu {
 								std::string make(make_ptr);
 								std::string model(model_ptr);
 								if (make[0] || model[0]) {
-									make = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(make.c_str());
 									model = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(model.c_str());
-									if (make != "NULL" && model != "NULL") {
-										ss << make << " " << model;
-									}
-									else if (model != "NULL") {
+									if (model != "NULL") {
 										ss << model;
 									}
 									else {
 										ss << "Unknown";
 									}
 								}
-								core->addOption(buttonOption((ss.str().c_str()))
+								core->addOption(vehicleOption((ss.str().c_str()))
 									.addClick([=] { spawn_vehicle(*(std::uint32_t*)(info + 0x18)); }));
 							}
 						}

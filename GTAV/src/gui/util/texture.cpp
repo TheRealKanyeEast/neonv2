@@ -35,7 +35,7 @@ namespace menu {
 		return texture;
 	}
 	textures::textures() {
-		m_path.append("neon").append("textures");
+		m_path.append("aether").append("textures");
 		if (std::filesystem::exists(m_path)) {
 			std::filesystem::directory_iterator it{ m_path };
 			for (auto&& entry : it) {

@@ -24,6 +24,11 @@ namespace menu {
 	namespace recovery::vars {
 		struct variables {
 			bool m_loop;
+			int m_selected_character;
+
+			int m_kills;
+			int m_deaths;
+			float m_calculated;
 		};
 
 		extern variables m_vars;

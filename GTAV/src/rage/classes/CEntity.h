@@ -8,7 +8,8 @@
 
 class CEntityDrawHandler;
 namespace rage {
-    class CEntity : public fwEntity {
+    class CEntity : public rage::fwEntity
+    {
     public:
         virtual void* _0x120() = 0; // implemented only by CPed
         virtual void UpdatePositionImpl() = 0; // 0x128
@@ -39,19 +40,21 @@ namespace rage {
         virtual bool _0x1F0() = 0;
         virtual void Warp(rage::vector3* pos, float heading, bool) = 0; // 0x1F8
 
-        uint8_t unk_00B9; //0x00B9
-        char pad_00BA[6]; //0x00BA
+
+        uint8_t gapB9; //0x00B9
+        char gapBA[6]; //0x00BA
         uint32_t m_flags_3; //0x00C0
         uint32_t m_flags_4; //0x00C4
-        uint32_t unk_00C8; //0x00C8
-        uint32_t unk_00CC; //0x00CC
+        uint32_t dwordC8;
+        uint32_t dwordCC;
     };
     static_assert(sizeof(CEntity) == 0xD0);
-    class CDynamicEntity : public CEntity {
+    class CDynamicEntity : public CEntity
+    {
     public:
-        class netObject* m_net_object; //0x00D0
-        char pad_00D8[16]; //0x00D8
-        uint64_t unk_00E8; //0x00E8
-    }; //Size: 0x00F0
+        class rage::netObject* m_net_object; //0x00D0
+        char gapD8[16];
+        uint64_t qwordE8;
+    };
     static_assert(sizeof(CDynamicEntity) == 0xF0);
 }

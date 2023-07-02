@@ -8,9 +8,9 @@ namespace rage
     public:
         virtual ~rlMetric() = default;
 
-        virtual int _0x08() { return 0; }; // returns a constant integer
+        virtual int get_type() { return 0; }; 
 
-        virtual int _0x10() { return 0; }; // returns a constant integer
+        virtual int get_sub_type() { return 0; }; 
 
         virtual int _0x18() { return 0; };
 

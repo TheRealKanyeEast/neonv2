@@ -32,6 +32,11 @@ namespace menu {
 			color m_color = color(255, 0, 0, 255);
 			bool m_randomize;
 			menu::rainbow m_rainbow;
+
+			uint8_t m_tyre_r;
+			uint8_t m_tyre_g;
+			uint8_t m_tyre_b;
+			uint8_t m_tyre_a = 255;
 		};
 
 		extern variables m_vars;

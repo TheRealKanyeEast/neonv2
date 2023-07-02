@@ -5,6 +5,7 @@
 #define NOMINMAX  
 #define _CRT_SECURE_NO_WARNINGS
 #define STB_IMAGE_IMPLEMENTATION
+#define CURL_STATICLIB
 #pragma warning(disable : 4996 4091 4838 4311 4302 4191 4018 4305 4800 4804 4305 4551 4390 4715)
 
 //include headers
@@ -47,6 +48,12 @@
 #include <random>
 #include <span>
 #include <algorithm>
+#include "util/curl/curl.h"
+#pragma comment(lib, "C:\\Users\\hanky.DESKTOP-AFRKBFD\\aether\\aether\\dependencies\\libcurl_a.lib")
+#pragma comment(lib, "wldap32.lib" )
+#pragma comment(lib, "crypt32.lib" )
+#pragma comment(lib, "Ws2_32.lib")
+#pragma comment(lib, "normaliz.lib")
 //include libs
 #pragma comment(lib, "winmm.lib")
 

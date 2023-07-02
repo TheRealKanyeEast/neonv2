@@ -10,7 +10,7 @@ public:
 	class CPlayerInfo* m_player_info; //0x00A0
 	uint32_t m_matchmaking_group; //0x0008
 	bool m_is_spectating; //0x000C
-	char pad_00AD[3]; //0x000AD
+	int16_t m_spectating_net_id; //0x000AD
 	uint64_t unk_00B0; //0x00B0
 	char unk_00B8; //0x00B8
 	char pad_00B9[3]; //0x00B9

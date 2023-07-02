@@ -39,6 +39,8 @@ namespace menu {
 			bool m_laser_sight;
 			bool m_defibrillator;
 			bool m_spawn_money;
+			bool m_toggle_crosshair;
+			bool m_triggerbot;
 		};
 
 		extern variables m_vars;

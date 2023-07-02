@@ -6,6 +6,25 @@
 #pragma pack(push, 1)
 namespace rage
 {
+
+	struct rockstar_identifier {
+		uint64_t m_rockstar_id;
+		uint32_t m_type;
+		uint32_t m_sub_type;
+	};
+
+	struct gs_session {
+		uint64_t m_peer_token;
+		uint64_t m_peer_token2;
+		uint64_t m_peer_token3;
+		rockstar_identifier m_rockstar_id;
+		char _0x0028[0x48];
+
+		uint32_t get_local_ip() {
+			return *(uint32_t*)((uint64_t)this + 0x64);
+		}
+	};
+
 	class netConnectionManager;
 	class sysMemAllocator;
 

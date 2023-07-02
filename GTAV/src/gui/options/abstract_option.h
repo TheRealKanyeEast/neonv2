@@ -18,5 +18,7 @@ namespace base::gui {
 		virtual bool get_flag(eOptionFlag flag) = 0;
 		virtual std::function<void()> get_action() = 0;
 		virtual bool* get_bool_pointer() = 0;
+
+	
 	};
 }

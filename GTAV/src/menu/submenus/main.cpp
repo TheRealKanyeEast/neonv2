@@ -7,6 +7,7 @@
 #include "gui/util/texture.h"
 #include "gui/util/panels.h"
 #include "gui/util/notify.h"
+
 using namespace base::gui;
 
 namespace menu {
@@ -33,10 +34,10 @@ namespace menu {
 		return results;
 	}
 
+	
 	void main_menu::render() {	
 
 		renderer::addSubmenu("Main Menu", "Main Menu", [](core* core) {
-
 			core->addOption(submenuOption("Player")
 				.addTranslate()
 				.setTarget("Player"));
@@ -80,11 +81,12 @@ namespace menu {
 			core->addOption(submenuOption("Settings")
 				.addTranslate()
 				.setTarget("Settings"));		
+
 			
 		});
 
 	}
-
+	std::unordered_map<int, std::unordered_map<int, uint32_t>> m_spectate_map;
 	void main_menu::update() {
 		fonts::update_queue();
 		menu::textures::tick();

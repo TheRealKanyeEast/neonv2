@@ -322,14 +322,12 @@ namespace base::hooks {
 			case 2: handleScriptEvent(player_name, "Spectate Message", true); return true; break;
 			}
 			break;
-		case eRemoteEvent::Teleport:
-			if (!isPlayerDriverOfLocalVehicle(player->m_player_id)) {
-				switch (var.block_force_teleport_id) {
-				case 0: break;
-				case 1:  return true; break;
-				case 2: handleScriptEvent(player_name, "Force Teleport", true); return true; break;
-				}
-			}
+		case eRemoteEvent::Teleport:		
+			switch (var.block_force_teleport_id) {
+			case 0: break;
+			case 1:  return true; break;
+			case 2: handleScriptEvent(player_name, "Force Teleport", true); return true; break;
+			}			
 			break;
 		case eRemoteEvent::TransactionError: return true;
 		case eRemoteEvent::VehicleKick:
@@ -960,6 +958,7 @@ namespace base::hooks {
 		case eNetworkEvents::NETWORK_PED_SEEN_DEAD_PED_EVENT:
 		case eNetworkEvents::NETWORK_START_SYNCED_SCENE_EVENT:
 		case eNetworkEvents::GIVE_PICKUP_REWARDS_EVENT:
+		case eNetworkEvents::FIRE_EVENT:
 		case eNetworkEvents::KICK_VOTES_EVENT: {
 			return sendEventAck(_this, sender, receiver, event_index, event_bitset);
 		}

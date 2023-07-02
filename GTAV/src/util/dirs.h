@@ -17,7 +17,8 @@ namespace util::dirs {
 		const char* get_aether() { return get_path(PATH_AETHER); }
 		const char* get_tmp() { return get_path(PATH_TMP); }
 		const char* get_textures() { return get_path(PATH_TEXTURES); }
-
+		const char* get_theme() { return get_path(PATH_THEME); }
+		const char* get_auth() { return get_path(PATH_AUTH); }
 
 		enum Paths {
 			PATH_DOCUMENTS,
@@ -26,7 +27,9 @@ namespace util::dirs {
 			PATH_GFX,
 			PATH_CONFIG,
 			PATH_TMP,
-			PATH_TEXTURES
+			PATH_TEXTURES,
+			PATH_THEME,
+			PATH_AUTH
 		};
 	private:
 		std::unordered_map<Paths, char[MAX_PATH]> m_paths;

@@ -25,7 +25,7 @@ namespace menu {
 
 	namespace teleport::vars {
 		struct variables {
-			bool m_transition = true;
+			bool m_transition = false;
 			bool m_auto_waypoint;
 			bool m_include_current_vehicle = true;
 			bool m_has_teleported_flag;

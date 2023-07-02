@@ -16,6 +16,7 @@ namespace menu::scr_globals {
 	static inline script_global gsbd_fm_events(1924276);
 	static inline script_global gsbd_block_c(2652364);
 	static inline script_global gsbd_property_instances(1944302);
+    static inline script_global tunables(1654054);
 
 	static inline script_global globalplayer_bd(2657704);
 	static inline script_global gpbd_fm_3(1895156);
@@ -42,6 +43,39 @@ namespace menu::scr_globals {
 	static inline script_global spawn_global = script_global(2694613);
 
 	static inline script_global offradar_time(2672524);
+
+
+}
+
+namespace menu::scr_locals
+{
+    namespace am_hunt_the_beast
+    {
+        constexpr static auto broadcast_idx = 600;
+        constexpr static auto player_broadcast_idx = 2584;
+    }
+
+    namespace am_criminal_damage
+    {
+        constexpr static auto broadcast_idx = 111;
+        constexpr static auto score_idx = 106;
+    }
+
+    namespace am_cp_collection
+    {
+        constexpr static auto broadcast_idx = 816;
+        constexpr static auto player_broadcast_idx = 3457;
+    }
+
+    namespace am_king_of_the_castle
+    {
+        constexpr static auto broadcast_idx = 94;
+    }
+
+    namespace fmmc_launcher
+    {
+        constexpr static auto broadcast_idx = 11629;
+    }
 }
 
 

@@ -3,19 +3,11 @@
 #include <cstdint>
 #include "TlsContext.h"
 #include "fwddec.h"
-
+#include "enums.h"
 class CGameScriptHandlerNetComponent;
 class scriptHandler;
 namespace rage
 {
-	enum class eThreadState : std::uint32_t
-	{
-		idle,
-		running,
-		killed,
-		unk_3,
-		unk_4,
-	};
 
 	class scrThreadContext
 	{
@@ -75,7 +67,8 @@ public:
 	bool m_safe_for_network_game;              // 0x141
 	char m_padding5[0x02];                     // 0x142
 	bool m_is_minigame_script;                 // 0x144
-	char m_padding6[0x02];                     // 0x145
+	bool m_is_paused;
+	char m_padding6[0x01];                     // 0x145
 	bool m_can_be_paused;                      // 0x147
 	bool m_can_remove_blips_from_other_scripts;// 0x148
 	char m_padding7[0x0F];                     // 0x149

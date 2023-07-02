@@ -31,6 +31,8 @@ namespace menu {
 			bool peer_token_correction;
 
 			bool m_force_session_host;
+
+
 		};
 
 		extern variables m_vars;

@@ -4,7 +4,7 @@
 #include "util/caller.h"
 
 // maxi small cock momento?
-//yoinked from orbit
+//yoinked from orbit (dead class and siggy)
 struct arxanReportItem {
         DWORD m_0x00;     // 0x0000
         DWORD m_0x04;     // 0x0004
@@ -59,17 +59,17 @@ namespace base::hooks {
 		uint64_t caller = (uint64_t)_ReturnAddress();
 
 		if (caller == patterns::report_myself) {
-			LOG_CUSTOM_WARN("AC", "Prevented REPORT_MYSELF_EVENT creation");
+			//LOG_CUSTOM_WARN("AC", "Prevented REPORT_MYSELF_EVENT creation");
 			return false;
 		}
 
 		if (caller == patterns::check_crc) {
-			LOG_CUSTOM_WARN("AC", "Prevented NETWORK_CHECK_CODE_CRCS_EVENT creation");
+		//	LOG_CUSTOM_WARN("AC", "Prevented NETWORK_CHECK_CODE_CRCS_EVENT creation");
 			return false;
 		}
 
 		if (caller == patterns::cash_spawn) {
-			LOG_CUSTOM_WARN("AC", "Prevented REPORT_CASH_SPAWN_EVENT creation");
+			//LOG_CUSTOM_WARN("AC", "Prevented REPORT_CASH_SPAWN_EVENT creation");
 			return false;
 		}
 
@@ -81,7 +81,7 @@ namespace base::hooks {
 			short type = *(short*)(event + 8);
 
 			if (type == 83u || type == 84u || type == 78u) {
-				LOG_CUSTOM_WARN("AC", "Blocking network event - %i", type);
+				//LOG_CUSTOM_WARN("AC", "Blocking network event - %i", type);
 
 				uint64_t table = *(uint64_t*)event;
 				caller::call<int>(*(uint64_t*)table, event, 1); // Deallocate event
@@ -96,13 +96,16 @@ namespace base::hooks {
 		return 1;
 	}
 
-	bool inline is_address_in_game_region(uint64_t address) {
+	bool inline is_address_in_game_region(uint64_t address)
+	{
 		static uint64_t moduleBase = NULL;
 		static uint64_t moduleSize = NULL;
-		if ((!moduleBase) || (!moduleSize)) {
+		if ((!moduleBase) || (!moduleSize))
+		{
 			MODULEINFO info;
-			if (!GetModuleInformation(GetCurrentProcess(), GetModuleHandle(0), &info, sizeof(info))) {
-				LOG_ERROR("Failed to find address in game region");
+			if (!GetModuleInformation(GetCurrentProcess(), GetModuleHandle(0), &info, sizeof(info)))
+			{
+				LOG_ERROR("GetModuleInformation failed!");
 				return true;
 			}
 			else
@@ -114,7 +117,8 @@ namespace base::hooks {
 		return address > moduleBase && address < (moduleBase + moduleSize);
 	}
 
-	bool is_jump(__int64 fptr) {
+	bool is_jump(__int64 fptr)
+	{
 		if (!is_address_in_game_region(fptr))
 			return false;
 
@@ -122,20 +126,66 @@ namespace base::hooks {
 		return value == 0xE9;
 	}
 
-	bool is_unwanted_dependency(__int64 cb) {
+	bool is_unwanted_dependency(__int64 cb)
+	{
 		auto f1 = *(__int64*)(cb + 0x60);
 		auto f2 = *(__int64*)(cb + 0x100);
 		auto f3 = *(__int64*)(cb + 0x1A0);
+
+		if (!is_address_in_game_region(f1) || !is_address_in_game_region(f2) || !is_address_in_game_region(f3))
+			return false;
 
 		return is_jump(f1) || is_jump(f2) || is_jump(f3);
 	}
 
 	void hooks::queueDependencyHook(void* dependency) {
-		if (is_unwanted_dependency((__int64)dependency)) {
+		if (is_unwanted_dependency((__int64)dependency))
+		{
 			return;
 		}
-
 		return ogQueueDependencyHook(dependency);
+	}
+
+	std::vector<std::string> blocked_metrics = {
+	"DIG",
+	"XP_LOSS",
+	"AWARD_XP",
+	"CF",
+	"CC",
+	"CNR",
+	"SCRIPT",
+	"CHEAT",
+	"AUX_DEUX",
+	"WEATHER",
+	"HARDWARE_OS",
+	"HARDWARE_GPU",
+	"HARDWARE_MOBO",
+	"HARDWARE_MEM",
+	"HARDWARE_CPU",
+	"PCSETTINGS",
+	"CASH_CREATED",
+	"DR_PS",
+	"UVC",
+	"W_L",
+	"ESVCS",
+	"IDLEKICK",
+	"GSCB",
+	"GSINV",
+	"GSCW",
+	"GSINT",
+	"EARN",
+	"GARAGE_TAMPER"
+	};
+
+	bool sendMetricHook(rage::rlMetric* _this, bool unk) {
+		//LOG_WARN(std::format("METRIC: {} {} {}", _this->get_name(), _this->get_name_hash(), _this->get_size()).c_str());
+
+		if (std::find(begin(blocked_metrics), end(blocked_metrics), _this->get_name()) != end(blocked_metrics)) {
+			//LOG_WARN(std::format("Blocking bad metric: {}", _this->get_name()).c_str());
+			return false;
+		}
+
+		return ogSendMetricHook(_this, unk);
 	}
 
 }

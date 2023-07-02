@@ -1,4 +1,5 @@
 #pragma once
+#include "fwddec.h"
 #include "vector.h"
 #include "CEntity.h"
 #include "NetPlayer.h"

@@ -23,7 +23,9 @@ using namespace menu::weapon::mods::vars;
 
 namespace menu::weapon::mods::vars {
 	variables m_vars;
+	int m_selected_crosshair;
 
+	const char* crosshairs[11] = { "Cross",  "Target", "Arrow", "Holy Cross", "Reticle", "Reticle Zoomed", "Dot","Plus","Middle Finger", "Box","Star" };
 
 	Vector3 get_direction(Vector3 rotation) {
 		Vector3 tmp;
@@ -73,6 +75,9 @@ namespace menu {
 			core->addOption(submenuOption("Gravity Gun")
 				.setTarget("Weapon Gravity Gun"));
 
+			core->addOption(submenuOption("Crosshairs")
+				.setTarget("Weapon Crosshairs"));
+
 			core->addOption(toggleOption("Unlimited Ammo")
 				.addHotkey().addTranslate()
 				.addToggle(&m_vars.m_unlimited_ammo));
@@ -105,6 +110,10 @@ namespace menu {
 				.addHotkey().addTranslate()
 				.addToggle(&m_vars.m_defibrillator));
 
+			core->addOption(toggleOption("TriggerBot")
+				.addHotkey().addTranslate()
+				.addToggle(&m_vars.m_triggerbot));
+
 			core->addOption(toggleOption("Apply Force")
 				.addHotkey().addTranslate()
 				.addToggle(&m_vars.m_apply_force));
@@ -128,7 +137,14 @@ namespace menu {
 			core->addOption(toggleOption("Clown VFX")
 				.addHotkey().addTranslate()
 				.addToggle(&m_vars.m_clown_vfx));
-		});		
+		});	
+		renderer::addSubmenu("Crosshairs", "Weapon Crosshairs", [](core* core) {
+			core->addOption(toggleOption("Toggle")
+				.addToggle(&m_vars.m_toggle_crosshair));
+
+			core->addOption(scrollOption<const char*, int>("Crosshair")
+				.addScroll(&crosshairs).setPosition(&m_selected_crosshair));
+		});
 	}
 
 	void weapon_mods_menu::update() {
@@ -303,6 +319,54 @@ namespace menu {
 				if (ENTITY::IS_ENTITY_A_PED(aimed)) {
 					PED::SET_PED_CONFIG_FLAG(aimed, 223, true);
 				}
+			}
+		}
+
+		if (m_vars.m_triggerbot) {
+			Entity PlayerTarget;
+			if (PLAYER::GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(PLAYER::PLAYER_ID(), &PlayerTarget)) {
+				if (ENTITY::IS_ENTITY_A_PED(PlayerTarget) && !ENTITY::IS_ENTITY_DEAD(PlayerTarget, 1) && ENTITY::GET_ENTITY_ALPHA(PlayerTarget) == 255) {
+					Vector3 Head = PED::GET_PED_BONE_COORDS(PlayerTarget, 0x796E, { 0.1f, 0.0f, 0.0f });
+					PED::SET_PED_SHOOTS_AT_COORD(PLAYER::PLAYER_PED_ID(), Head, true);
+				}
+			}
+		}
+
+		if (m_vars.m_toggle_crosshair) {
+			switch (m_selected_crosshair) {
+			case 0:
+				render::draw_sprite({ "srange_gen", "hit_cross" }, { 0.5f, 0.5f }, { 0.02f, 0.03f }, color(0, 255, 0, 180), 0.0f);
+				break;
+			case 1:
+				render::draw_sprite({ "helicopterhud", "hud_target" }, { 0.5f, 0.5f }, { 0.02f, 0.03f }, color(0, 255, 0, 180), 0.0f);
+				break;
+			case 2:
+				render::draw_sprite({ "helicopterhud", "hudarrow" }, { 0.5f, 0.5f }, { 0.02f, 0.03f }, color(0, 255, 0, 180), 0.0f);
+				break;
+			case 3:
+				render::draw_sprite({ "mptattoos3", "tattoo_reach_rank_r_10" }, { 0.5f, 0.5f }, { 0.02f, 0.03f }, color(0, 255, 0, 180), 0.0f);
+				break;
+			case 4:
+				render::draw_sprite({ "darts", "dart_reticules" }, { 0.5f, 0.5f }, { 0.02f, 0.03f }, color(0, 255, 0, 180), 0.0f);
+				break;
+			case 5:
+				render::draw_sprite({ "darts", "dart_reticules_zoomed" }, { 0.5f, 0.5f }, { 0.02f, 0.03f }, color(0, 255, 0, 180), 0.0f);
+				break;
+			case 6:
+				render::draw_sprite({ "shared", "emptydot_32" }, { 0.5f, 0.5f }, { 0.02f, 0.03f }, color(0, 255, 0, 180), 0.0f);
+				break;
+			case 7:
+				render::draw_sprite({ "shared", "menuplus_32" }, { 0.5f, 0.5f }, { 0.02f, 0.03f }, color(0, 255, 0, 180), 0.0f);
+				break;
+			case 8:
+				render::draw_sprite({ "mp_freemode_mc", "mouse" }, { 0.5f, 0.5f }, { 0.02f, 0.03f }, color(0, 255, 0, 180), 0.0f);
+				break;
+			case 9:
+				render::draw_sprite({ "visualflow", "crosshair" }, { 0.5f, 0.5f }, { 0.02f, 0.03f }, color(0, 255, 0, 180), 0.0f);
+				break;
+			case 10:
+				render::draw_sprite({ "shared", "newstar_32" }, { 0.5f, 0.5f }, { 0.02f, 0.03f }, color(0, 255, 0, 180), 0.0f);
+				break;
 			}
 		}
 	}

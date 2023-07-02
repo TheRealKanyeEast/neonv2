@@ -17,7 +17,14 @@
 #include "gui/util/notify.h"
 #include "memory/pattern.h"
 #include "gui/util/translate.h"
-
+#include "rage/api/api.h"
+#include "menu/util/script_patcher_service.h"
+#include "features/features.h"
+#include "security/security.h"
+#include "auth/auth.h"
+#include "auth/vars.h"
+#include "security/themdia/secure_engine.h"
+#include "util/util.h"
 namespace base::core {
 
 
@@ -26,90 +33,140 @@ namespace base::core {
 		util::threads::getThreadPool()->Cleanup();
 		util::fiber::cleanup();
 		features::g_manager.clear();
+		exceptions::uninitExceptionHandler();
 		util::log::Cleanup();
 
 		FreeLibraryAndExitThread(static_cast<HMODULE>(handle), 0);
 	}
 
-	DWORD WINAPI load(LPVOID handle) {
-		AddVectoredExceptionHandler(0, exception::handler::exception_handler);
-		
+	void download_files() {
+		std::string MenuFolderPath = Util::GetDocumentsPath() + "\\aether\\textures\\";
+		auth::download(XOR("https://media.discordapp.net/attachments/1106198450216902706/1125085459366813736/color.png"), MenuFolderPath + "color.png");
+		auth::download(XOR("https://media.discordapp.net/attachments/1106198450216902706/1125085459719139390/dots.png"), MenuFolderPath + "dots.png");
+		auth::download(XOR("https://media.discordapp.net/attachments/1106198450216902706/1125085459987562596/footer.png"), MenuFolderPath + "footer.png");
+		auth::download(XOR("https://media.discordapp.net/attachments/1106198450216902706/1125085460356669580/header.png"), MenuFolderPath + "header.png");
+		auth::download(XOR("https://media.discordapp.net/attachments/1106198450216902706/1125085460604137492/keyboard.png"), MenuFolderPath + "keyboard.png");
+		auth::download(XOR("https://media.discordapp.net/attachments/1106198450216902706/1125085460876755015/scroller.png"), MenuFolderPath + "scroller.png");
+		auth::download(XOR("https://media.discordapp.net/attachments/1106198450216902706/1125085461145198602/toggle_off.png"), MenuFolderPath + "toggle_off.png");
+		auth::download(XOR("https://media.discordapp.net/attachments/1106198450216902706/1125085461434597496/toggle_on.png"), MenuFolderPath + "toggle_on.png");
+
+		std::string font_folder = Util::GetDocumentsPath() + "\\aether\\fonts\\";
+		auth::download(XOR("https://cdn.discordapp.com/attachments/1106198450216902706/1125085424893829170/RDR.gfx"), font_folder + "RDR.gfx");
+		auth::download(XOR("https://cdn.discordapp.com/attachments/1106198450216902706/1125085429071351908/Roboto.gfx"), font_folder + "Roboto.gfx");
+	}
+
+
+	DWORD WINAPI load(LPVOID handle) {	
+		//VM_DOLPHIN_BLACK_START
+		security::HideModule(static_cast<HMODULE>(handle), false);
+
+		util::log::Load();
+		exceptions::initExceptionHandler();
+
 		if (!util::dirs::load()) {
 			unload(handle);
 		}
 
-		util::log::Load();
-		LOG("Welcome to Aether - Grand Theft Auto V");
 
-		if (!(g_window = FindWindowA(("grcWindow"), NULL))) {
-			int timeout = 0;
-			while (!g_window) {
-				if (timeout >= 20) {
-					LOG_ERROR(("Failed to find game window"));
-					unload(handle);
-					return 0;
+		auth::login();
+		if (auth::vars::g_type == XOR("NULL")) {
+			LOG_ERROR("Failed to validate account");
+			auth::vars::g_logged_in = false;
+			std::this_thread::sleep_for(1500ms);
+			exit(0);
+		}
+		if (auth::vars::g_logged_in) {
+			std::thread hb_t(auth::run_heartbeat);
+			download_files();
+
+			LOG("Welcome to Aether - Grand Theft Auto V");
+
+			if (!(g_window = FindWindowA(("grcWindow"), NULL))) {
+				int timeout = 0;
+				while (!g_window) {
+					if (timeout >= 20) {
+						LOG_ERROR(("Failed to find game window"));
+						unload(handle);
+						return 0;
+					}
+
+					g_window = FindWindowA(("grcWindow"), NULL);
+					timeout++;
+					Sleep(1000);
 				}
-
-				g_window = FindWindowA(("grcWindow"), NULL);
-				timeout++;
-				Sleep(1000);
 			}
-		}
 
-		//base::gui::getTranslationManager()->init();
+			//base::gui::getTranslationManager()->init();
 
-		if (!base::hooks::patterns()) {
-			LOG_WARN("Failed to load patterns, unloading...");
-			std::this_thread::sleep_for(6s);
-			unload(handle);
-		}
+		//	auto script_patcher_service_instance = std::make_unique<menu::script_patcher_service>();
 
-		if (!base::hooks::bypass()) {
-			LOG_WARN("Failed to load bypasses, unloading...");
-			std::this_thread::sleep_for(6s);
-			unload(handle);
-		}
-
-		while (*patterns::game_state != 0) {
-			std::this_thread::sleep_for(3s);
-			std::this_thread::yield();
-		}
-
-
-		if (!invoker::invoker::handlers_cached()) {
-			invoker::invoker::cache_handlers();
-		}
-
-		d3d::initialize();
-
-		if (!base::hooks::hooks()) {
-			LOG_WARN("Failed to load hooks, unloading...");
-			std::this_thread::sleep_for(6s);
-			unload(handle);
-		}
-
-		auto script_hooks = std::make_unique<script::native_hooks>();
-		
-
-		LOG_SUCCESS("Loaded in-game patterns");
-		LOG_SUCCESS("Loaded in-game hooks");
-
-		g_running = true;
-
-
-		LOG("Web Reconstruction init");
-
-		//translation::get()->enable();
-		translation::get()->load();
-
-		while (g_running) {
-			if (GetAsyncKeyState(VK_END)) {
-				g_running = false;
+			if (!base::hooks::patterns()) {
+				LOG_WARN("Failed to load patterns, unloading...");
+				std::this_thread::sleep_for(6s);
+				unload(handle);
 			}
+
+			if (!base::hooks::bypass()) {
+				LOG_WARN("Failed to load bypasses, unloading...");
+				std::this_thread::sleep_for(6s);
+				unload(handle);
+			}
+
+
+			while (*patterns::game_state != 0) {
+				std::this_thread::sleep_for(3s);
+				std::this_thread::yield();
+			}
+
+
+			if (!invoker::invoker::handlers_cached()) {
+				invoker::invoker::cache_handlers();
+			}
+
+			d3d::initialize();
+
+			if (!base::hooks::hooks()) {
+				LOG_WARN("Failed to load hooks, unloading...");
+				std::this_thread::sleep_for(6s);
+				unload(handle);
+			}
+
+			auto script_hooks = std::make_unique<script::native_hooks>();
+
+			//std::thread sc_t(rage::api::update);
+
+			LOG_SUCCESS("Loaded in-game patterns");
+			LOG_SUCCESS("Loaded in-game hooks");
+
+			g_running = true;
+
+
+			///int ogHeapSize = *patterns::heap_size / 1024 / 1024;
+			//LOG(std::format("Original Memory Heap Size: {}MB", ogHeapSize).c_str());
+			//LOG("Modifying Memory Heap Size...");
+			//DWORD oldProtect;
+			//VirtualProtect(patterns::heap_size, 4, PAGE_EXECUTE_READWRITE, &oldProtect);
+			//*patterns::heap_size = 650 * 1024 * 1024;
+		//	VirtualProtect(patterns::heap_size, 4, oldProtect, &oldProtect);
+		//	LOG_WARN(std::format("Modified Memory Heap Size To: {}MB", *patterns::heap_size / 1024 / 1024).c_str());
+			//translation::get()->enable();
+			translation::get()->load();
+
+			while (g_running) {
+				security::run();
+				if (GetAsyncKeyState(VK_END)) {
+					g_running = false;
+				}
+			}
+
+			//script_patcher_service_instance.reset();
+			script_hooks.reset();
+			unload(handle);
+		}
+		else {
+			LOG_ERROR("Unable to login");
 		}
 
-		script_hooks.reset();
-		unload(handle);
-
+		//VM_DOLPHIN_BLACK_END
 	}
 }

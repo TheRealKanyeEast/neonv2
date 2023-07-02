@@ -17,6 +17,11 @@
 #include "rage/classes/Network.h"
 #include "rage/classes/CCommunications.h"
 #include "rage/classes/netShopping.h"
+#include "rage/classes/HashTable.h"
+#include "rage/classes/CBaseModelInfo.h"
+#include "rage/classes/CEntity.h"
+#include "rage/classes/ros.h"
+#include "rage/classes/chatData.h"
 
 class GenericPool;
 class VehiclePool;
@@ -81,12 +86,12 @@ namespace patterns {
 	extern uint64_t begin_service;
 	extern uint64_t construct_basket;
 	extern uint64_t add_item_to_basket;
-	extern uint64_t get_net_object;
 	extern uint64_t send_event_ack;
 	extern uint64_t ped_orientation;
 	extern uint64_t vehicle_orientation;
 	extern uint64_t handle_rotation;
 	extern uint64_t received_network_event;
+	extern int* heap_size;
 	extern int64_t* host_token;
 	extern int64_t** script_globals;
 	extern uint32_t* game_state;
@@ -143,4 +148,113 @@ namespace patterns {
 	extern add_dictionary_to_pool_t add_dictionary_to_pool;
 	extern ptr_to_handle_t ptr_to_handle;
 	extern get_native_handler_t get_native_handler;
+
+	extern rage::types::memory_heap_pt* memory_heap_pool;
+
+
+	using get_sync_type_info_t = const char* (*)(uint16_t sync_type, char a2);
+
+	using get_sync_tree_for_type_t = rage::netSyncTree* (*)(CNetworkObjectMgr* mgr, uint16_t sync_type);
+
+	using get_net_object_t = rage::netObject* (*)(CNetworkObjectMgr* mgr, int16_t id, bool can_delete_be_pending);
+
+	using get_net_object_for_player_t = rage::netObject* (*)(CNetworkObjectMgr*, int16_t, CNetGamePlayer*, bool);
+
+	using read_bitbuffer_into_sync_tree_t = void (*)(rage::netSyncTree* tree, uint64_t flag, uint32_t flag2, rage::datBitBuffer* buffer, uint64_t netLogStub);
+
+	extern uint64_t receive_clone_sync;
+	extern uint64_t receive_clone_create;
+	extern uint64_t receive_clone_remove;
+	extern uint64_t receive_clone_create_ack;
+	extern uint64_t can_apply_data;
+	extern get_sync_tree_for_type_t get_sync_tree_for_type;
+	extern get_sync_type_info_t get_sync_type_info;
+	extern get_net_object_t get_net_object;
+	extern read_bitbuffer_into_sync_tree_t read_bitbuffer_into_sync_tree;
+	extern uint64_t get_entity_attached_to;
+	extern HashTable<CBaseModelInfo*>* model_table;
+
+	extern uint64_t arxanCheckFunction;
+
+	extern uint64_t tick_script_thread;
+
+	using increment_stat_t = void (*) (Hash hash, unsigned int value, CNetGamePlayer* player);
+	extern increment_stat_t remote_increment_stat;
+
+	using give_pickup_rewards_t = void(*)(int players, uint32_t hash);
+	extern give_pickup_rewards_t give_pickup_rewards;
+
+	using trigger_script_event_t = void(*)(int event_group, int64_t* args, int arg_count, int player_bits);
+	extern trigger_script_event_t trigger_script_event;
+
+	extern uint64_t invalid_decal;
+	extern uint64_t invalid_mods;
+	extern uint64_t parachute_crash_patch;
+	extern uint64_t parachute_crash_patch2;
+	extern uint64_t fragment_crash;
+
+	extern uint64_t network_event_data;
+	extern uint64_t read_new_script_host_message;
+	extern uint64_t apply_player_physical_index;
+
+	extern uint64_t receive_array_broadcast;
+
+	inline CNetGamePlayer* g_syncing_player;
+
+	extern uint64_t write_player_game_state_data_node;
+	extern uint64_t write_ped_health_data_node;
+
+	extern uint64_t receive_presence_event;
+
+	extern uint64_t update_presence_attribute_int;
+	extern uint64_t update_presence_attribute_string;
+	extern uint64_t start_get_presence_attributes;
+	extern uint64_t write_gs_item;
+
+	using clear_ped_tasks_network_t = void (*)(CPed* ped, bool immediately);
+	extern clear_ped_tasks_network_t clear_ped_tasks_network;
+
+	extern PVOID world_model_spawn_bypass;
+	using request_ragdoll_t = void (*)(uint16_t object_id);
+	extern request_ragdoll_t request_ragdoll;
+
+	extern memory::byte_patch* blame_explode;
+
+	extern ScInfo* sc_info;
+	extern FriendRegistry* friend_registry;
+	extern uint64_t init_native_tables;
+
+	extern ChatData** chat_data;
+	extern int64_t** chat_ptr;
+
+	//using send_chat_message_t = bool (*)(int64_t* send_chat_ptr, rage::rlGamerInfo* gamer_info, const char* message, bool is_team);
+	extern uint64_t send_chat_message;
+	extern uint64_t receive_net_message;
+	extern uint64_t chat_profanity;
+
+	using get_model_info_t = uint64_t(*)(rage::joaat_t hash, uint32_t* ctx);
+	extern get_model_info_t get_model_info;
+
+	extern uint64_t dispatch_table;
+
+	extern rage::ui_weather* ui_weather;
+
+	inline bool m_disable_sky = true;
+
+	extern uint64_t send_metric;
+
+	extern uint64_t update_ui_values;
+	extern uint64_t update_ui_values_2;
+
+	extern rage::CWeatherVfx* weather_fx;
+	extern rage::CGameVisuals* game_visuals;
+	extern rage::CVisualVfx* visual_settings;
+
+
+	extern uint64_t mobile_radio;
+
+	inline void test() {
+		ui_weather->set_sky(m_disable_sky);
+
+	}
 }

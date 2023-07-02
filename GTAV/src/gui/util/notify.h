@@ -6,7 +6,7 @@ namespace menu::notify {
 		std::vector<std::string> m_text = {};
 		std::string m_rendering_text = "";
 		int m_lines = 1;
-		color m_color = {};
+		color m_color = { 255, 0, 0 };
 		float m_max_width = 0.20f;
 		float m_max_height = 0.f; // Add the m_max_height variable here
 		float x = 1.f;
@@ -23,7 +23,7 @@ namespace menu::notify {
 	class notify {
 	public:
 		void update();
-		void stacked(std::string text, color color = renderer::getRenderer()->m_header.m_color, uint32_t timeout = 6000);
+		void stacked(std::string text, color color = { 255, 0, 0, } , uint32_t timeout = 6000);
 		void subtitle(const char* msg);
 
 		color m_notify_background = color(31, 30, 31, 255);

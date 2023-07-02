@@ -8,12 +8,217 @@
 #include <gui/util/notify.h>
 #include <menu/submenus/main.h>
 #include "util/json.h"
+#include "rage/classes/CVehicleModelInfo.h"
+#include "util/dirs.h"
+
 
 namespace menu::renderer {
 	bool pushed_options = false;
 	int get_id_from_name(const char* name) {
 		for (std::uint32_t i = 0; i < 32; ++i) {
 			if (!strcmp(PLAYER::GET_PLAYER_NAME(i), name))
+				return i;
+		}
+		return 0;
+	}
+
+	std::string texture_list[] = {
+	"candc_apartments",
+	"candc_assault",
+	"candc_battle",
+	"candc_casinoheist",
+	"candc_chopper",
+	"candc_default",
+	"candc_executive1",
+	"candc_gunrunning",
+	"candc_hacker",
+	"candc_importexport",
+	"candc_smuggler",
+	"candc_truck",
+	"candc_xmas2017",
+	"casino_suites",
+	"dock_default",
+	"dock_dlc_banner",
+	"dock_dlc_color",
+	"dock_dlc_executive1",
+	"dock_dlc_fittings",
+	"dock_dlc_flag",
+	"dock_dlc_lights",
+	"dock_dlc_model",
+	"dock_dlc_slides",
+	"dock_yacht_backgrounds",
+	"elt_default",
+	"elt_dlc_apartments",
+	"elt_dlc_assault",
+	"elt_dlc_battle",
+	"elt_dlc_business",
+	"elt_dlc_executive1",
+	"elt_dlc_luxe",
+	"elt_dlc_pilot",
+	"elt_dlc_smuggler",
+	"lgm_default",
+	"lgm_dlc_apartments",
+	"lgm_dlc_arena",
+	"lgm_dlc_assault",
+	"lgm_dlc_battle",
+	"lgm_dlc_biker",
+	"lgm_dlc_business",
+	"lgm_dlc_business2",
+	"lgm_dlc_casinoheist",
+	"lgm_dlc_executive1",
+	"lgm_dlc_gunrunning",
+	"lgm_dlc_heist",
+	"lgm_dlc_importexport",
+	"lgm_dlc_lts_creator",
+	"lgm_dlc_luxe",
+	"lgm_dlc_pilot",
+	"lgm_dlc_smuggler",
+	"lgm_dlc_specialraces",
+	"lgm_dlc_stunt",
+	"lgm_dlc_summer2020",
+	"lgm_dlc_valentines",
+	"lgm_dlc_valentines2",
+	"lgm_dlc_vinewood",
+	"lgm_dlc_xmas2017",
+	"lsc_default",
+	"lsc_dlc_import_export",
+	"lsc_dlc_summer2020",
+	"lsc_jan2016",
+	"lsc_lowrider2",
+	"mba_vehicles",
+	"pandm_default",
+	"sssa_default",
+	"sssa_dlc_arena",
+	"sssa_dlc_assault",
+	"sssa_dlc_battle",
+	"sssa_dlc_biker",
+	"sssa_dlc_business",
+	"sssa_dlc_business2",
+	"sssa_dlc_casinoheist",
+	"sssa_dlc_christmas_2",
+	"sssa_dlc_christmas_3",
+	"sssa_dlc_executive_1",
+	"sssa_dlc_halloween",
+	"sssa_dlc_heist",
+	"sssa_dlc_hipster",
+	"sssa_dlc_independence",
+	"sssa_dlc_lts_creator",
+	"sssa_dlc_mp_to_sp",
+	"sssa_dlc_smuggler",
+	"sssa_dlc_stunt",
+	"sssa_dlc_summer2020",
+	"sssa_dlc_valentines",
+	"sssa_dlc_vinewood",
+	"sssa_dlc_xmas2017",
+	"lgm_dlc_tuner",
+	"sssa_dlc_tuner"
+	};
+
+	std::unordered_map<uint32_t, std::string> m_textures;
+	void populate_textures() {
+		util::fiber::pool::add([=] {
+			for (std::string texture : texture_list) {
+				bool loaded = true;
+
+				while (!GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED(texture.c_str())) {
+					loaded = false;
+					GRAPHICS::REQUEST_STREAMED_TEXTURE_DICT(texture.c_str(), true);
+					util::fiber::sleep(100);
+				}
+
+				util::fiber::sleep(250);
+
+				rage::grcTextureStore* store = patterns::texture_store;
+				if (util::is_valid_ptr(store) && util::is_valid_ptr(store->m_pool) && util::is_valid_ptr(store->m_mask)) {
+					rage::pgDictionaryPool* pool = store->m_pool;
+					for (uint32_t i = 0; i < store->m_count; i++) {
+						if (~(store->m_mask[i] >> 7) & 1) {
+							rage::pgDictionaryPool element = pool[i];
+							if (util::is_valid_ptr(element.m_dictionary)) {
+								if (element.m_dictionary_hash == MISC::GET_HASH_KEY(texture.c_str())) {
+									for (short j = 0; j < element.m_dictionary->m_count; j++) {
+										rage::grcTexture* item = element.m_dictionary->m_items[j];
+										if (util::is_valid_ptr(item)) {
+											if (util::is_valid_ptr(item->m_name)) {
+												if (!strstr(item->m_name, "_")) {
+													m_textures[MISC::GET_HASH_KEY(item->m_name)] = texture;
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
+				if (!loaded) {
+					GRAPHICS::SET_STREAMED_TEXTURE_DICT_AS_NO_LONGER_NEEDED(texture.c_str());
+				}
+			}
+		});
+	}
+
+	std::pair<std::pair<std::string, std::string>,	CVehicleModelInfo*> get_vehicle_model_texture(uint32_t model) {
+		uint32_t ctx = 0xFF;
+		CVehicleModelInfo* info = (CVehicleModelInfo*)patterns::get_model_info(model, &ctx);
+		if (info) {
+			auto vit = std::find_if(m_textures.begin(), m_textures.end(), [=](std::pair<uint32_t, std::string> Element) {
+				return Element.first == model;
+				});
+
+			if (vit != m_textures.end()) {
+				return { std::make_pair(vit->second, info->m_name), info };
+			}
+
+			// try again for 2
+			std::string name = std::string(info->m_name) + "2";
+
+			vit = std::find_if(m_textures.begin(), m_textures.end(), [=](std::pair<uint32_t, std::string> Element) {
+				return Element.first == MISC::GET_HASH_KEY(name.c_str());
+				});
+
+			if (vit != m_textures.end()) {
+				return { std::make_pair(vit->second, name), info };
+			}
+		}
+
+		return { std::make_pair("", ""), nullptr };
+	}
+
+	/*void renderer::draw_vehicle_preview(uint32_t hash) {
+		if (hash != 0) {
+			std::string model = VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(hash);
+			std::string text = HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION(model.c_str());
+
+			std::string VehiclePreviewDictName, VehiclePreviewName;
+			std::transform(model.begin(), model.end(), model.begin(), tolower);
+			for (auto& Vector : g_vehicle_pictures) {
+				std::string PreviewName = Vector.PreviewName;
+				std::transform(PreviewName.begin(), PreviewName.end(), PreviewName.begin(), tolower);
+				if (PreviewName == model) {
+					VehiclePreviewDictName = Vector.DictName;
+					VehiclePreviewName = Vector.PreviewName;
+					break;
+				}
+			}
+
+			auto maxSpeed = VEHICLE::GET_VEHICLE_MODEL_ESTIMATED_MAX_SPEED(hash) * 2.236936f;
+			auto seats = VEHICLE::GET_VEHICLE_MODEL_NUMBER_OF_SEATS(hash);
+			auto maxBraking = VEHICLE::GET_VEHICLE_MODEL_MAX_BRAKING(hash);
+			auto maxTraction = VEHICLE::GET_VEHICLE_MODEL_MAX_TRACTION(hash);
+
+			if (strlen(VehiclePreviewDictName.c_str()) > 0 && strlen(VehiclePreviewName.c_str()) > 0) {
+				render::draw_sprite({ VehiclePreviewDictName, VehiclePreviewName }, { m_position.x + test_x + 0.001f + 0.18f, m_position.y + test_y }, { 0.2f, 0.18f }, { 255,255,255,255 });
+				render::draw_rect({ m_position.x + test_x + 0.001f + 0.18f, m_position.y + test_y }, { 0.21f, 0.25f }, { 0, 0, 0, 220 });
+			}
+
+		}
+	}*/
+
+	int get_id_from_friend(const char* name) {
+		for (std::uint32_t i = 0; i < patterns::friend_registry->m_friend_count; ++i) {
+			if (!strcmp(patterns::friend_registry->get(i)->m_name, name))
 				return i;
 		}
 		return 0;
@@ -162,6 +367,8 @@ namespace menu::renderer {
 				//LOG_SUCCESS("Pushed Options");
 			}
 			PAD::DISABLE_CONTROL_ACTION(0, 27, true);
+			HUD::CLEAR_HELP(true);
+			HUD::CLEAR_ALL_HELP_MESSAGES();
 			m_draw_base_y = m_position.y;
 			if (!m_submenu_stack.empty()) {
 				auto sub = m_submenu_stack.top();
@@ -377,12 +584,20 @@ namespace menu::renderer {
 		if (selected) {
 			if (!strcmp(sub->get_name(), "Players")) {
 				if (sub->get_selected_option() != 0 && sub->get_selected_option() != 1) {
-					g_panel_spacing = 0.06f;
+					//g_panel_spacing = 0.06f;
 					menu::player_info_panel(get_id_from_name(option->get_left_text()));
 				}
 			}
 		}
 
+		if (selected) {
+			if (!strcmp(sub->get_name(), "Network Friends")) {
+				if (sub->get_selected_option() != 0 && sub->get_selected_option() != 1) {
+					//g_panel_spacing = 0.06f;
+					menu::friend_info_panel(get_id_from_friend(option->get_left_text()));
+				}
+			}
+		}
 
 		if (g_is_mouse_enabled && is_point_in_rect(get_mouse_pos(), { m_position.x, render::get_rect_base(m_option.m_height) }, { m_width, m_option.m_height })) {
 			auto sub = m_submenu_stack.top();
@@ -414,6 +629,13 @@ namespace menu::renderer {
 			else {
 				render::draw_sprite({ "textures", "toggle_off" }, { m_position.x + (m_width / m_option.m_padding.x - 0.0045f),
 					m_draw_base_y + (m_option.m_height / 2.f), }, { size.x, size.y }, selected ? m_option.m_selected_text_color : m_option.m_text_color, 0.0f);
+			}
+		}
+
+		if (option->get_flag(eOptionFlag::vehicle_option)) {
+			render::draw_text(option->get_left_text(), JUSTIFY_LEFT, { m_position.x, y_pos }, m_option.m_font_scale, m_option.m_font, m_option.m_padding, selected ? m_option.m_selected_text_color : m_option.m_text_color);
+			if (selected) {
+				vehicle_info_panel(MISC::GET_HASH_KEY(option->get_left_text()));
 			}
 		}
 
@@ -564,7 +786,7 @@ namespace menu::renderer {
 		try {
 			std::filesystem::path cheat_path;
 			cheat_path.append(Util::GetDocumentsPath());
-			cheat_path.append("neon");
+			cheat_path.append("aether");
 			cheat_path.append("hotkeys.json");
 			std::ifstream file(cheat_path);
 			if (!file.good()) {
@@ -600,7 +822,7 @@ namespace menu::renderer {
 		for (auto hotkey : m_bool_hotkeys) {
 			std::filesystem::path cheat_path;
 			cheat_path.append(Util::GetDocumentsPath());
-			cheat_path.append("neon");
+			cheat_path.append("aether");
 			cheat_path.append("hotkeys.json");
 			std::ofstream file(cheat_path, std::ios::out | std::ios::trunc);
 			save[std::to_string(hotkey.first).c_str()]["Hotkey"] = hotkey.second.m_key;
@@ -735,6 +957,141 @@ namespace menu::renderer {
 			m_OverlayLineColor);
 	}
 
+	std::initializer_list<int> split_color(color col) {
+		return { col.r, col.g, col.b, col.a };
+	}
 
+	void renderer::save_theme(const char* name) {
+		bool dupe = false;
+		int new_dupe = 1;
+
+		if (std::filesystem::exists(std::format("{}{}.json", util::dirs::get_path(theme), name))) {
+			for (int i = 1; i < 100; i++) {
+				if (std::filesystem::exists(std::format("{}{} ({}).json", util::dirs::get_path(theme), name, i))) {
+					new_dupe = i + 1;
+				}
+				else {
+					if (i != 1) {
+						dupe = true;
+						break;
+					}
+				}
+			}
+		}
+		try {
+			std::ofstream output;
+			if (dupe) output = std::ofstream(std::format("{}{} ({}).json", util::dirs::get_path(theme), name, new_dupe));
+			else output = std::ofstream(std::format("{}{}.json", util::dirs::get_path(theme), name));
+
+			nlohmann::json json;
+
+
+			json["Color"]["Header"] = split_color(m_header.m_color);
+			json["Color"]["Header Text"] = split_color(m_header.m_text_color);
+			json["Color"]["Submenu Bar"] = split_color(m_title.m_color);
+			json["Color"]["Submenu Bar Text"] = split_color(m_title.m_text_color);
+			json["Color"]["Selected Text"] = split_color(m_option.m_selected_text_color);
+			json["Color"]["Unselected Text"] = split_color(m_option.m_text_color);
+			json["Color"]["Selected Option"] = split_color(m_scroller_color);
+			json["Color"]["Unselected Option"] = split_color(m_option.m_color);
+			json["Color"]["Footer"] = split_color(m_footer.m_color);
+			json["Color"]["Footer Icon"] = split_color(m_footer.m_text_color);
+
+			json["Scale"]["Header Height"] = m_header.m_height;
+			json["Scale"]["Header Text"] = m_header.m_font_scale;
+			json["Scale"]["Submenu Bar Height"] = m_title.m_height;
+			json["Scale"]["Submenu Text"] = m_title.m_font_scale;
+			json["Scale"]["Option Height"] = m_option.m_height;
+			json["Scale"]["Option Text"] = m_option.m_font_scale;
+			json["Scale"]["Footer Height"] = m_footer.m_height;
+			json["Scale"]["Footer Icon"] = m_option.m_font_scale;
+
+			output << json.dump(4);
+			output.close();
+		}
+		catch (std::exception& e) {
+			LOG_CUSTOM_ERROR("Error", "%s", e.what());
+		}
+	}
+
+	void renderer::load_theme(const char* name) {
+		try {
+			std::ifstream input(std::format("{}{}.json", util::dirs::get_path(theme), name));
+			if (input.good()) {
+				nlohmann::json json;
+				input >> json;
+				input.close();
+
+				m_header.m_color.r = json["Color"]["Header"][0].get<uint8_t>();
+				m_header.m_color.g = json["Color"]["Header"][1].get<uint8_t>();
+				m_header.m_color.b = json["Color"]["Header"][2].get<uint8_t>();
+				m_header.m_color.a = json["Color"]["Header"][3].get<uint8_t>();
+
+				m_header.m_text_color.r = json["Color"]["Header Text"][0].get<uint8_t>();
+				m_header.m_text_color.g = json["Color"]["Header Text"][1].get<uint8_t>();
+				m_header.m_text_color.b = json["Color"]["Header Text"][2].get<uint8_t>();
+				m_header.m_text_color.a = json["Color"]["Header Text"][3].get<uint8_t>();
+
+				m_title.m_color.r = json["Color"]["Submenu Bar"][0].get<uint8_t>();
+				m_title.m_color.g = json["Color"]["Submenu Bar"][1].get<uint8_t>();
+				m_title.m_color.b = json["Color"]["Submenu Bar"][2].get<uint8_t>();
+				m_title.m_color.a = json["Color"]["Submenu Bar"][3].get<uint8_t>();
+
+				m_title.m_text_color.r = json["Color"]["Submenu Bar Text"][0].get<uint8_t>();
+				m_title.m_text_color.g = json["Color"]["Submenu Bar Text"][1].get<uint8_t>();
+				m_title.m_text_color.b = json["Color"]["Submenu Bar Text"][2].get<uint8_t>();
+				m_title.m_text_color.a = json["Color"]["Submenu Bar Text"][3].get<uint8_t>();
+
+				m_option.m_selected_text_color.r = json["Color"]["Selected Text"][0].get<uint8_t>();
+				m_option.m_selected_text_color.g = json["Color"]["Selected Text"][1].get<uint8_t>();
+				m_option.m_selected_text_color.b = json["Color"]["Selected Text"][2].get<uint8_t>();
+				m_option.m_selected_text_color.a = json["Color"]["Selected Text"][3].get<uint8_t>();
+
+				m_option.m_text_color.r = json["Color"]["Unselected Text"][0].get<uint8_t>();
+				m_option.m_text_color.g = json["Color"]["Unselected Text"][1].get<uint8_t>();
+				m_option.m_text_color.b = json["Color"]["Unselected Text"][2].get<uint8_t>();
+				m_option.m_text_color.a = json["Color"]["Unselected Text"][3].get<uint8_t>();
+
+				m_scroller_color.r = json["Color"]["Selected Option"][0].get<uint8_t>();
+				m_scroller_color.g = json["Color"]["Selected Option"][1].get<uint8_t>();
+				m_scroller_color.b = json["Color"]["Selected Option"][2].get<uint8_t>();
+				m_scroller_color.a = json["Color"]["Selected Option"][3].get<uint8_t>();
+
+				m_option.m_color.r = json["Color"]["Unselected Option"][0].get<uint8_t>();
+				m_option.m_color.g = json["Color"]["Unselected Option"][1].get<uint8_t>();
+				m_option.m_color.b = json["Color"]["Unselected Option"][2].get<uint8_t>();
+				m_option.m_color.a = json["Color"]["Unselected Option"][3].get<uint8_t>();
+
+				m_footer.m_color.r = json["Color"]["Footer"][0].get<uint8_t>();
+				m_footer.m_color.g = json["Color"]["Footer"][1].get<uint8_t>();
+				m_footer.m_color.b = json["Color"]["Footer"][2].get<uint8_t>();
+				m_footer.m_color.a = json["Color"]["Footer"][3].get<uint8_t>();
+
+				m_footer.m_text_color.r = json["Color"]["Footer Icon"][0].get<uint8_t>();
+				m_footer.m_text_color.g = json["Color"]["Footer Icon"][1].get<uint8_t>();
+				m_footer.m_text_color.b = json["Color"]["Footer Icon"][2].get<uint8_t>();
+				m_footer.m_text_color.a = json["Color"]["Footer Icon"][3].get<uint8_t>();
+			}
+		}
+		catch (std::exception& e) {
+			LOG_CUSTOM_ERROR("Error", "%s", e.what());
+		}
+	}
+
+	void renderer::reset_theme() {
+		 m_header.m_color = { 23, 22, 22 };
+		 m_header.m_text_color = { 255, 255, 255 };
+
+		 m_title.m_color = { 0, 0, 0, 255 };
+		 m_title.m_text_color = { 255, 255, 255, 255 };
+
+		 m_option.m_color = { 0, 0, 0, 160 };
+		 m_option.m_text_color = { 220, 220, 220, 220 };
+		 m_option.m_selected_text_color = { 0, 0, 0, 255 };
+		 m_scroller_color = { 255, 255, 255, 220 };
+
+		 m_footer.m_color = { 0,0,0,255 };
+		 m_footer.m_text_color = { 255,255,255,255 };
+	}
 }
 

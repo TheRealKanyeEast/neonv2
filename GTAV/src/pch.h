@@ -3,10 +3,13 @@
 
 #include "framework.h"
 
+
 extern bool g_running;
 inline bool g_input_disabled{};
+extern bool g_freemode_terminated;
+extern std::uint64_t g_vehicle_info;
 extern HWND g_window;
-
+inline HMODULE g_module{};
 
 //define namespaces
 using namespace std::chrono;
@@ -55,6 +58,20 @@ struct protectionContext {
 };
 
 namespace rage::types {
+
+    struct memory_heap_pt {
+        virtual ~memory_heap_pt();
+        virtual void _0x1();
+        virtual void _0x2();
+        virtual void _0x3();
+        virtual void _0x4();
+        virtual void _0x5();
+        virtual void _0x6();
+        virtual void _0x7();
+        virtual void _0x8();
+        virtual void _0x9();
+        virtual uint64_t allocate(uint32_t size);
+    };
 
     struct guid_pool {
     public:
@@ -147,5 +164,4 @@ namespace util {
 
 
 #endif 
-
 

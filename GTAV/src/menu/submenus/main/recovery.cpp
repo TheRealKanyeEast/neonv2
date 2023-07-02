@@ -4,7 +4,9 @@
 #include "rage/engine.h"
 #include <vector>
 #include <array>
-
+#include "menu/util/stats.h"
+#include "recovery/recovery_level.h"
+#include "recovery/unlocks.h"
 using namespace base::gui;
 using namespace menu::recovery::vars;
 
@@ -115,16 +117,242 @@ namespace menu::recovery::vars {
 				{ (int)rage::joaat("SERVICE_EARN_ISLAND_HEIST_FINALE"), 1, 2550000, 0, 1 },
 			});
 	}
+
+	const char* characters[] = {
+		"PLACEHOLDER", "PLACEHOLDER"
+	}; 
+
+	int get_character_count() {
+		const char* character_two = STATS::STAT_GET_STRING(0xD2AB0EC6, -1);
+		if (!character_two || strlen(character_two) < 1) return 1;
+		return 2;
+	}
+
+	float calculate() {
+		float calculated = 0.f;
+		if (m_vars.m_deaths == 0) {
+			calculated = (float)m_vars.m_kills;
+		}
+		else calculated = (float)((float)m_vars.m_kills / (float)m_vars.m_deaths);
+
+		return calculated;
+	}
+
+	inline void set_kd() {
+		stats<float>::set("MPPLY_KILLS_PLAYERS", m_vars.m_kills);
+		stats<float>::set("MPPLY_DEATHS_PLAYER", m_vars.m_deaths);
+	}
 }
+
 
 namespace menu {
 
 	void recovery_menu::render() {
 		renderer::addSubmenu("Recovery", "Recovery", [](core* core) {
+
+			int current_char = 0;
+			STATS::STAT_GET_INT(0x2F2F120F, &current_char, -1);
+			m_vars.m_selected_character = current_char ? 1 : 0;
+
+			core->addOption(numberOption<int>("Selected Character")
+				.addNumber(&m_vars.m_selected_character).addMin(0).addMax(get_character_count()));
+
 			core->addOption(submenuOption("Money")
 				.setTarget("Recovery Money"));
+
+			core->addOption(submenuOption("Level")
+				.setTarget("Recovery Level"));
+
+			core->addOption(submenuOption("Unlocks")
+				.setTarget("Recovery Unlocks"));
+
+			core->addOption(submenuOption("Abilities")
+				.setTarget("recovery_abilities"));
+
+			core->addOption(submenuOption("Inventory")
+				.setTarget("snacks"));
+
+			core->addOption(submenuOption("Strippers")
+				.setTarget("strippers"));
+
+			core->addOption(submenuOption("ATM")
+				.setTarget("ATM"));
+
+			core->addOption(submenuOption("K/D")
+				.setTarget("K/D"));
+
+			core->addOption(buttonOption("Redesign Character")
+				.addClick([] { stats<bool>::set("FM_CHANGECHAR_ASKED", false); }));
+
+			core->addOption(buttonOption("Clear Mental State")
+				.addClick([] { stats<float>::set("PLAYER_MENTAL_STATE", 0.0f); }));
+
+			static int night_club_pop = 1000;
+			core->addOption(numberOption<int>("Set Nightclub Popularity")
+				.addNumber(&night_club_pop).addMin(0).addMax(1000).addClick([=] {
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_STAM"), night_club_pop, 0);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_STAM"), night_club_pop, 0);
+				}));
 		
 		});
+
+		renderer::addSubmenu("Abilities", "recovery_abilities", [](core* core) {
+			core->addOption(buttonOption("Max all Abilities")
+				.addClick([] {
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_STAM"), 100, 0);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_STAM"), 100, 0);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_STRN"), 100, 0);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_STRN"), 100, 0);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_LUNG"), 100, 0);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_LUNG"), 100, 0);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_DRIV"), 100, 0);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_DRIV"), 100, 0);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_FLY"), 100, 0);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_FLY"), 100, 0);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_SHO"), 100, 0);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_SHO"), 100, 0);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_STL"), 100, 0);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_STL"), 100, 0);
+					}));
+			core->addOption(buttonOption("Max Stamina Ability")
+				.addClick([] {
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_STAM"), 100, 0);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_STAM"), 100, 0);
+					}));
+			core->addOption(buttonOption("Max Strength Ability")
+				.addClick([] {
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_STRN"), 100, 0);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_STRN"), 100, 0);
+					}));
+			core->addOption(buttonOption("Max Lung Function Ability")
+				.addClick([] {
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_LUNG"), 100, 0);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_LUNG"), 100, 0);
+					}));
+			core->addOption(buttonOption("Max Driving Ability")
+				.addClick([] {
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_DRIV"), 100, 0);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_DRIV"), 100, 0);
+					}));
+			core->addOption(buttonOption("Max Flying Ability")
+				.addClick([] {
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_FLY"), 100, 0);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_FLY"), 100, 0);
+					}));
+			core->addOption(buttonOption("Max Shooting Ability")
+				.addClick([] {
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_SHO"), 100, 0);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_SHO"), 100, 0);
+					}));
+			core->addOption(buttonOption("Max Stealth Ability")
+				.addClick([] {
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP0_SCRIPT_INCREASE_STL"), 100, 0);
+					STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MP1_SCRIPT_INCREASE_STL"), 100, 0);
+					}));
+			});
+
+		renderer::addSubmenu("Inventory", "snacks", [](core* core) {
+			core->addOption(buttonOption("Max Snacks")
+				.addClick([] {
+					STATS::STAT_SET_INT(rage::joaat("MP0_NO_BOUGHT_YUM_SNACKS"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP0_NO_BOUGHT_HEALTH_SNACKS"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP0_NO_BOUGHT_EPIC_SNACKS"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP0_NUMBER_OF_ORANGE_BOUGHT"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP0_CIGARETTES_BOUGHT"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP1_NO_BOUGHT_YUM_SNACKS"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP1_NO_BOUGHT_HEALTH_SNACKS"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP1_NO_BOUGHT_EPIC_SNACKS"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP1_NUMBER_OF_ORANGE_BOUGHT"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP1_CIGARETTES_BOUGHT"), 2000000000, 1);
+					}));
+			core->addOption(buttonOption("Max Armor")
+				.addClick([] {
+					STATS::STAT_SET_INT(rage::joaat("MP0_MP_CHAR_ARMOUR_1_COUNT"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP0_MP_CHAR_ARMOUR_2_COUNT"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP0_MP_CHAR_ARMOUR_3_COUNT"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP0_MP_CHAR_ARMOUR_4_COUNT"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP0_MP_CHAR_ARMOUR_5_COUNT"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP1_MP_CHAR_ARMOUR_1_COUNT"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP1_MP_CHAR_ARMOUR_2_COUNT"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP1_MP_CHAR_ARMOUR_3_COUNT"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP1_MP_CHAR_ARMOUR_4_COUNT"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP1_MP_CHAR_ARMOUR_5_COUNT"), 2000000000, 1);
+					}));
+
+			core->addOption(buttonOption("Max Fireworks")
+				.addClick([] {
+					STATS::STAT_SET_INT(rage::joaat("MP0_FIREWORK_TYPE_1_WHITE"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP0_FIREWORK_TYPE_1_RED"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP0_FIREWORK_TYPE_1_BLUE"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP0_FIREWORK_TYPE_2_WHITE"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP0_FIREWORK_TYPE_2_RED"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP0_FIREWORK_TYPE_2_BLUE"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP0_FIREWORK_TYPE_3_WHITE"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP0_FIREWORK_TYPE_3_RED"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP0_FIREWORK_TYPE_3_BLUE"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP0_FIREWORK_TYPE_4_WHITE"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP0_FIREWORK_TYPE_4_RED"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP0_FIREWORK_TYPE_4_BLUE"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP1_FIREWORK_TYPE_1_WHITE"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP1_FIREWORK_TYPE_1_RED"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP1_FIREWORK_TYPE_1_BLUE"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP1_FIREWORK_TYPE_2_WHITE"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP1_FIREWORK_TYPE_2_RED"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP1_FIREWORK_TYPE_2_BLUE"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP1_FIREWORK_TYPE_3_WHITE"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP1_FIREWORK_TYPE_3_RED"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP1_FIREWORK_TYPE_3_BLUE"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP1_FIREWORK_TYPE_4_WHITE"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP1_FIREWORK_TYPE_4_RED"), 2000000000, 1);
+					STATS::STAT_SET_INT(rage::joaat("MP1_FIREWORK_TYPE_4_BLUE"), 2000000000, 1);
+					}));
+			});
+
+		renderer::addSubmenu("Strippers", "strippers", [](core* core) {
+			core->addOption(buttonOption("Get Juliet to Like You")
+				.addClick([] { *script_global::script_global(114054).as<int*>() = 7500; }));
+
+			core->addOption(buttonOption("Get Nikki to Like You")
+				.addClick([] { *script_global::script_global(114054).at(5).as<int*>() = 7500; }));
+
+			core->addOption(buttonOption("Get Chastity to Like You")
+				.addClick([] { *script_global::script_global(114054).at(10).as<int*>() = 7500; }));
+
+			core->addOption(buttonOption("Get Cheetah to Like You")
+				.addClick([] { *script_global::script_global(114054).at(15).as<int*>() = 7500; }));
+
+			core->addOption(buttonOption("Get Sapphire to Like You")
+				.addClick([] { *script_global::script_global(114054).at(20).as<int*>() = 7500; }));
+
+			core->addOption(buttonOption("Get Infernus to Like You")
+				.addClick([] { *script_global::script_global(114054).at(25).as<int*>() = 7500; }));
+
+			core->addOption(buttonOption("Get Fufu to Like You")
+				.addClick([] { *script_global::script_global(114054).at(30).as<int*>() = 7500; }));
+
+			core->addOption(buttonOption("Get Peach to Like You")
+				.addClick([] { *script_global::script_global(114054).at(35).as<int*>() = 7500; }));
+		});
+
+		renderer::addSubmenu("K/D", "K/D", [](core* core) {
+			core->addOption(numberOption<int>("Set Kills")
+				.addNumber(&m_vars.m_kills).addMin(0).addMax(999999));
+
+			core->addOption(numberOption<int>("Set Deaths")
+				.addNumber(&m_vars.m_deaths).addMin(0).addMax(999999));
+
+			m_vars.m_calculated = calculate();
+
+			core->addOption(buttonOption(std::format("Set K/D: {}", m_vars.m_calculated).c_str()));
+			});
+		renderer::addSubmenu("ATM", "ATM", [](core* core) {
+
+			core->addOption(buttonOption("Transfer Money to Wallet")
+				.addClick([] {  }));
+
+			core->addOption(buttonOption("Transfer Money to Bank")
+				.addClick([] {  }));
+			});
 
 		renderer::addSubmenu("Money", "Recovery Money", [](core* core) {
 
@@ -183,6 +411,9 @@ namespace menu {
 
 	void recovery_menu::update() {
 		render();
+		getRecoveryLevelMenu()->update();
+		getRecoveryUnlocksMenu()->update();
+
 		int m_timer = 0;
 		if (m_vars.m_loop) {
 			run_timed(&m_timer, 1000, [] {

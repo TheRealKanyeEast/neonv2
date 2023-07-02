@@ -26,24 +26,3 @@ namespace rage {
 	static_assert(sizeof(CPhysical) == 0x2EC);
 #pragma pack(pop)
 }
-#pragma pack(push, 2)
-class CObject : public rage::CPhysical {
-public:
-	char pad_030C[60]; //0x030C
-	uint64_t unk_0348; //0x0348
-	char pad_0350[8]; //0x0350
-	uint64_t unk_0358; //0x0358
-	uint16_t unk_0360; //0x0360
-	uint32_t unk_0362; //0x0362
-	uint16_t unk_0366; //0x0366
-	char pad_0368[120];//0x0368
-	uint64_t unk_03E0; //0x03E0
-	char pad_03E8[8]; //0x03E8
-	uint64_t unk_03F0; //0x03F0
-	uint64_t unk_03F8; //0x03F8
-	uint64_t unk_0400; //0x0400
-	uint64_t unk_0408; //0x0408
-	uint64_t unk_0410; //0x0410
-}; //Size: 0x03F8
-static_assert(sizeof(CObject) == 0x3F8);
-#pragma pack(pop)

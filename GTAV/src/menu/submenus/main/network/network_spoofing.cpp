@@ -203,19 +203,7 @@ namespace menu {
 			m_vars.m_vehicle_hook_value.z *= 0.0174532924f;
 		}
 
-		if (m_vars.m_toggle_ping) {
-			for (int i = 0; i < (*patterns::network_player_mgr)->m_player_count; i++) {
-				auto player = (*patterns::network_player_mgr)->m_player_list[i];
-				if (*patterns::ped_factory && *patterns::network_object_mgr) {
-					if ((*patterns::ped_factory)->m_local_ped && (*patterns::ped_factory)->m_local_ped->m_net_object && *patterns::network_object_mgr) {
-						ping_id = (*patterns::network_object_mgr)->m_handler->m_sequences[player->m_player_id];
-						(*patterns::network_object_mgr)->m_handler->m_sequences[player->m_player_id] = ping_id;
-
-					}
-				}
-
-			}
-		}
+		
 	}
 
 }

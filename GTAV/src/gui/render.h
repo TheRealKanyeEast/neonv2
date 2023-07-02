@@ -131,7 +131,7 @@ namespace menu::render {
 	}
 
 	inline void draw_sprite(std::pair<std::string, std::string> asset, math::vector2<float> position, math::vector2<float> scale, color color = { 255, 255, 255, 255 }, float rotation = 0.f, bool alligned = false) {
-		if (!GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED(asset.first.c_str()) && asset.first != "neon") {
+		if (!GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED(asset.first.c_str()) && asset.first != "aether") {
 			GRAPHICS::REQUEST_STREAMED_TEXTURE_DICT(asset.first.c_str(), true);
 		}
 		if (alligned) {

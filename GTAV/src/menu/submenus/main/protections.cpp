@@ -3,6 +3,12 @@
 #include "protections/protection_network_events.h"
 #include "protections/protection_script_events.h"
 #include "protections/protection_reports.h"
+#include "protections/protection_detection.h"
+#include "protections/protections_misc.h"
+#include "protections/protections_presence.h"
+#include "protections/protections_entity.h"
+#include "protections/protection_syncs.h"
+#include "protections/protections_join_blocking.h"
 using namespace base::gui;
 using namespace menu::protections::vars;
 
@@ -12,7 +18,6 @@ namespace menu::protections::vars {
 	void enable_all() {
 		m_vars.m_fake_lag = true;
 		m_vars.m_force_entities_visible = true;
-		m_vars.m_block_all_script_events = true;
 		network_events::vars::m_vars.block_network_crashes_id = 2;
 		network_events::vars::m_vars.block_network_kicks_id = 2;
 		network_events::vars::m_vars.block_desync_id = 2;
@@ -57,7 +62,6 @@ namespace menu::protections::vars {
 	void disable_all() {
 		m_vars.m_fake_lag = false;
 		m_vars.m_force_entities_visible = false;
-		m_vars.m_block_all_script_events = false;
 		network_events::vars::m_vars.block_network_crashes_id = 0;
 		network_events::vars::m_vars.block_network_kicks_id = 0;
 		network_events::vars::m_vars.block_desync_id = 0;
@@ -111,8 +115,26 @@ namespace menu {
 			core->addOption(submenuOption("Script Events")
 				.setTarget("Protections Script Events"));
 
+			core->addOption(submenuOption("Presence Events")
+				.setTarget("Protections Presence Events"));
+
+			core->addOption(submenuOption("Anti Detection")
+				.setTarget("Protections Anti Detection"));
+
+			core->addOption(submenuOption("Join Blocking")
+				.setTarget("Protections Join Blocking"));
+
 			core->addOption(submenuOption("Reports")
 				.setTarget("Protections Reports"));
+
+			core->addOption(submenuOption("Entity")
+				.setTarget("Protections Entity"));
+
+			core->addOption(submenuOption("Syncs")
+				.setTarget("Protections Syncs"));
+
+			core->addOption(submenuOption("Miscellaneous")
+				.setTarget("Protections Misc"));
 
 			core->addOption(toggleOption("Fake Lag")
 				.addToggle(&m_vars.m_fake_lag));
@@ -137,5 +159,11 @@ namespace menu {
 		getProtectionsNetworkEventsMenu()->update();
 		getProtectionsScriptEventsMenu()->update();
 		getProtectionsReportsMenu()->update();
+		getProtectionsDetectionMenu()->update();
+		getProtectionsMiscMenu()->update();
+		getProtectionsPresenceMenu()->update();
+		getProtectionsEntityMenu()->update();
+		getProtectionsSyncsMenu()->update();
+		getProtectionsJoinBlockingMenu()->update();
 	}
 }

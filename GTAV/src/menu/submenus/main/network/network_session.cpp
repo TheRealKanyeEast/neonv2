@@ -13,7 +13,7 @@
 
 #include "session/network_session_block_join.h"
 #include "session/network_session_scripts.h"
-
+#include "rage/api/api.h"
 using namespace base::gui;
 using namespace menu::network::session::vars;
 
@@ -124,6 +124,9 @@ namespace menu::network::session::vars {
 		{ "Crew", 4 },
 		{ "Public" , 5 },
 	};
+
+
+
 }
 
 
@@ -180,12 +183,15 @@ namespace menu {
 					}
 
 				}));
+
+			core->addOption(buttonOption("Be Alone")
+				.addClick([] {  *menu::script_global(262145).at(33302).as<int*>() = 1; }));
 		});
 
 		renderer::addSubmenu("Set Session Type", "Set Session Type", [](core* core) {		
 			for (const auto type : session_type) {
 				core->addOption(buttonOption(type.name)
-					.addClick([=] { (*patterns::network)->m_network_game_filter.m_matchmaking_component.m_session_type = (uint16_t)type.id; }));
+					.addClick([=] { LOG(std::format("{}", (*patterns::network)->m_network_game_filter.m_matchmaking_component.m_session_type).c_str()); (*patterns::network)->m_network_game_filter.m_matchmaking_component.m_session_type = (uint16_t)type.id; }));
 			}
 		});
 
