@@ -478,48 +478,31 @@ namespace menu::renderer {
 				sub->scroll_forward();
 			}
 
+
 			static Timer leftTimer(0ms);
 			leftTimer.SetDelay(std::chrono::milliseconds(m_horizontal_delay));
-			if (m_left_key && sub->get_options_size() != 0) {
-				if (leftTimer.Update()) {
-					AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
-					if (auto opt = sub->get_option(sub->get_selected_option())) {
-						opt->handle_action(eOptionAction::left_click);
-					}
+			if (m_left_key && sub->get_options_size() != 0 && leftTimer.Update())
+			{
+				
+				AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
 
-					// Decrease delay based on key hold duration
-					if (leftTimer.GetElapsedTime() > std::chrono::milliseconds(500)) {
-						m_horizontal_delay -= 100;  // Decrease the delay by 50 milliseconds
-					}
-					else if (leftTimer.GetElapsedTime() > std::chrono::milliseconds(100)) {
-						m_horizontal_delay -= 50;  // Decrease the delay by 20 milliseconds
-					}
+				if (auto opt = sub->get_option(sub->get_selected_option()))
+				{
+					opt->handle_action(eOptionAction::left_click);
 				}
-			}
-			else {
-				leftTimer.Reset();  // Reset the left timer when the key is released
 			}
 
 			static Timer rightTimer(0ms);
 			rightTimer.SetDelay(std::chrono::milliseconds(m_horizontal_delay));
-			if (m_right_key && sub->get_options_size() != 0) {
-				if (rightTimer.Update()) {
-					AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
-					if (auto opt = sub->get_option(sub->get_selected_option())) {
-						opt->handle_action(eOptionAction::right_click);
-					}
+			if (m_right_key && sub->get_options_size() != 0 && rightTimer.Update())
+			{
+				
+				AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
 
-					// Decrease delay based on key hold duration
-					if (rightTimer.GetElapsedTime() > std::chrono::milliseconds(500)) {
-						m_horizontal_delay -= 100;  // Decrease the delay by 50 milliseconds
-					}
-					else if (rightTimer.GetElapsedTime() > std::chrono::milliseconds(100)) {
-						m_horizontal_delay -= 50;  // Decrease the delay by 20 milliseconds
-					}
+				if (auto opt = sub->get_option(sub->get_selected_option()))
+				{
+					opt->handle_action(eOptionAction::right_click);
 				}
-			}
-			else {
-				rightTimer.Reset();  // Reset the right timer when the key is released
 			}
 		}
 	}
@@ -529,7 +512,12 @@ namespace menu::renderer {
 
 		GRAPHICS::SET_SCRIPT_GFX_DRAW_ORDER(2);
 		//::draw_rect({ m_position.x, m_current }, { m_width, m_option.m_height }, m_scroller_color);
-		render::draw_sprite({ "textures", "scroller" }, { m_position.x, m_current }, { m_width, m_option.m_height }, m_scroller_color, 0.f);
+		if (m_smooth_scroll) {
+			render::draw_sprite({ "textures", "scroller" }, { m_position.x, m_current }, { m_width, m_option.m_height }, m_scroller_color, 0.f);
+		}
+		else {
+			render::draw_sprite({ "textures", "scroller" }, { m_position.x, render::get_rect_base(m_option.m_height) }, { m_width, m_option.m_height }, m_scroller_color, 0.f);
+		}
 	}
 
 	void renderer::draw_header() {

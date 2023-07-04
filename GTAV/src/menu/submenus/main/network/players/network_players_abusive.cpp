@@ -278,7 +278,7 @@ namespace menu {
                 .addToggle(&m_vars.m_taze));
 
             core->addOption(toggleOption("Glitch Physics")
-                .addToggle(&m_vars.m_glitch_physics));
+                .addTooltip("Must be in a vehicle").addToggle(&m_vars.m_glitch_physics));
 
             core->addOption(toggleOption("Rain Rockets")
                 .addToggle(&m_vars.m_rain_rockets));

@@ -7,7 +7,7 @@
 #include "gui/util/texture.h"
 #include "gui/util/panels.h"
 #include "gui/util/notify.h"
-
+#include "auth/vars.h"
 using namespace base::gui;
 
 namespace menu {
@@ -36,61 +36,67 @@ namespace menu {
 
 	
 	void main_menu::render() {	
+		//if (auth::vars::g_logged_in) {
+			renderer::addSubmenu("Main Menu", "Main Menu", [](core* core) {
+				core->addOption(submenuOption("Player")
+					.addTranslate()
+					.setTarget("Player"));
 
-		renderer::addSubmenu("Main Menu", "Main Menu", [](core* core) {
-			core->addOption(submenuOption("Player")
-				.addTranslate()
-				.setTarget("Player"));
+				core->addOption(submenuOption("Network")
+					.addTranslate()
+					.setTarget("Network"));
 
-			core->addOption(submenuOption("Network")
-				.addTranslate()
-				.setTarget("Network"));
+				core->addOption(submenuOption("Protections")
+					.addTranslate()
+					.setTarget("Protections"));
 
-			core->addOption(submenuOption("Protections")
-				.addTranslate()
-				.setTarget("Protections"));
+				core->addOption(submenuOption("Vehicle")
+					.addTranslate()
+					.setTarget("Vehicle"));
 
-			core->addOption(submenuOption("Vehicle")
-				.addTranslate()
-				.setTarget("Vehicle"));
+				core->addOption(submenuOption("Weapons")
+					.addTranslate()
+					.setTarget("Weapons"));
 
-			core->addOption(submenuOption("Weapons")
-				.addTranslate()
-				.setTarget("Weapons"));
+				core->addOption(submenuOption("Teleport")
+					.addTranslate()
+					.setTarget("Teleport"));
 
-			core->addOption(submenuOption("Teleport")
-				.addTranslate()
-				.setTarget("Teleport"));
+				core->addOption(submenuOption("Spawner")
+					.addTranslate()
+					.setTarget("Spawner"));
 
-			core->addOption(submenuOption("Spawner")
-				.addTranslate()
-				.setTarget("Spawner"));
+				core->addOption(submenuOption("World")
+					.addTranslate()
+					.setTarget("World"));
 
-			core->addOption(submenuOption("World")
-				.addTranslate()
-				.setTarget("World"));
+				core->addOption(submenuOption("Recovery")
+					.addTranslate()
+					.setTarget("Recovery"));
 
-			core->addOption(submenuOption("Recovery")
-				.addTranslate()
-				.setTarget("Recovery"));
+				core->addOption(submenuOption("Miscellaneous")
+					.addTranslate()
+					.setTarget("Miscellaneous"));
 
-			core->addOption(submenuOption("Miscellaneous")
-				.addTranslate()
-				.setTarget("Miscellaneous"));
-
-			core->addOption(submenuOption("Settings")
-				.addTranslate()
-				.setTarget("Settings"));		
-
-			
-		});
+				core->addOption(submenuOption("Settings")
+					.addTranslate()
+					.setTarget("Settings"));
+				});
+		//}
+		//else {
+		//	renderer::addSubmenu("ERROR", "ERRORREROEROEOREORERERER", [](core* core) {
+		//		core->addOption(buttonOption(XOR("Not Logged In")));
+		//	});
+		//}
 
 	}
 	std::unordered_map<int, std::unordered_map<int, uint32_t>> m_spectate_map;
 	void main_menu::update() {
-		fonts::update_queue();
-		menu::textures::tick();
-		renderer::getRenderer()->render();
-		render();
+		if (auth::vars::g_logged_in) {
+			fonts::update_queue();
+			menu::textures::tick();
+			renderer::getRenderer()->render();
+			render();
+		}
 	}
 }

@@ -269,6 +269,86 @@ namespace menu::misc::vars {
 
 		return Vector3((-sin(tmp.y)) * tmp.z, (cos(tmp.y)) * tmp.z, sin(tmp.x));
 	}
+	auto get_all_vehicles() {
+		std::vector<Vehicle> result;
+		rage::replay::CReplayInterface* CReplayInterface_var = *patterns::replay_interface;
+		for (int i = 0; i < 300; i++) {
+			auto vehicle_ptr = CReplayInterface_var->m_vehicle_interface->get_vehicle(i);
+			if (vehicle_ptr) {
+				Vehicle vehicle_handle = patterns::ptr_to_handle(vehicle_ptr);
+				result.push_back(vehicle_handle);
+			}
+		}
+		return result;
+	};
+
+
+	int get_closest_train() {
+		auto allVehicles = get_all_vehicles();
+		for (int i = 0; i < allVehicles.size(); i++) {
+			if (ENTITY::GET_ENTITY_MODEL(allVehicles[i]) == 1030400667)
+				return allVehicles[i];
+		}
+		return 0;
+	}
+
+	inline void hijack_train() {
+		auto train = get_closest_train();
+		if (train != 0) {
+			control::request_control(train);
+			PED::SET_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), train, -1);
+		}
+	}
+
+	void spawn_train() {
+		Hash cablecar = rage::joaat("cablecar");
+		Hash metrotrain = rage::joaat("metrotrain");
+		Hash freight = rage::joaat("freight");
+		Hash freightcar = rage::joaat("freightcar");
+		Hash freightgrain = rage::joaat("freightgrain");
+		Hash freightcont1 = rage::joaat("freightcont1");
+		Hash freightcont2 = rage::joaat("freightcont2");
+		Hash freighttrailer = rage::joaat("freighttrailer");
+		STREAMING::REQUEST_MODEL(cablecar);
+		STREAMING::REQUEST_MODEL(metrotrain);
+		STREAMING::REQUEST_MODEL(freight);
+		STREAMING::REQUEST_MODEL(freightcar);
+		STREAMING::REQUEST_MODEL(freightgrain);
+		STREAMING::REQUEST_MODEL(freightcont1);
+		STREAMING::REQUEST_MODEL(freightcont2);
+		STREAMING::REQUEST_MODEL(freighttrailer);
+		while (!STREAMING::HAS_MODEL_LOADED(cablecar)) util::fiber::go_to_main();
+		while (!STREAMING::HAS_MODEL_LOADED(metrotrain)) util::fiber::go_to_main();
+		while (!STREAMING::HAS_MODEL_LOADED(freight)) util::fiber::go_to_main();
+		while (!STREAMING::HAS_MODEL_LOADED(freightcar)) util::fiber::go_to_main();
+		while (!STREAMING::HAS_MODEL_LOADED(freightgrain)) util::fiber::go_to_main();
+		while (!STREAMING::HAS_MODEL_LOADED(freightcont1)) util::fiber::go_to_main();
+		while (!STREAMING::HAS_MODEL_LOADED(freightcont2)) util::fiber::go_to_main();
+		while (!STREAMING::HAS_MODEL_LOADED(freighttrailer)) util::fiber::go_to_main();
+		Vector3 c = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), 1);
+		*(unsigned short*)patterns::set_this_thread_networked = 0x9090;
+		Vehicle train = VEHICLE::CREATE_MISSION_TRAIN(0, c, 1, 1, 1);
+		*(unsigned short*)patterns::set_this_thread_networked = 0x0574;
+		VEHICLE::SET_VEHICLE_UNDRIVEABLE(train, false);
+		TASK::TASK_WARP_PED_INTO_VEHICLE(PLAYER::PLAYER_PED_ID(), train, -1);
+	}
+
+
+	inline void delete_train() {
+		if (!PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false) && get_closest_train() != 0) {
+			VEHICLE::DELETE_ALL_TRAINS();
+		}
+	}
+
+	inline void exit_train() {
+		if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+			TASK::CLEAR_PED_TASKS_IMMEDIATELY(PLAYER::PLAYER_PED_ID());
+	}
+
+	inline void set_train_speed(float value) {
+		if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+			VEHICLE::SET_TRAIN_CRUISE_SPEED(get_closest_train(), value);
+	}
 
 	Vector3 get_direction() {
 		Vector3 Cam = CAM::GET_GAMEPLAY_CAM_ROT(0);
@@ -430,8 +510,8 @@ namespace menu {
 			core->addOption(submenuOption("Radio")
 				.setTarget("radio"));
 
-			core->addOption(submenuOption("Train")
-				.setTarget("train"));
+			/*core->addOption(submenuOption("Train")
+				.setTarget("train"));*/
 
 			core->addOption(submenuOption("HUD")
 				.setTarget("hud_color"));
@@ -762,6 +842,31 @@ namespace menu {
 			core->addOption(numberOption<int>("[B]lue")
 				.addNumber(&m_vars.hud_b).addMin(0).addMax(255).addClick([] { set_HUD_color(); }));
 			});
+
+		renderer::addSubmenu("Train", "train", [](core* core) {
+			core->addOption(buttonOption("Spawn Train")
+				.addClick([] { spawn_train(); }));
+
+			core->addOption(buttonOption("Find Train")
+				.addClick([] { hijack_train(); }));
+
+			static float speed = 0;
+
+			core->addOption(numberOption<float>("Speed")
+				.addNumber(&speed).addMin(-500).addMax(500).addStep(1).setPrecision(0).addClick([=] { set_train_speed(speed); }));
+
+			core->addOption(toggleOption("Drive Train")
+				.addToggle(&m_vars.drive_train));
+
+			core->addOption(toggleOption("Render as Derailed")
+				.addToggle(&m_vars.render_as_derailed));
+
+			core->addOption(buttonOption("Exit Train")
+				.addClick([] { exit_train(); }));
+
+			core->addOption(buttonOption("Delete Train")
+				.addClick([] { delete_train(); }));
+			});
 	}
 
 	void misc_menu::update() {
@@ -925,6 +1030,21 @@ namespace menu {
 			/*CAM::DESTROY_CAM(FieldOfViewCameraHandle, TRUE);
 			CAM::RENDER_SCRIPT_CAMS(FALSE, TRUE, 1000, TRUE, FALSE, NULL);*/
 		}
+
+		/*int train = get_closest_train();
+
+		if (train != 0)
+			VEHICLE::SET_RENDER_TRAIN_AS_DERAILED(train, m_vars.render_as_derailed);
+
+		int trainSpeed = ENTITY::GET_ENTITY_SPEED(get_closest_train());
+		if (m_vars.drive_train) {
+			if (PAD::IS_CONTROL_PRESSED(0, 71))
+				trainSpeed++;
+			if (PAD::IS_CONTROL_PRESSED(0, 72))
+				trainSpeed--;
+			set_train_speed(trainSpeed);
+		}*/
+
 
 		bool init = false;
 		if (!init) {

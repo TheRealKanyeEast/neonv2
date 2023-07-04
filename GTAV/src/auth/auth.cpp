@@ -57,12 +57,12 @@ namespace auth {
 		std::string decoded_result = auth::crypto::aes256cbc_decrypt(result, key, iv);
 
 		if (decoded_result == XOR("User Banned")) {
-			LOG_ERROR("Account Terminated");
+			LOG_ERROR(XOR("Account Terminated"));
 			Sleep(4500);
 			exit(0);
 		}
 		else if (decoded_result == XOR("Wrong HWID")) {
-			LOG_ERROR("Invalid HWID");
+			LOG_ERROR(XOR("Invalid HWID"));
 			Sleep(4500);
 			exit(0);
 		}
@@ -88,7 +88,7 @@ namespace auth {
 		}
 		else {
 			auth::vars::g_logged_in = false;
-			LOG_ERROR("%s", decoded_result);
+			LOG_ERROR(XOR("%s"), decoded_result);
 			Sleep(4500);
 			exit(0);
 		}
@@ -142,15 +142,15 @@ namespace auth {
 	}*/
 
 	bool auth::run_heartbeat() {
-		if (vars::g_type == XOR("Staff"))
-			LOG("Heartbeat init");
+		if (vars::g_type == XOR("Admin"))
+			LOG(XOR("Heartbeat init"));
 
 		Timer timer(std::chrono::minutes(3));
 		while (true) {
 			if (timer.Update()) {
 				login();
-				if (vars::g_type == XOR("Staff"))
-					LOG_SUCCESS("Heartbeat Passed");
+				if (vars::g_type == XOR("Admin"))
+					LOG_SUCCESS(XOR("Heartbeat Passed"));
 			}
 		}
 		return true;
@@ -167,7 +167,7 @@ namespace auth {
 		CURLcode res;
 		curl = curl_easy_init();
 		if (curl) {
-			fp = fopen(path.c_str(), "wb");
+			fp = fopen(path.c_str(), XOR("wb"));
 			curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 			curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteData);
 			curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);

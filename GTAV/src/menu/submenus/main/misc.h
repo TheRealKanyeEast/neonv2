@@ -97,6 +97,8 @@ namespace menu {
 			std::string PM_FRIEND_FM = { "Join Friend with Aether" };
 			std::string PM_FIND_SESS = { "Find New Session with Aether" };
 
+			bool drive_train;
+			bool render_as_derailed;
 		};
 
 		extern variables m_vars;

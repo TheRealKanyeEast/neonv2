@@ -21,4 +21,23 @@ namespace rage::netShopping {
         int m_multiplier;
         int m_value;
     };
+
+    struct netShopTransactionBasket {
+        char _0x0000[0x8];
+        int m_transaction_id;
+        char _0x000C[0xC];
+        int m_category;
+        char _0x001C[0x8];
+        int m_action;
+        int m_target; // 4 = bank etc
+        char _0x002C[0xB4];
+        netTransaction m_transactions[71];
+        int m_transaction_count;
+    };
+
+    struct transactionNode {
+        char _0x0000[0x8];
+        netShopTransactionBasket* m_transaction;
+        transactionNode* m_next;
+    };
 }

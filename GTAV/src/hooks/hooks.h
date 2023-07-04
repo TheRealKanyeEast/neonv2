@@ -5,8 +5,7 @@
 #include "rage/classes/scrProgram.h"
 #include "rage/classes/WebConstuction.h"
 #include "rage/classes/enums.h"
-
-
+#include "rage/classes/netShopping.h"
 class CPlayerGamerDataNode;
 class CPlayerGameStateDataNode;
 class CPedInventoryDataNode;
@@ -30,7 +29,7 @@ class CPlayerAppearanceDataNode;
 class CFoundDevice;
 class IDirectSoundCapture;
 class CVehicleProximityMigrationDataNode;
-
+class CTrainGameStateDataNode;
 namespace rage
 {
 	class snSession;
@@ -94,6 +93,9 @@ namespace base::hooks {
 
 	bool sendMetricHook(rage::rlMetric* _this, bool unk);
 	inline decltype(&sendMetricHook) ogSendMetricHook;
+
+	bool addItemToBasketHook(uint64_t _this, i32* items);
+	inline decltype(&addItemToBasketHook) ogAddItemToBasketHook;
 
 	bool sendHTTPRequestHook(CHttpRequest* request);
 	inline decltype(&sendHTTPRequestHook) ogSendHTTPRequestHook;
@@ -192,4 +194,9 @@ namespace base::hooks {
 	void syncPedHealthHook(uint64_t rcx, uint64_t rdx);
 	inline decltype(&syncPedHealthHook) ogSyncPedHealthHook;
 
+	void readTrainGameStateHook(rage::netObject* player, CTrainGameStateDataNode* node);
+	inline decltype(&readTrainGameStateHook) ogReadTrainGameStateHook;
+
+	void* infiniteTrainCrashHook(void* carriage);
+	inline decltype(&infiniteTrainCrashHook) ogInfiniteTrainCrashHook;
 }

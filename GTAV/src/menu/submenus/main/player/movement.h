@@ -33,7 +33,7 @@ namespace menu {
 			bool m_graceful_landing;
 			bool m_swim_in_air;
 			bool m_no_clip;
-			float m_no_clip_speed = 20.f;
+			float m_no_clip_speed = 1.f;
 			bool m_walk_on_air;
 			bool m_freeze;
 			

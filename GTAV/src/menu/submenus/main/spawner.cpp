@@ -89,21 +89,19 @@ namespace menu {
 		}
 		return NULL;
 	}
-	bool active = false;
+	static bool active = false;
 	void spawn_by_name() {
-		MISC::DISPLAY_ONSCREEN_KEYBOARD(true, "Input Vehicle Name", "", "", "", "", "", 40);
+		MISC::DISPLAY_ONSCREEN_KEYBOARD(true, (char*)"Input", (char*)"", (char*)"", (char*)"", (char*)"", (char*)"", 256);
 		while (MISC::UPDATE_ONSCREEN_KEYBOARD() == 0) {
 			active = true;
-		}
-		while (active) {
 			renderer::getRenderer()->reset_keys();
 			util::fiber::go_to_main();
 		}
 		active = false;
 		if (!MISC::GET_ONSCREEN_KEYBOARD_RESULT())
 			return;
-
-		spawn_vehicle(rage::joaat(MISC::GET_ONSCREEN_KEYBOARD_RESULT()));
+		std::string result = MISC::GET_ONSCREEN_KEYBOARD_RESULT();
+		spawn_vehicle(rage::joaat(result));
 	}
 
 	void spawner_menu::render() {

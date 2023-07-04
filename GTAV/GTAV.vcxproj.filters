@@ -813,6 +813,9 @@
     <ClInclude Include="src\auth\vars.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\rage\classes\CReplayInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">

@@ -22,7 +22,7 @@
 #include "rage/classes/CEntity.h"
 #include "rage/classes/ros.h"
 #include "rage/classes/chatData.h"
-
+#include "rage/classes/CReplayInterface.h"
 class GenericPool;
 class VehiclePool;
 namespace patterns {
@@ -250,8 +250,16 @@ namespace patterns {
 	extern rage::CGameVisuals* game_visuals;
 	extern rage::CVisualVfx* visual_settings;
 
+	extern rage::replay::CReplayInterface** replay_interface;
 
 	extern uint64_t mobile_radio;
+
+	extern uint64_t read_train_data_node;
+	extern uint64_t infinite_train_crash;
+
+	using get_next_carriage_t = void* (*)(void* carriage);
+	extern get_next_carriage_t get_next_carriage;
+	extern uint64_t attach_crash_patch;
 
 	inline void test() {
 		ui_weather->set_sky(m_disable_sky);

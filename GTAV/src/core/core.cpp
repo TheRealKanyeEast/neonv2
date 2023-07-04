@@ -58,7 +58,7 @@ namespace base::core {
 
 	DWORD WINAPI load(LPVOID handle) {	
 		//VM_DOLPHIN_BLACK_START
-		security::HideModule(static_cast<HMODULE>(handle), false);
+		//MUTATE_START
 
 		util::log::Load();
 		exceptions::initExceptionHandler();
@@ -70,7 +70,7 @@ namespace base::core {
 
 		auth::login();
 		if (auth::vars::g_type == XOR("NULL")) {
-			LOG_ERROR("Failed to validate account");
+			LOG_ERROR(XOR("Failed to validate account"));
 			auth::vars::g_logged_in = false;
 			std::this_thread::sleep_for(1500ms);
 			exit(0);
@@ -79,18 +79,18 @@ namespace base::core {
 			std::thread hb_t(auth::run_heartbeat);
 			download_files();
 
-			LOG("Welcome to Aether - Grand Theft Auto V");
+			LOG(XOR("Welcome to Aether - Grand Theft Auto V"));
 
 			if (!(g_window = FindWindowA(("grcWindow"), NULL))) {
 				int timeout = 0;
 				while (!g_window) {
 					if (timeout >= 20) {
-						LOG_ERROR(("Failed to find game window"));
+						LOG_ERROR(XOR("Failed to find game window"));
 						unload(handle);
 						return 0;
 					}
 
-					g_window = FindWindowA(("grcWindow"), NULL);
+					g_window = FindWindowA(XOR("grcWindow"), NULL);
 					timeout++;
 					Sleep(1000);
 				}
@@ -101,13 +101,13 @@ namespace base::core {
 		//	auto script_patcher_service_instance = std::make_unique<menu::script_patcher_service>();
 
 			if (!base::hooks::patterns()) {
-				LOG_WARN("Failed to load patterns, unloading...");
+				LOG_WARN(XOR("Failed to load patterns, unloading..."));
 				std::this_thread::sleep_for(6s);
 				unload(handle);
 			}
 
 			if (!base::hooks::bypass()) {
-				LOG_WARN("Failed to load bypasses, unloading...");
+				LOG_WARN(XOR("Failed to load bypasses, unloading..."));
 				std::this_thread::sleep_for(6s);
 				unload(handle);
 			}
@@ -126,7 +126,7 @@ namespace base::core {
 			d3d::initialize();
 
 			if (!base::hooks::hooks()) {
-				LOG_WARN("Failed to load hooks, unloading...");
+				LOG_WARN(XOR("Failed to load hooks, unloading..."));
 				std::this_thread::sleep_for(6s);
 				unload(handle);
 			}
@@ -135,8 +135,8 @@ namespace base::core {
 
 			//std::thread sc_t(rage::api::update);
 
-			LOG_SUCCESS("Loaded in-game patterns");
-			LOG_SUCCESS("Loaded in-game hooks");
+			LOG_SUCCESS(XOR("Loaded in-game patterns"));
+			LOG_SUCCESS(XOR("Loaded in-game hooks"));
 
 			g_running = true;
 
@@ -153,7 +153,13 @@ namespace base::core {
 			translation::get()->load();
 
 			while (g_running) {
-				security::run();
+				//security::run();
+
+				if (!auth::vars::g_logged_in) {
+					Sleep(5000);
+					exit(0);
+				}
+
 				if (GetAsyncKeyState(VK_END)) {
 					g_running = false;
 				}
@@ -164,9 +170,10 @@ namespace base::core {
 			unload(handle);
 		}
 		else {
-			LOG_ERROR("Unable to login");
+			LOG_ERROR(XOR("Unable to login"));
+			auth::vars::g_logged_in = false;
 		}
-
+		//MUTATE_END
 		//VM_DOLPHIN_BLACK_END
 	}
 }

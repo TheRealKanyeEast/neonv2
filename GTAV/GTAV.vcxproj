@@ -318,6 +318,7 @@
     <ClInclude Include="src\rage\classes\CPedWeaponManager.h" />
     <ClInclude Include="src\rage\classes\CPhysical.h" />
     <ClInclude Include="src\rage\classes\CPlayerInfo.h" />
+    <ClInclude Include="src\rage\classes\CReplayInterface.h" />
     <ClInclude Include="src\rage\classes\CSyncDataBase.h" />
     <ClInclude Include="src\rage\classes\CVehicleModelInfo.h" />
     <ClInclude Include="src\rage\classes\CWeaponInfo.h" />

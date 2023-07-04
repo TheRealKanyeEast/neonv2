@@ -170,6 +170,11 @@ namespace patterns {
 	rage::CWeatherVfx* weather_fx;
 	rage::CGameVisuals* game_visuals;
 	rage::CVisualVfx* visual_settings;
+	rage::replay::CReplayInterface** replay_interface;
+	uint64_t read_train_data_node;
+	uint64_t infinite_train_crash;
+	get_next_carriage_t get_next_carriage;
+	uint64_t attach_crash_patch;
 
 	uint64_t mobile_radio;
 }

@@ -114,9 +114,11 @@ namespace menu {
 				.addHotkey().addTranslate()
 				.addToggle(&m_vars.m_triggerbot));
 
+			static bool off = false;
+
 			core->addOption(toggleOption("Apply Force")
 				.addHotkey().addTranslate()
-				.addToggle(&m_vars.m_apply_force));
+				.addToggle(&off));
 
 			core->addOption(toggleOption("Delete Entity")
 				.addHotkey().addTranslate()

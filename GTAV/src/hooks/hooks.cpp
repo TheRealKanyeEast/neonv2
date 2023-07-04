@@ -33,8 +33,9 @@
 #include "security/xor.h"
 #include "util/hooking/script.h"
 #include "menu/util/script_patcher_service.h"
-
 #include "security/themdia/secure_engine.h"
+#include "rage/classes/netShopping.h"
+#include "rage/classes/dataNodes.h"
 using namespace memory;
 
 
@@ -43,7 +44,7 @@ namespace base::hooks {
 	bool patterns() {
 		batch batch;
 		bool out = true;
-		VM_TIGER_BLACK_START
+	    VM_TIGER_BLACK_START
 			batch.Add({ XOR("GS"), XOR("83 3D ? ? ? ? ? 75 17 8B 43 20") }, [](Ptr ptr) {
 			patterns::game_state = ptr.lea().as<decltype(patterns::game_state)>();
 			return util::is_valid_ptr(patterns::game_state);
@@ -288,15 +289,15 @@ namespace base::hooks {
 			return util::is_valid_ptr(patterns::begin_service);
 			}, out);
 
-		batch.Add({ XOR("NS_AITB"), XOR("48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC 20 48 8B F2 48 8D 54 24") }, [](Ptr ptr) {
-			patterns::add_item_to_basket = ptr.as<decltype(patterns::add_item_to_basket)>();
-			return util::is_valid_ptr(patterns::add_item_to_basket);
-			}, out);
-
 		batch.Add({ XOR("NS_CB"), XOR("48 8B C4 48 89 58 08 48 89 68 10 48 89 70 18 48 89 78 20 41 54 41 56 41 57 48 83 EC 30 48 8B F1") }, [](Ptr ptr) {
 			patterns::construct_basket = ptr.as<decltype(patterns::construct_basket)>();
 			return util::is_valid_ptr(patterns::construct_basket);
 			}, out);
+
+		batch.Add({ XOR("NS_AITB"), XOR("48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC 20 48 8B F2 48 8D 54 24") }, [](Ptr ptr) {
+			patterns::add_item_to_basket = ptr.as<decltype(patterns::add_item_to_basket)>();
+			//return hooking::detour("NS_AITB", patterns::add_item_to_basket, &addItemToBasketHook, &ogAddItemToBasketHook);
+		}, out);
 
 		batch.Add({ XOR("SEA"), XOR("E8 ? ? ? ? 66 83 7B 08 5B") }, [](Ptr ptr) {
 			patterns::send_event_ack = ptr.call().as<decltype(patterns::send_event_ack)>();
@@ -434,6 +435,10 @@ namespace base::hooks {
 			patterns::mobile_radio = ptr.add(1).as<decltype(patterns::mobile_radio)>();
 			}, out);
 
+		/*batch.Add({ XOR("RI2"), XOR("0F B7 44 24 ? 66 89 44 4E") }, [](Ptr ptr) {
+			patterns::replay_interface = ptr.add(0x1F).as<decltype(patterns::replay_interface)>();
+		}, out);*/
+
 		batch.Add({ XOR("BE"), XOR("0F 85 ? ? ? ? 48 8B 05 ? ? ? ? 48 8B 48 08 E8") }, [](Ptr ptr) {
 			patterns::blame_explode = memory::byte_patch::make(ptr.as<std::uint16_t*>(), 0xE990).get();
 			}, out);
@@ -445,10 +450,12 @@ namespace base::hooks {
 
 		VM_TIGER_BLACK_END	
 
-		auto mod = memory::module("GTA5.exe");
+		auto mod = memory::module(XOR("GTA5.exe"));
 		batch.run(mod);
 
-		LOG_SUCCESS("Loaded patterns");
+
+
+		LOG_SUCCESS(XOR("Loaded patterns"));
 		return true;
 	}
 
@@ -457,8 +464,8 @@ namespace base::hooks {
 		bool out = true;
 		//VM_LION_BLACK_START
 		/*batch.Add({ "IRC", "80 3D ? ? ? ? ? 0F 85 ? ? ? ? 48 8B 05 ? ? ? ? 48 85 C0" }, [](Ptr ptr) {
-			patterns::invalid_resource_check = ptr.as<uint64_t>();
-			memory::patchAddress(patterns::invalid_resource_check, 0xC3);
+			//patterns::invalid_resource_check = ptr.as<uint64_t>();
+			//memory::patchAddress(patterns::invalid_resource_check, 0xC3);
 		}, out);
 
 		batch.Add({ "ICP-1", "48 83 EC 48 48 83 64 24 ? ? 83 4C 24" }, [](Ptr ptr) {
@@ -466,20 +473,50 @@ namespace base::hooks {
 			memory::patchAddress(patterns::integ_check_1, 0xC3);
 		}, out);*/
 
-		MUTATE_START
+		//MUTATE_START
 
 		batch.Add({ XOR("MEM_HS"), XOR("83 C8 01 48 8D 0D ? ? ? ? 41 B1 01 45 33 C0") }, [](Ptr ptr) {
 			patterns::heap_size = ptr.add(17).as<decltype(patterns::heap_size)>();
 		}, out);
+		/*batch.Add({ XOR("AC_ICF"), XOR(48 8D 0D ? ? ? ? 88 05 ? ? ? ? 48 8D 05") }, [](Ptr ptr) {
+			patterns::interval_check_func = ptr.from_instruction().as<PVOID>();
+		}, out);*/
+
+
+
+		//MUTATE_END
+		
+		auto mod = memory::module(XOR("GTA5.exe"));
+		batch.run(mod);
+		//VM_TIGER_BLACK_START
+		auto patches = mod.scan_all(XOR("48 8D 45 ? 48 89 45 ? 48 8D 05 ? ? ? ? 48 89 45"));
+		//VM_TIGER_BLACK_END
+		int patchCount = 0;
+		for (auto patch : patches) {
+			memset(patch.add(8).as<PVOID>(), 0x90, 7);
+			patchCount++;
+			//LOG_WARN("Created Integerity Patch #%d", patchCount);
+		}
+
+		//48 8D 45 ? 48 8D 45
+
+
+		//LOG_SUCCESS(XOR("Loaded bypasses"));
+		//VM_LION_BLACK_END
+		return true;
+	}
+
+	bool hooks() {
+		batch batch;
+		bool out = false;
+		MUTATE_START
+		
+		//VM_TIGER_BLACK_START
 
 		batch.Add({ XOR("AC_QD"), XOR("48 89 5C 24 ? 57 48 83 EC ? 0F B6 99") }, [](Ptr ptr) {
 			patterns::queue_dependency = ptr.as<uint64_t>();
 			return hooking::detour("QD", patterns::queue_dependency, &queueDependencyHook, &ogQueueDependencyHook);
 			}, out);
-
-		/*batch.Add({ XOR("AC_ICF"), XOR(48 8D 0D ? ? ? ? 88 05 ? ? ? ? 48 8D 05") }, [](Ptr ptr) {
-			patterns::interval_check_func = ptr.from_instruction().as<PVOID>();
-		}, out);*/
 
 
 		batch.Add({ XOR("AC_CRC"), XOR("48 8B C4 48 89 58 08 48 89 68 10 48 89 70 18 48 89 78 20 41 56 48 83 EC 30 44 8B F1 48 8B 0D") }, [](Ptr ptr) {
@@ -514,29 +551,7 @@ namespace base::hooks {
 			return hooking::detour("SM", patterns::send_metric, &sendMetricHook, &ogSendMetricHook);
 			}, out);
 
-		MUTATE_END
-		
-		auto mod = memory::module("GTA5.exe");
-		batch.run(mod);
 
-		//48 8D 45 ? 48 8D 45
-		auto patches = mod.scan_all(XOR("48 8D 45 ? 48 89 45 ? 48 8D 05 ? ? ? ? 48 89 45"));
-		int patchCount = 0;
-		for (auto patch : patches) {
-			memset(patch.add(8).as<PVOID>(), 0x90, 7);
-			patchCount++;
-			//LOG_WARN("#%d", patchCount);
-		}
-
-		LOG_SUCCESS("Loaded bypasses");
-		//VM_LION_BLACK_END
-		return true;
-	}
-
-	bool hooks() {
-		batch batch;
-		bool out = false;
-		MUTATE_START
 		batch.Add({ XOR("GFI"), XOR("85 D2 74 68 FF CA 74 5B FF CA 74 4E FF CA 74 41 FF CA 74 34 FF CA 74 27 FF CA 74 1A FF CA 74 0D") }, [](Ptr ptr) {
 			patterns::get_font_id = ptr.as<uint64_t>();
 			return hooking::detour("GFI", patterns::get_font_id, &getFontIdHook, &ogGetFontIdHook);
@@ -590,12 +605,12 @@ namespace base::hooks {
 			return hooking::detour("CAD", patterns::can_apply_data, &canApplyDataHook, &ogCanApplyDataHook);
 			}, out);
 
-		/*batch.Add({ XOR("RPE"), XOR(E8 ?? ?? ?? ?? F6 C3 02 74 15" }, [](Ptr ptr) {
+		/*batch.Add({ XOR("RPE"), XOR("E8 ? ? ? ? ? ? ? ? F6 C3 02 74 15") }, [](Ptr ptr) {
 			patterns::receive_presence_event = ptr.call().as<uint64_t>();
-			//return hooking::detour("RPE", patterns::receive_presence_event, &receivePresenceEvent, &ogReceivePresenceEvent);
-		}, out);
+			return hooking::detour("RPE", patterns::receive_presence_event, &receivePresenceEvent, &ogReceivePresenceEvent);
+		}, out);*/
 
-		batch.Add({ XOR("WGSITEM"), XOR(48 89 5C 24 ?? 48 89 74 24 ?? 57 48 81 EC ?? ?? ?? ?? 48 8B 02" }, [](Ptr ptr) {
+		/*batch.Add({XOR("WGSITEM"), XOR(48 89 5C 24 ? ? 48 89 74 24 ? ? 57 48 81 EC ? ? ? ? ? ? ? ? 48 8B 02" }, [](Ptr ptr) {
 			patterns::write_gs_item = ptr.as<uint64_t>();
 		//	return hooking::detour("WGSITEM", patterns::write_gs_item, &writeGSItemHook, &ogWriteGSItemHook);
 		}, out);*/
@@ -622,7 +637,7 @@ namespace base::hooks {
 
 		batch.Add({ XOR("STT"), XOR("48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC 20 80 B9 ? ? ? ? ? 8B FA 48 8B D9 74 05 8B 41 10 EB 7F E8 ? ? ? ? 83 25") }, [](Ptr ptr) {
 			patterns::tick_script_thread = ptr.as<uint64_t>();
-			return hooking::detour("STT", patterns::tick_script_thread, &tickScriptThreadHook, &ogTickScriptThreadHook);
+			//return hooking::detour("STT", patterns::tick_script_thread, &tickScriptThreadHook, &ogTickScriptThreadHook);
 			}, out);
 
 		batch.Add({ XOR("IMCP"), XOR("E8 ? ? ? ? 40 88 7C 24 ? 49 89 9C 24") }, [](Ptr ptr) {
@@ -647,7 +662,7 @@ namespace base::hooks {
 
 		batch.Add({ XOR("FCP"), XOR("E8 ? ? ? ? 84 C0 75 0B 41 FF CF") }, [](Ptr ptr) {
 			patterns::fragment_crash = ptr.call().as<uint64_t>();
-			return hooking::detour("PCP2", patterns::fragment_crash, &fragmentCrashHook, &ogFragmentCrashHook);
+			return hooking::detour("FCP", patterns::fragment_crash, &fragmentCrashHook, &ogFragmentCrashHook);
 			}, out);
 
 		batch.Add({ XOR("GNED"), XOR("53 43 52 49 50 54 5F 4E 45 54 57 4F 52 4B") }, [](Ptr ptr) {
@@ -660,8 +675,8 @@ namespace base::hooks {
 			return hooking::detour("SCM", patterns::send_chat_message, &sendChatMessageHook, &ogSendChatMessageHook);
 			}, out);
 
-		batch.Add({ XOR("RNM"), XOR("48 83 EC 20 48 8B F1 48 8B CA 41 8A E9") }, [](Ptr ptr) {
-			patterns::receive_net_message = ptr.sub(21).as<uint64_t>();
+		batch.Add({ XOR("RNM"), XOR("48 83 EC 20 4C 8B 71 50 33 ED") }, [](Ptr ptr) {
+			patterns::receive_net_message = ptr.sub(0x19).as<uint64_t>();
 			return hooking::detour("RNM", patterns::receive_net_message, &receiveNetMessageHook, &ogReceiveNetMessageHook);
 			}, out);
 
@@ -670,14 +685,52 @@ namespace base::hooks {
 			return hooking::detour("CCP", patterns::chat_profanity, &checkChatProfanityHook, &ogCheckChatProfanityHook);
 			}, out);
 
+		batch.Add({ XOR("RTGSDN"), XOR("48 89 5C 24 ? 57 48 83 EC 30 48 8B 02 48 8B FA") }, [](Ptr ptr) {
+			patterns::read_train_data_node = ptr.as<uint64_t>();
+			//return hooking::detour("RTGSDN", patterns::read_train_data_node, &readTrainGameStateHook, &ogReadTrainGameStateHook);
+		}, out);
+
+		/*
+		* batch.Add({ XOR("ITC"), XOR("E8 ? ? ? ? F3 44 0F 10 93 90 03 00 00") }, [](Ptr ptr) {
+			patterns::infinite_train_crash = ptr.call().as<uint64_t>();
+			patterns::get_next_carriage = ptr.call().add(0xF).rip().as<patterns::get_next_carriage_t>();
+			return hooking::detour("ITC", patterns::infinite_train_crash, &infiniteTrainCrashHook, &ogInfiniteTrainCrashHook);
+		}, out);
+		*/
 
 		/*batch.Add({ "RNSM", "E8 ? ? ? ? 84 C0 74 60 4C 39 77 40 74 29 48 8B 4C 24 ? 48 8B 01 FF 50 28 48 8B 4F 40 44 0F B7" }, [](Ptr ptr) {
 			patterns::read_new_script_host_message = ptr.call().as<uint64_t>();
 			return hooking::detour("RNSM", patterns::read_new_script_host_message - 0x6D, &readNewScriptHostMessageHook, &ogReadNewScriptHostMessageHook);
 		}, out);*/
 		MUTATE_END
+
+		//VM_TIGER_BLACK_END
+
 		auto mod = memory::module("GTA5.exe");
 		batch.run(mod);
+
+		if (auto pat1 = mod.scan(XOR("3b 0a 0f 83 ? ? ? ? 48 ff c7"))) {
+			memory::byte_patch::make(pat1.add(2).as<uint32_t*>(), 0xc9310272)->apply();
+			memory::byte_patch::make(pat1.add(6).as<uint16_t*>(), 0x9090)->apply();
+		}
+
+		if (auto pat2 = mod.scan(XOR("3b 0a 0f 83 ? ? ? ? 49 03 fa"))) {
+			memory::byte_patch::make(pat2.add(2).as<uint32_t*>(), 0xc9310272)->apply();
+			memory::byte_patch::make(pat2.add(6).as<uint16_t*>(), 0x9090)->apply();
+		}
+
+		auto pat3 = mod.scan_all(XOR("3b 11 0f 83 ? ? ? ? 48 ff c7"));
+		for (auto& handle : pat3) {
+			memory::byte_patch::make(handle.add(2).as<uint32_t*>(), 0xd2310272)->apply();
+			memory::byte_patch::make(handle.add(6).as<uint16_t*>(), 0x9090)->apply();
+		}
+
+		auto pat4 = mod.scan_all(XOR("3b 11 0f 83 ? ? ? ? 49 03 fa"));
+		for (auto& handle : pat4) {
+			memory::byte_patch::make(handle.add(2).as<uint32_t*>(), 0xd2310272)->apply();
+			memory::byte_patch::make(handle.add(6).as<uint16_t*>(), 0x9090)->apply();
+		}
+
 		//MUTATE_END
 	/*	memory::batch batch2;
 
@@ -696,9 +749,47 @@ namespace base::hooks {
 		auto mod2 = memory::module("socialclub.dll");
 		batch2.run(mod2);*/
 
-		LOG_SUCCESS("Loaded hooks");
+		LOG_SUCCESS(XOR("Loaded hooks"));
 
 		return true;
+	}
+
+	void* hooks::infiniteTrainCrashHook(void* carriage) {
+		void* current_carriage = carriage;
+		int count = 0;
+		while (patterns::get_next_carriage(current_carriage)) {
+			if (++count > 20)
+				return nullptr;
+			current_carriage = patterns::get_next_carriage(current_carriage);
+		}
+		return current_carriage;
+	}
+
+	void hooks::readTrainGameStateHook(rage::netObject* player, CTrainGameStateDataNode* node) {
+		if (player->m_object_id == node->m_linked_to_backward_id && player->m_object_id == node->m_linked_to_forward_id && player->m_object_id == node->m_engine_id) {
+			return;
+		}
+		if (++node->m_carriage_config_index > 20) {
+			return;
+		}
+		if (node->m_track_id < 0 || node->m_track_id >= 27) {
+			return;
+		}
+		return ogReadTrainGameStateHook(player, node);
+	}
+
+	bool hooks::addItemToBasketHook(uint64_t _this, i32* items) {
+		if (_this) {
+			rage::netShopping::transactionNode* node = *(rage::netShopping::transactionNode**)(_this + 0x20);//m_next
+			while (node) {
+				if (node->m_transaction->m_category == (int)0xAE04310C) {
+					LOG_WARN(XOR("Blocked Arxan Report"));
+					return false;
+				}
+				
+			}
+		}
+		return ogAddItemToBasketHook(_this, items);
 	}
 
 	int hooks::checkChatProfanityHook(uint64_t rcx, uint64_t input, uint64_t output) {

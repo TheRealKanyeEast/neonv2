@@ -122,8 +122,10 @@ namespace menu {
 
 			core->addOption(buttonOption("Delete")
 				.addClick([] {
-					Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
-					ENTITY::DELETE_ENTITY(&veh);
+					if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), 0)) {
+						Vehicle veh = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
+						ENTITY::DELETE_ENTITY(&veh);
+					}
 				}));
 		});
 

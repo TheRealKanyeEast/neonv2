@@ -74,7 +74,7 @@ namespace menu {
 		STREAMING::OVERRIDE_LODSCALE_THIS_FRAME(m_vars.distance_scaling);
 
 		if (m_vars.night_vision) {
-			*script_global(1853910).at(PLAYER::PLAYER_ID(), 862).at(821).at(11).as<int*>() = -1;
+			*script_global(1853988).at(PLAYER::PLAYER_ID(), 862).at(823).at(13).as<int*>() = -1;
 			GRAPHICS::SET_NIGHTVISION(true);
 		}
 		else {
@@ -82,7 +82,7 @@ namespace menu {
 		}
 
 		if (m_vars.thermal_vision) {
-			*script_global(1853910).at(PLAYER::PLAYER_ID(), 862).at(821).at(11).as<int*>() = -1;
+			*script_global(1853988).at(PLAYER::PLAYER_ID(), 862).at(823).at(13).as<int*>() = -1;
 			GRAPHICS::SET_SEETHROUGH(true);
 		}
 		else {
