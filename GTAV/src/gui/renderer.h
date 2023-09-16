@@ -107,6 +107,8 @@ namespace menu::renderer {
 		float m_delta = 0.f;
 		float m_tooltip_x = 0.0985f;
 
+		bool full_theme;
+
 		std::int32_t m_open_delay = 200, m_close_delay = 300, m_back_delay = 300, m_enter_delay = 300, m_vertical_delay = 120, m_horizontal_delay = 110;
 		bool m_open_key; bool m_back_key; bool m_enter_key; bool m_up_key; bool m_down_key; bool m_left_key; bool m_right_key;
 		void reset_keys();

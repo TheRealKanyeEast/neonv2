@@ -1,7 +1,14 @@
 #pragma once
 #include "pch.h"
 #include "util/math.h"
+#include "rage/classes/atArray.h"
 namespace rage {
+
+    struct waypoint_data {
+        rage::vector4* m_points;
+        char _0x0008[0x3C];
+        uint32_t m_count;
+    };
 
     struct CVisualVfx {//didnt i give you this
         char pad_0000[0x2874];
@@ -14,6 +21,72 @@ namespace rage {
         float m_saturation;
     };
 
+    struct vfx_liquid {
+        float m_duration_foot;
+        float m_duration_wheel_in;
+        float m_life_foot;
+        float m_life_wheel;
+        char _0x0010[0x48];
+        uint8_t r;
+        uint8_t g;
+        uint8_t b;
+        uint8_t a;
+        char _0x005C[0x4];
+    };
+
+    struct ocean_wave_quad {
+        math::vector2<short> m_min;
+        math::vector2<short> m_max;
+        short m_amplitude;
+        math::vector2<uint8_t> m_direction;
+    };
+
+    struct ocean_calming_quad {
+        math::vector2<short> m_min;
+        math::vector2<short> m_max;
+        float m_dampening;
+    };
+
+    struct ocean_quad {
+        math::vector2<short> m_min;
+        math::vector2<short> m_max;
+        uint32_t m_alpha;
+        char _0x000C[0x8];
+        float m_height;
+        char _0x0024[0x4];
+    };
+
+    struct ocean_quad_info {
+        uint64_t m_quad_pool;
+        short m_quad_count;
+    };
+
+    struct ocean_quads {
+        ocean_quad_info* m_ocean;
+        ocean_quad_info* m_wave;
+        ocean_quad_info* m_calming;
+    };
+
+    struct water_tune {
+        int m_water_color;
+        float m_ripple_scale;
+        float m_ocean_foam_scale;
+        float m_specular_falloff;
+        float m_fog_pierce_intensity;
+        float m_refraction_blend;
+        float m_refraction_exponent;
+        float m_water_cycle_depth;
+        float m_water_cycle_fade;
+        float m_water_lightning_depth;
+        float m_water_lightning_fade;
+        float m_deep_water_mod_depth;
+        float m_deep_water_mod_fade;
+        float m_god_rays_lerp_start;
+        float m_god_rays_lerp_end;
+        float m_disturb_foam_scale;
+        math::vector2<float> m_fog_min;
+        math::vector2<float> m_fog_max;
+    };
     class CGameVisuals
     {
     public:
@@ -22,6 +95,7 @@ namespace rage {
         float m_unk_0x8; //0x0008
         float m_fov; //0x000C
     }; //Size: 0x0010
+   // static_assert(sizeof(CGameVisuals) == 0x10);
 
     struct CWeatherVfx {//didnt i give you this
         uint32_t m_name_hash;
@@ -94,87 +168,104 @@ namespace rage {
     }; //Size: 0x0010
     static_assert(sizeof(CUIElementShader) == 0x10);
 
-    class ui_weather {//didnt i give you this
+    class TimecycleKeyframeData
+    {
     public:
-        char pad_0000[16]; //0x0000
-        CUIElementColor m_azimuth_east_color; //0x0010
-        char pad_0030[16]; //0x0030
-        CUIElementColor m_azimuth_west_color; //0x0040
-        char pad_0060[16]; //0x0060
-        CUIElementColor m_azimuth_transition_color; //0x0070
-        char pad_0090[4]; //0x0090
-        CUIElementInt m_azimuth_transition_position; //0x0094
-        char pad_009C[4]; //0x009C
-        CUIElementColor m_zenith_color; //0x00B8
-        char pad_00C0[16]; //0x00C0
-        CUIElementColor m_zenith_transition_color; //0x00D0
-        char pad_00F0[4]; //0x00F0
-        CUIElementColorConstant m_zenith_constants; //0x00F0
-        char pad_0114[28]; //0x0114
-        CUIElementColor m_sky_plane_color; //0x0130
-        char pad_0150[16]; //0x0150
-        CUIIndex m_sky_plane_params; //0x0160
-        char pad_0164[52]; //0x0164
-        CUIIndex m_sun_direction; //0x0198
-        CUIIndex m_sun_position; //0x019C
-        char pad_01A0[16]; //0x01A0
-        CUIElementColor m_sun_color; //0x01B0
-        CUIElementColor m_sun_color_hdr; //0x01D0
-        char pad_01F0[16]; //0x01F0
-        CUIElementColor m_sun_disc_color_hdr; //0x0200
-        char pad_0220[32]; //0x0220
-        CUIElementColor m_sun_constants; //0x0240
-        CUIElementShader m_high_detail_noise; //0x0260
-        CUIElementColorConstant m_cloud_constant1; //0x0270
-        char pad_0290[16]; //0x0290
-        CUIElementColorConstant m_cloud_constant2; //0x02A0
-        char pad_02C0[16]; //0x02C0
-        CUIElementColorConstant m_cloud_constant3; //0x02D0
-        char pad_02F0[16]; //0x02F0
-        CUIElementColorConstant m_cloud_detail_constants; //0x0300
-        char pad_0320[48]; //0x0320
-        CUIElementColor m_cloud_base_minus_mid_colour; //0x0350
-        CUIElementColor m_cloud_mid_color; //0x0370
-        CUIElementColor m_cloud_shadow_minus_base_colour_times_shadow_strength; //0x0390
-        CUIElementColorConstant m_small_cloud_constants; //0x03B0
-        char pad_03D0[32]; //0x03D0
-        CUIElementColor m_small_cloud_color_hdr; //0x03F0
-        char pad_0410[16]; //0x0410
-        CUIIndex m_cloudgen_frequency; //0x0420
-        char pad_0424[28]; //0x0424
-        CUIElementColor m_noise_phase; //0x0440
-        char pad_0460[32]; //0x0460
-        CUIIndex m_speed_constants; //0x0480
-        char pad_0484[28]; //0x0484
-        CUIElementInt m_horizon_level; //0x04A0
-        char pad_04A8[16]; //0x04A8
-        CUIElementShader m_dither; //0x04B8
-        char pad_04C8[24]; //0x04C8
-        CUIElementShader m_star_field; //0x04E0
-        CUIElementInt m_starfield_intensity; //0x04F0
-        CUIElementShader m_moon; //0x04F8
-        char pad_0508[40]; //0x0508
-        CUIElementInt m_moon_intensity; //0x0530
-        char pad_0538[8]; //0x0538
-        CUIElementColor m_moon_color; //0x0540
-        char pad_0560[16]; //0x0560
-        CUIIndex m_lunar_cycle; //0x0570
-        char pad_0574[28]; //0x0574
-        CUIIndex m_moon_direction; //0x0590
-        CUIIndex m_moon_position; //0x0594
-        char pad_0598[24]; //0x0598
-        CUIElementInt m_noise_frequency; //0x05A8
-        CUIElementInt m_noise_scale; //0x05B0
-        CUIElementInt m_noise_threshold; //0x05B8
-        CUIElementInt m_noise_softness; //0x05C0
-        CUIElementInt m_noise_density_offset; //0x05C8
-        CUIElementShader m_noise; //0x05D8
+        char pad_0000[32]; //0x0000
+        math::vector4<float> m_azimuth_east; //0x0020
+        float m_azimuth_east_intensity; //0x0030
+        char pad_0034[28]; //0x0034
+        rage::vector4 m_azimuth_west; //0x0050
+        float m_azimuth_west_intensity; //0x0060
+        char pad_0064[28]; //0x0064
+        rage::vector4 m_azimuth_transition; //0x0080
+        float m_azimuth_transition_intensity; //0x0090
+        char pad_0094[4]; //0x0094
+        float m_azimuth_transition_position; //0x0098
+        char pad_009C[20]; //0x009C
+        rage::vector4 m_zenith; //0x00B0
+        float m_zenith_intensity; //0x00C0
+        char pad_00C4[28]; //0x00C4
+        rage::vector4 m_zenith_transition; //0x00E0
+        float m_zenith_transition_intensity; //0x00F0
+        float m_zenith_transition_position; //0x00F4
+        float m_zenith_transition_east_blend; //0x00F8
+        float m_zenith_transition_west_blend; //0x00FC
+        float m_zenith_blend_start; //0x0100
+        char pad_0104[60]; //0x0104
+        rage::vector3 m_plane; //0x0140
+        float m_plane_intensity; //0x014C
+        char pad_0150[52]; //0x0150
+        float m_hdr; //0x0184
+        float m_unk_188; //0x0188
+        bool m_update_sky_attributes; //0x018C
+        char pad_018D[3]; //0x018D
+        uint32_t m_unk_190; //0x0190
+        uint32_t m_unk_194; //0x0194
+        char pad_0198[8]; //0x0198
+        rage::vector4 m_unk_1A0; //0x01A0
+        char pad_01AC[16]; //0x01AC
+        rage::vector4 m_sun; //0x01C0
+        char pad_01CC[32]; //0x01CC
+        rage::vector4 m_sun_disc; //0x01F0
+        char pad_01FC[32]; //0x01FC
+        float m_sun_disc_size; //0x0220
+        float m_sun_hdr; //0x0224
+        float m_sun_miephase; //0x0228
+        float m_sun_miescatter; //0x022C
+        float m_sun_mie_intensity_mult; //0x0230
+        char pad_0234[28]; //0x0234
+        rage::vector4 m_unk_250; //0x0250
+        char pad_025C[16]; //0x025C
+        float m_cloud_shadow_strength; //0x0270
+        float m_cloud_density_mult; //0x0274
+        float m_cloud_density_bias; //0x0278
+        float m_cloud_fadeout; //0x027C
+        char pad_0280[32]; //0x0280
+        float m_unk_2A0; //0x02A0
+        float m_cloud_offset; //0x02A4
+        float m_cloud_overall_color; //0x02A8
+        float m_cloud_hdr; //0x02AC
+        char pad_02B0[32]; //0x02B0
+        float m_cloud_dither_strength; //0x02D0
+        char pad_02D4[44]; //0x02D4
+        float m_cloud_edge_strength; //0x0300
+        char pad_0304[4]; //0x0304
+        float m_cloud_overall_strength; //0x0308
+        char pad_030C[16]; //0x030C
+        rage::vector4 m_unk_320; //0x031C
+        rage::vector4 m_cloud_base; //0x032C
+        rage::vector4 m_unk_340; //0x033C
+        char pad_0348[16]; //0x0348
+        rage::vector4 m_cloud_1; //0x035C
+        char pad_0368[20]; //0x0368
+        rage::vector4 m_cloud_mid; //0x0380
+        char pad_038C[32]; //0x038C
+        float m_unk_380; //0x03B0
+        float m_small_cloud_detail_strength; //0x03B4
+        float m_small_cloud_density_mult; //0x03B8
+        float m_unk_3BC; //0x03BC
+        char pad_03C0[32]; //0x03C0
+        rage::vector4 m_small_cloud; //0x03E0
+        char pad_03EC[32]; //0x03EC
+        float m_sun_influence_radius; //0x0410
+        float m_sun_scatter_inten; //0x0414
+        float m_moon_influence_radius; //0x0418
+        float m_moon_scatter_inten; //0x041C
+        char pad_0420[212]; //0x0420
+        float m_stars_iten; //0x04F4
+        char pad_04F8[60]; //0x04F8
+        float m_moon_disc_size; //0x0534
+        char pad_0538[24]; //0x0538
+        rage::vector4 m_moon; //0x0550
+        float m_moon_intensity; //0x0560
+        char pad_0564[140]; //0x0564
 
         void set_sky(bool enabled) {
             *(bool*)((uint64_t)this - 0x60) = enabled;
         }
-    }; //Size: 0x05E8
-    static_assert(sizeof(ui_weather) == 0x5E8);
+    }; //Size: 0x05F0
+    static_assert(sizeof(TimecycleKeyframeData) == 0x5F0);
 }
 struct CWheelVfx {
     float m_slip_min; //0x0004
@@ -235,3 +326,77 @@ public:
     float m_tire_width; // 0x08
 };  
 static_assert(sizeof(CVehicleStreamRender) == 0xBA4);
+
+
+struct CCloudBurstCommonSettings {
+    float IntensityMin;
+    float IntensityMax;
+    float IntensityMinClamp;
+    float WidthMin;
+    float WidthMax;
+    float WidthMinClamp;
+    float IntensityFlickerMin;
+    float IntensityFlickerMax;
+    float IntensityFlickerFrequency;
+    float IntensityLevelDecayMin;
+    float IntensityLevelDecayMax;
+    float WidthLevelDecayMin;
+    float WidthLevelDecayMax;
+    float NoiseTexScale;
+    float NoiseAmplitude;
+    float NoiseAmpMinDistLerp;
+    float NoiseAmpMaxDistLerp;
+    unsigned char SubdivisionCount;
+    float OrbitDirXVariance;
+    float OrbitDirYVarianceMin;
+    float OrbitDirYVarianceMax;
+    float MaxDistanceForExposureReset;
+    float AngularWidthFactor;
+    float MaxHeightForStrike;
+    float CoronaIntensityMult;
+    float BaseCoronaSize;
+    unsigned int BaseColor;
+    unsigned int FogColor;
+    float CloudLightIntensityMult;
+    float CloudLightDeltaPos;
+    float CloudLightRadius;
+    float CloudLightFallOffExponent;
+    float MaxDistanceForBurst;
+    float BurstThresholdIntensity;
+    float LightningFadeWidth;
+    float LightningFadeWidthFalloffExp;
+};
+
+
+#pragma pack(push, 4)
+class CCarriageConfig
+{
+    uint32_t m_name_hash;                      // 0x00
+    int m_max_peds_per_carriage;               // 0x04
+    char m_pad[4];                             // 0x08
+    bool m_flip_model_dir;                     // 0x0C
+    bool m_do_interior_lights;                 // 0x0D
+    float m_carriage_vert_offset;              // 0x10
+};
+static_assert(sizeof(CCarriageConfig) == 0x14);
+
+class CTrainConfig
+{
+public:
+    uint32_t m_name_hash;                              // 0x00
+    float m_populate_train_dist;                       // 0x04
+    int m_unk1;                                        // 0x08
+    int m_unk2;                                        // 0x0C
+    int m_unk3;                                        // 0x10
+    bool m_announce_stations;                          // 0x14
+    bool m_doors_beep;                                 // 0x15
+    bool m_carriages_hang;                             // 0x16
+    bool m_carriages_swing;                            // 0x17
+    bool m_no_carriage_gap;                            // 0x18
+    bool m_link_tracks_with_adjacent_stations;         // 0x19
+    bool m_no_random_spawn;                            // 0x1A
+    float m_carriage_gap;                              // 0x1C
+    rage::atArray<CCarriageConfig> m_carraige_configs; // 0x20
+};
+static_assert(sizeof(CTrainConfig) == 0x30);
+#pragma pack(pop)

@@ -790,7 +790,43 @@ public:
 }; //Size: 0x00EC
 static_assert(sizeof(CPedCreationDataNode) == 0xEC);
 #pragma pack(pop)
-
+#pragma pack(push, 4)
+class CVehicleControlDataNode : CSyncDataNodeFrequent
+{
+public:
+    uint32_t m_num_wheels;
+    uint32_t dwordC4;
+    uint32_t m_brake_control;
+    uint32_t dwordCC;
+    uint32_t m_road_node_address;
+    bool m_kers_active;
+    bool m_bringing_vehicle_to_halt;
+    float m_halt_distance;
+    bool m_control_vertical_velocity;
+    bool m_has_suspension_data;
+    bool byteDE;
+    float m_suspension_heights[10];
+    bool byte108;
+    bool byte109;
+    bool byte10A;
+    bool byte10B;
+    bool byte10C;
+    bool byte10D;
+    bool byte10E;
+    float float110;
+    uint32_t dword114;
+    char byte118;
+    bool m_is_submarine_car;
+    char gap11A[2];
+    float m_rudder_rotation_x;
+    float m_rudder_rotation_y;
+    float m_rudder_rotation_z;
+    char byte128;
+    char byte129;
+    char pad[5];
+};
+static_assert(sizeof(CVehicleControlDataNode) == 0x130);
+#pragma pack(pop)
 #pragma pack(push,2)
 class CPedGameStateDataNode : CSyncDataNodeInfrequent
 {
@@ -1109,3 +1145,92 @@ public:
     bool m_door_closed[10]; //0x00C1
 };
 //static_assert(sizeof(CAutomobileCreationDataNode) == 0xD0);
+
+
+#pragma pack(push,4)
+class CPedTaskData
+{
+public:
+    int m_task_type;   // 0x00
+    int m_priority;    // 0x04
+    int m_tree_depth;  // 0x08
+    int m_sequence_id; // 0x0C
+    bool m_active;     // 0x10
+};
+static_assert(sizeof(CPedTaskData) == 0x14);
+#pragma pack(push,4)
+class CVehicleTaskDataNode : CSyncDataNodeInfrequent
+{
+public:
+    uint32_t m_task_type;       // 0xC0
+    uint32_t m_task_data_size;  // 0xC4
+    char m_task_data[255];      // 0xC8
+}; //Size: 0x0180
+static_assert(sizeof(CVehicleTaskDataNode) == 0x1C8);
+#pragma pack(pop)
+class CPedTaskTreeDataNode : CSyncDataNodeFrequent
+{
+public:
+    CPedTaskData m_tasks[8];    // 0xC0
+    int m_task_bitset;          // 0x160
+    int m_script_command;       // 0x164
+    int m_script_command_stage; // 0x168
+};
+static_assert(sizeof(CPedTaskTreeDataNode) == 0x16C); // tree offset != size for this one
+#pragma pack(pop)
+
+class CNetObjPlayer
+{
+public:
+    BYTE gap0[197];
+    BYTE byteC5;
+    BYTE byteC6;
+    BYTE byteC7;
+    BYTE byteC8;
+    BYTE gapC9[2];
+    BYTE byteCB;
+    BYTE gapCC[8];
+    BYTE byteD4;
+    BYTE gapD5[51];
+    float float108;
+    BYTE gap10C[12];
+    WORD word118;
+    DWORD dword11C;
+    DWORD dword120;
+    BYTE gap124[7];
+    __unaligned __declspec(align(1)) WORD word12B;
+    BYTE gap12D[7];
+    DWORD dword134;
+    BYTE byte138;
+    BYTE gap139[7];
+    DWORD dword140;
+    DWORD dword144;
+    DWORD dword148;
+    DWORD dword14C;
+    BYTE gap150[4];
+    DWORD dword154;
+    BYTE byte158;
+    unsigned int unsigned_int15C;
+    BYTE gap160[38];
+    BYTE byte186;
+    BYTE byte187;
+    BYTE gap188[12];
+    BYTE byte194;
+    BYTE gap195[37];
+    WORD word1BA;
+    DWORD dword1BC;
+    BYTE gap1C0[4];
+    float float1C4;
+    float float1C8;
+    float float1CC;
+    BYTE byte1D0;
+    BYTE gap1D1[15];
+    DWORD dword1E0;
+    DWORD dword1E4;
+    DWORD dword1E8;
+    DWORD dword1EC;
+    BYTE byte1F0;
+    BYTE byte1F1;
+    BYTE gap1F2;
+    BYTE byte1F3;
+};

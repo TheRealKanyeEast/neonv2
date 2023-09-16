@@ -59,17 +59,17 @@ namespace base::hooks {
 		uint64_t caller = (uint64_t)_ReturnAddress();
 
 		if (caller == patterns::report_myself) {
-			//LOG_CUSTOM_WARN("AC", "Prevented REPORT_MYSELF_EVENT creation");
+			LOG_CUSTOM_WARN("AC", "REPORT_MYSELF_EVENT creation");
 			return false;
 		}
 
 		if (caller == patterns::check_crc) {
-		//	LOG_CUSTOM_WARN("AC", "Prevented NETWORK_CHECK_CODE_CRCS_EVENT creation");
+			LOG_CUSTOM_WARN("AC", "NETWORK_CHECK_CODE_CRCS_EVENT creation");
 			return false;
 		}
 
 		if (caller == patterns::cash_spawn) {
-			//LOG_CUSTOM_WARN("AC", "Prevented REPORT_CASH_SPAWN_EVENT creation");
+			LOG_CUSTOM_WARN("AC", "REPORT_CASH_SPAWN_EVENT creation");
 			return false;
 		}
 
@@ -81,7 +81,7 @@ namespace base::hooks {
 			short type = *(short*)(event + 8);
 
 			if (type == 83u || type == 84u || type == 78u) {
-				//LOG_CUSTOM_WARN("AC", "Blocking network event - %i", type);
+				LOG_CUSTOM_WARN("AC", "network event - %i", type);
 
 				uint64_t table = *(uint64_t*)event;
 				caller::call<int>(*(uint64_t*)table, event, 1); // Deallocate event
@@ -178,10 +178,10 @@ namespace base::hooks {
 	};
 
 	bool sendMetricHook(rage::rlMetric* _this, bool unk) {
-		//LOG_WARN(std::format("METRIC: {} {} {}", _this->get_name(), _this->get_name_hash(), _this->get_size()).c_str());
+		LOG_WARN(std::format("METRIC: {} {} {}", _this->get_name(), _this->get_name_hash(), _this->get_size()).c_str());
 
 		if (std::find(begin(blocked_metrics), end(blocked_metrics), _this->get_name()) != end(blocked_metrics)) {
-			//LOG_WARN(std::format("Blocking bad metric: {}", _this->get_name()).c_str());
+			LOG_WARN(std::format("Blocking bad metric: {}", _this->get_name()).c_str());
 			return false;
 		}
 

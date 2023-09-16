@@ -2,7 +2,8 @@
 #include "misc.h"
 #include "menu/util/control.h"
 #include "gui/util/timer.h"
-
+#include "menu/util/lists.h"
+#include "gui/util/notify.h"
 using namespace base::gui;
 using namespace menu::misc::vars;
 
@@ -493,6 +494,234 @@ namespace menu::misc::vars {
 			return;
 		m_vars.PM_FIND_SESS = MISC::GET_ONSCREEN_KEYBOARD_RESULT();
 	}
+#define SPAWN_PED_ALL_WEAPONS -1
+#define SPAWN_PED_NO_WEAPONS -2
+
+#define SPAWN_PED_FOR_SELF -1
+#define SPAWN_PED_FOR_EVERYONE -2
+	static int selected_ped_weapon_type = SPAWN_PED_ALL_WEAPONS;
+	static Hash selected_ped_weapon_hash = 0;
+	void spawn_ped_give_weapon(const Ped ped)
+	{
+		if (selected_ped_weapon_type == SPAWN_PED_NO_WEAPONS)
+		{
+			return;
+		}
+
+		for (const auto& weapon : lists::g_weapons)
+		{
+			if (selected_ped_weapon_type == SPAWN_PED_ALL_WEAPONS)
+			{
+				if ((selected_ped_weapon_hash == 0 || weapon.id == selected_ped_weapon_hash) && weapon.id != RAGE_JOAAT("WEAPON_UNARMED"))
+				{
+					WEAPON::GIVE_WEAPON_TO_PED(ped, weapon.id, 9999, false, selected_ped_weapon_hash != 0);
+				}
+			}
+		}
+	}
+
+	struct outfit_t
+	{
+		int id;
+		std::string label;
+		int drawable_id = 0;
+		int drawable_id_max = 0;
+		int texture_id = 0;
+		int texture_id_max = 0;
+	};
+
+	inline const char* g_ped_model_popular[8] = {
+		"s_m_m_movalien_01",
+		"s_m_m_movspace_01",
+		"mp_f_deadhooker",
+		"u_m_y_pogo_01",
+		"s_f_y_stripper_01",
+		"s_m_y_swat_01",
+		"a_f_y_topless_01",
+		"u_m_y_zombie_01"
+	}; inline int g_ped_model_popular_id;
+
+	inline const char* g_ped_model_popular_names[8] = {
+		"Alien",
+		"Astronaut",
+		"Hooker",
+		"Pogo",
+		"Stripper",
+		"Swat",
+		"Topless",
+		"Zombie"
+	};
+
+	struct components_t
+	{
+		std::vector<outfit_t> items = { {0, "OUTFIT_HEAD"},
+			{1, "OUTFIT_BERD"},
+			{2, "OUTFIT_HAIR"},
+			{3, "OUTFIT_UPPR"},
+			{4, "OUTFIT_LOWR"},
+			{5, "OUTFIT_HAND"},
+			{6, "OUTFIT_FEET"},
+			{7, "OUTFIT_TEEF"},
+			{8, "OUTFIT_ACCS"},
+			{9, "OUTFIT_TASK"},
+			{10, "OUTFIT_DECL"},
+			{11, "OUTFIT_JBIB"} };
+	};
+	
+
+	void set_ped_random_component_variation(Ped ped)
+	{
+		auto range = [](int lower_bound, int upper_bound) -> int {
+			return std::rand() % (upper_bound - lower_bound + 1) + lower_bound;
+		};
+		components_t components;
+		for (auto& item : components.items)
+		{
+			int drawable_id_max = PED::GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(ped, item.id) - 1;
+			if (drawable_id_max == -1)
+				continue;
+			int drawable_id = range(0, drawable_id_max);
+			int texture_id_max = PED::GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(ped, item.id, drawable_id) - 1;
+			if (texture_id_max == -1)
+				continue;
+			int texture_id = range(0, texture_id_max);
+			PED::SET_PED_COMPONENT_VARIATION(ped, item.id, drawable_id, texture_id, PED::GET_PED_PALETTE_VARIATION(ped, item.id));
+		}
+	}
+	Ped spawn(ePedType pedType, Hash hash, Hash clone, Vector3 location, float heading, bool is_networked = true)
+	{
+		for (uint8_t i = 0; !STREAMING::HAS_MODEL_LOADED(hash) && i < 100; i++)
+		{
+			STREAMING::REQUEST_MODEL(hash);
+			util::fiber::go_to_main();
+		}
+
+		if (!STREAMING::HAS_MODEL_LOADED(hash))
+		{
+			return 0;
+		}
+
+		auto ped = PED::CREATE_PED(pedType, hash, location, heading, is_networked, false);
+
+		util::fiber::go_to_main();
+
+		if (clone)
+		{
+			PED::CLONE_PED_TO_TARGET(clone, ped);
+		}
+
+		STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(hash);
+
+		return ped;
+	}
+
+
+	Ped spawn_ped_at_location(const int selected_ped_type, const char* ped_model_buf, const Player selected_ped_player_id, const Player selected_ped_for_player_id, const bool is_bodyguard)
+	{
+		Hash hash = 0;
+		Ped clone = 0;
+		Vector3 location;
+		Player player;
+		Ped player_ped;
+
+		if (selected_ped_type == -2)
+		{
+			if (selected_ped_player_id == -1)
+			{
+				clone = PLAYER::PLAYER_PED_ID();
+				hash = ENTITY::GET_ENTITY_MODEL(clone);
+			}
+		}
+		else
+		{
+			hash = rage::joaat(ped_model_buf);
+		}
+
+
+		if (selected_ped_for_player_id == SPAWN_PED_FOR_SELF)
+		{
+			location = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+			player = PLAYER::PLAYER_ID();
+			player_ped = PLAYER::PLAYER_PED_ID();
+		}
+
+		location.x += 1.f;
+		location.y += 1.f;
+		Ped ped = spawn(ePedType::PED_TYPE_ARMY, hash, clone, location, 0);
+
+		if (ped == 0)
+		{
+			notify::stacked("Failed to Spawn Bodyguard");
+			return 0;
+		}
+
+		PED::SET_PED_ARMOUR(ped, 100);
+		ENTITY::SET_ENTITY_MAX_HEALTH(ped, 1000);
+		ENTITY::SET_ENTITY_HEALTH(ped, 1000, 0);
+		PED::SET_PED_COMBAT_ABILITY(ped, 100);
+		PED::SET_PED_ACCURACY(ped, 100);
+		PED::SET_PED_COMBAT_ATTRIBUTES(ped, 1, 1);
+		PED::SET_PED_COMBAT_ATTRIBUTES(ped, 3, 1);
+		PED::SET_PED_COMBAT_ATTRIBUTES(ped, 5, 1);
+		PED::SET_PED_COMBAT_ATTRIBUTES(ped, 13, 1);
+		PED::SET_PED_COMBAT_ATTRIBUTES(ped, 21, 1);
+		PED::SET_PED_COMBAT_ATTRIBUTES(ped, 27, 1);
+		PED::SET_PED_COMBAT_ATTRIBUTES(ped, 41, 1);
+		PED::SET_PED_COMBAT_ATTRIBUTES(ped, 46, 1);
+		PED::SET_PED_COMBAT_ATTRIBUTES(ped, 63, 0);
+		PED::SET_PED_COMBAT_ABILITY(ped, 2);
+		PED::SET_PED_COMBAT_MOVEMENT(ped, 2);
+		PED::SET_PED_COMBAT_RANGE(ped, 0);
+		PED::SET_PED_HIGHLY_PERCEPTIVE(ped, true);
+		PED::SET_PED_SEEING_RANGE(ped, 200.0f);
+		PED::SET_PED_HEARING_RANGE(ped, 200.0f);
+		PED::SET_PED_ID_RANGE(ped, 200.0f);
+		PED::SET_PED_FIRING_PATTERN(ped, RAGE_JOAAT("FIRING_PATTERN_FULL_AUTO"));
+		PED::SET_PED_SHOOT_RATE(ped, 150);
+		set_ped_random_component_variation(ped);
+
+		if (is_bodyguard)
+		{
+			int player_group = PED::GET_PED_GROUP_INDEX(player_ped);
+
+			if (!PED::DOES_GROUP_EXIST(player_group))
+				player_group = PED::CREATE_GROUP(0);
+
+			PED::SET_PED_AS_GROUP_LEADER(player_ped, player_group);
+			PED::SET_PED_AS_GROUP_MEMBER(ped, player_group);
+			PED::SET_PED_CAN_TELEPORT_TO_GROUP_LEADER(ped, player_group, true);
+			PED::SET_PED_NEVER_LEAVES_GROUP(ped, true);
+			PED::SET_PED_RELATIONSHIP_GROUP_HASH(ped, PED::GET_PED_RELATIONSHIP_GROUP_HASH(player_ped));
+			PED::SET_PED_CAN_BE_TARGETTED_BY_PLAYER(ped, player, true);
+
+			if (player != PLAYER::PLAYER_ID())
+			{
+				PED::SET_PED_KEEP_TASK(ped, true);
+				PED::SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(ped, true);
+				TASK::TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(ped, true);
+				TASK::TASK_FOLLOW_TO_OFFSET_OF_ENTITY(ped, player, { 0.0f, 0.0f, 0.0f }, 4.0f, -1, 0.0f, true);
+			}
+		}
+
+		if (m_vars.spawn_godmode)
+		{
+			ENTITY::SET_ENTITY_INVINCIBLE(ped, true);
+		}
+
+		if (m_vars.spawn_invisible)
+		{
+			ENTITY::SET_ENTITY_VISIBLE(ped, false, false);
+		}
+
+		spawn_ped_give_weapon(ped);
+		m_vars.spawned_bodyguards.push_back({ ped, PLAYER::PLAYER_ID() });
+		return ped;
+	}
+
+	void cleanup_spawned_ped(spawned_ped& ped)
+	{
+		PED::DELETE_PED(&ped.ped_handle);
+	}
 
 }
 	
@@ -519,6 +748,9 @@ namespace menu {
 			core->addOption(submenuOption("Dispatch")
 				.setTarget("Misc Dispatch"));
 
+			core->addOption(submenuOption("Bodyguards")
+				.setTarget("bodyguard_manager"));
+
 			core->addOption(submenuOption("Label Editor")
 				.setTarget("label_editing"));
 
@@ -527,6 +759,9 @@ namespace menu {
 
 			core->addOption(submenuOption("View Report Stats")
 				.setTarget("report_stats"));
+
+			core->addOption(submenuOption("Virtual TV")
+				.setTarget("vtv"));
 
 			core->addOption(toggleOption("Snow Trails")
 				.addToggle(&m_vars.mobile_radio));
@@ -545,6 +780,50 @@ namespace menu {
 
 			core->addOption(buttonOption("Network Bail")
 				.addClick([] { NETWORK::NETWORK_BAIL(16, 0, 0); }));
+		});
+
+		renderer::addSubmenu("Virtual TV", "vtv", [](core* core) {
+			
+			core->addOption(toggleOption("Toggle TV")
+				.addToggle(&m_vars.tv));
+
+			core->addOption(numberOption<int>("Change channel")
+				.addNumber(&m_vars.channel).addMin(0).addMax(3)
+				.addClick([] { GRAPHICS::SET_TV_CHANNEL(m_vars.channel); }).addStep(1).setPrecision(0));
+
+			core->addOption(numberOption <float>("X")
+				.addNumber(&m_vars.x).addMin(0.0f).addMax(1.0f).addStep(0.01f).setPrecision(2));
+
+			core->addOption(numberOption<float>("Y")
+				.addNumber(&m_vars.y).addMin(0.0f).addMax(1.0f).addStep(0.01f).setPrecision(2));
+
+			core->addOption(numberOption<float>("W")
+				.addNumber(&m_vars.w).addMin(0.0f).addMax(1.0f).addStep(0.01f).setPrecision(2));
+
+			core->addOption(numberOption<float>("H")
+				.addNumber(&m_vars.h).addMin(0.0f).addMax(1.0f).addStep(0.01f).setPrecision(2));
+
+			core->addOption(numberOption<float>("Rotation")
+				.addNumber(&m_vars.rotation).addMin(0.0f).addStep(0.01f).setPrecision(2).addMax(360.0f));
+		});
+		
+		renderer::addSubmenu("Bodyguards", "bodyguard_manager", [](core* core) {
+			static int selected_ped_type = -2;
+			static bool ped_model_dropdown_open = false;
+			static Player selected_ped_player_id = -1;
+			static Player selected_ped_for_player_id = -1;
+			selected_ped_for_player_id = SPAWN_PED_FOR_SELF;
+
+			core->addOption(scrollOption<const char*, int>("Model")
+				.addScroll(&g_ped_model_popular_names).setPosition(&g_ped_model_popular_id));
+
+			/*core->addOption(toggleOption("Godmode")
+				.addToggle(&m_vars.spawn_godmode));*/
+
+			core->addOption(buttonOption("Spawn")
+				.addClick([=] { spawn_ped_at_location(selected_ped_type, g_ped_model_popular[g_ped_model_popular_id], selected_ped_player_id, selected_ped_for_player_id, true); }));
+
+
 		});
 
 		renderer::addSubmenu("View Report Stats", "report_stats", [](core* core) {
@@ -1044,7 +1323,75 @@ namespace menu {
 				trainSpeed--;
 			set_train_speed(trainSpeed);
 		}*/
+		static bool last_online = false;
+		static bool bLastLoadPathNodes = false;
+		if (*patterns::is_session_started != last_online)
+		{
+			last_online = *patterns::is_session_started;
 
+			for (auto& ped : m_vars.spawned_bodyguards)
+				cleanup_spawned_ped(ped);
+
+			m_vars.spawned_bodyguards.clear();
+		}
+
+		if (bLastLoadPathNodes && (m_vars.spawned_bodyguards.size() == 0))
+		{
+			PATHFIND::SET_ALLOW_STREAM_PROLOGUE_NODES(false);
+			bLastLoadPathNodes = false;
+		}
+		else if (m_vars.spawned_bodyguards.size() != 0)
+		{
+			PATHFIND::SET_ALLOW_STREAM_PROLOGUE_NODES(true);
+			bLastLoadPathNodes = true;
+		}
+
+		for (auto it = m_vars.spawned_bodyguards.begin(); it != m_vars.spawned_bodyguards.end();)
+		{
+			if ((*patterns::is_session_started && !NETWORK::NETWORK_IS_PLAYER_CONNECTED(it->spawned_for_player)) || !ENTITY::DOES_ENTITY_EXIST(it->ped_handle))
+			{
+				cleanup_spawned_ped(*it);
+				it = m_vars.spawned_bodyguards.erase(it);
+				continue;
+			}
+
+			
+			auto pos = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(it->spawned_for_player), false);
+			auto vel = NETWORK::NETWORK_GET_LAST_VEL_RECEIVED_OVER_NETWORK(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(it->spawned_for_player));
+			bool is_veh = PED::IS_PED_IN_ANY_VEHICLE(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(it->spawned_for_player), true) || PLAYER::IS_REMOTE_PLAYER_IN_NON_CLONED_VEHICLE(it->spawned_for_player);
+			auto ped_pos = ENTITY::GET_ENTITY_COORDS(it->ped_handle, false);
+
+			float distance = is_veh ? 170.0f : 120.0f;
+			float spawn_distance = is_veh ? 150.0f : 70.0f;
+
+			if (pos.x != 0.0f && SYSTEM::VDIST2(pos, ped_pos) > distance * distance)
+			{
+				Vector3 spawn_point;
+				if (MISC::FIND_SPAWN_POINT_IN_DIRECTION(pos, vel, spawn_distance, &spawn_point) && control::request_control(it->ped_handle, 0))
+				{
+					PED::SET_PED_COORDS_KEEP_VEHICLE(it->ped_handle, spawn_point);
+					
+					TASK::TASK_FOLLOW_TO_OFFSET_OF_ENTITY(it->ped_handle, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(it->spawned_for_player), { 0.0f, 0.0f, 0.0f }, 4.0f, -1, 0.0f, true);
+				}
+			}
+			
+
+			else if (it->spawned_for_player != PLAYER::PLAYER_ID() && TASK::GET_SCRIPT_TASK_STATUS(it->ped_handle, RAGE_JOAAT("SCRIPT_TASK_FOLLOW_TO_OFFSET_OF_ENTITY")) == 7)
+			{
+				TASK::TASK_FOLLOW_TO_OFFSET_OF_ENTITY(it->ped_handle, PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(it->spawned_for_player), { 0.0f, 0.0f, 0.0f }, 4.0f, -1, 0.0f, true);
+			}
+
+			it++;
+		}
+
+		if (m_vars.tv) {
+			HUD::SET_HUD_COMPONENT_POSITION(15, { 0.0f, -0.0375f });
+			HUD::SET_TEXT_RENDER_ID(1);
+			GRAPHICS::SET_SCRIPT_GFX_DRAW_ORDER(4);
+			GRAPHICS::SET_SCRIPT_GFX_DRAW_BEHIND_PAUSEMENU(1);
+			GRAPHICS::DRAW_TV_CHANNEL({ m_vars.x, m_vars.y }, {m_vars.w, m_vars.h}, m_vars.rotation, 255, 255, 255, 255);
+			HUD::SET_TEXT_RENDER_ID(HUD::GET_DEFAULT_SCRIPT_RENDERTARGET_RENDER_ID());
+		}
 
 		bool init = false;
 		if (!init) {

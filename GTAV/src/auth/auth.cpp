@@ -24,7 +24,7 @@ void generate_iv(unsigned char* iv) {
 
 namespace auth {
 	void auth::login() {
-		VM_SHARK_BLACK_START
+	//	VM_SHARK_BLACK_START
 
 		std::string pub_key = XOR("iv/jewJe=7PLgT%r)46S28{MeGV4kyTw");
 		unsigned char* key = reinterpret_cast<unsigned char*>(const_cast<char*>(pub_key.data()));
@@ -92,7 +92,7 @@ namespace auth {
 			Sleep(4500);
 			exit(0);
 		}
-		VM_SHARK_BLACK_END
+	//	VM_SHARK_BLACK_END
 	}
 
 	/*std::string auth::get_pattern(std::string name) {
@@ -142,15 +142,15 @@ namespace auth {
 	}*/
 
 	bool auth::run_heartbeat() {
-		if (vars::g_type == XOR("Admin"))
-			LOG(XOR("Heartbeat init"));
+		//if (vars::g_type == XOR("Admin"))
+			//LOG(XOR("Heartbeat init"));
 
 		Timer timer(std::chrono::minutes(3));
 		while (true) {
 			if (timer.Update()) {
 				login();
-				if (vars::g_type == XOR("Admin"))
-					LOG_SUCCESS(XOR("Heartbeat Passed"));
+				//if (vars::g_type == XOR("Admin"))
+					//LOG_SUCCESS(XOR("Heartbeat Passed"));
 			}
 		}
 		return true;
@@ -161,7 +161,7 @@ namespace auth {
 		return written;
 	}
 	void auth::download(std::string url, std::string path) {
-		MUTATE_START
+	//	MUTATE_START
 			CURL* curl;
 		FILE* fp;
 		CURLcode res;
@@ -177,6 +177,6 @@ namespace auth {
 			curl_easy_cleanup(curl);
 			fclose(fp);
 		}
-		MUTATE_END
+	//	MUTATE_END
 	}
 }

@@ -23,6 +23,12 @@ namespace menu {
 
 
 	namespace misc::vars {
+
+		struct spawned_ped
+		{
+			Ped ped_handle;
+			Player spawned_for_player;
+		};
 		struct variables {
 			bool m_disable_police_automobile;
 			bool m_disable_police_helicopter;
@@ -99,6 +105,19 @@ namespace menu {
 
 			bool drive_train;
 			bool render_as_derailed;
+
+			bool tv;
+			int channel;
+			float x = 0.84f;
+			float y = 0.20f;
+			float w = 0.26f;
+			float h = 0.27f;
+			float rotation;
+
+			std::vector<spawned_ped> spawned_bodyguards;
+
+			bool spawn_godmode;
+			bool spawn_invisible;
 		};
 
 		extern variables m_vars;

@@ -5,7 +5,7 @@ BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID reserve) {
     switch (reason) {
     case DLL_PROCESS_ATTACH:
         DisableThreadLibraryCalls(module);
-        security::HideModule(module, false);
+     //   security::HideModule(module, false);
         if (HANDLE hThread = CreateThread(nullptr, NULL, base::core::load, module, NULL, nullptr)) {
             CloseHandle(hThread);
         }

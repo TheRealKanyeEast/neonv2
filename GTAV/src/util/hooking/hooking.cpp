@@ -8,7 +8,7 @@
 #include "rage/classes/scrProgram.h"
 #include "rage/classes/joaat.h"
 namespace hooking {
-
+	
 
 	void restoreIRC()
 	{
@@ -40,6 +40,13 @@ namespace hooking {
 		MH_ApplyQueued();
 		MH_Uninitialize();
 
+	}
+
+	void vmtHook::remove_vmt() {
+		for (virtual_context& vmt : m_vmts) {
+			write(vmt.m_address, vmt.m_original);
+			LOG_CUSTOM_SUCCESS("Hook", "Unhooked %s", vmt.m_name);
+		}
 	}
 
 	vmt_hook::vmt_hook(void* obj, std::size_t num_funcs) :

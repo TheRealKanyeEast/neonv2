@@ -9,6 +9,6 @@ namespace auth::vars {
 	inline std::string g_password;
 
 	inline std::string g_type = XOR("NULL");
-	inline bool g_logged_in = false;
+	inline bool g_logged_in = true;
 
 }

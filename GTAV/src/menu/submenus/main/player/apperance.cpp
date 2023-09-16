@@ -369,7 +369,7 @@ namespace menu {
 
 		renderer::addSubmenu("Model", "Player Model", [](core* core) {
 			core->addOption(scrollOption<const char*, int>("Popular")
-				.addScroll(&g_ped_model_popular).setPosition(&g_ped_model_popular_id)
+				.addScroll(&g_ped_model_popular_names).setPosition(&g_ped_model_popular_id)
 				.addClick([=] {
 					if (Util::is_key_pressed(VK_RETURN)) {
 						apply_model(g_ped_model_popular[g_ped_model_popular_id]);
@@ -377,7 +377,7 @@ namespace menu {
 				}));
 
 			core->addOption(scrollOption<const char*, int>("Story")
-				.addScroll(&g_ped_model_story).setPosition(&g_ped_model_story_id)
+				.addScroll(&g_ped_model_story_names).setPosition(&g_ped_model_story_id)
 				.addClick([=] {
 					if (Util::is_key_pressed(VK_RETURN)) {
 						apply_model(g_ped_model_story[g_ped_model_story_id]);
@@ -385,7 +385,7 @@ namespace menu {
 				}));
 
 			core->addOption(scrollOption<const char*, int>("Animals")
-				.addScroll(&g_ped_model_animal).setPosition(&g_ped_model_animal_id)
+				.addScroll(&g_ped_model_animal_names).setPosition(&g_ped_model_animal_id)
 				.addClick([=] {
 					if (Util::is_key_pressed(VK_RETURN)) {
 						apply_model(g_ped_model_animal[g_ped_model_animal_id]);
@@ -393,7 +393,7 @@ namespace menu {
 				}));
 
 			core->addOption(scrollOption<const char*, int>("Emergency")
-				.addScroll(&g_ped_model_emergency).setPosition(&g_ped_model_emergency_id)
+				.addScroll(&g_ped_model_emergency_names).setPosition(&g_ped_model_emergency_id)
 				.addClick([=] {
 					if (Util::is_key_pressed(VK_RETURN)) {
 						apply_model(g_ped_model_emergency[g_ped_model_emergency_id]);
@@ -401,7 +401,7 @@ namespace menu {
 				}));
 
 			core->addOption(scrollOption<const char*, int>("Role")
-				.addScroll(&g_ped_model_role).setPosition(&g_ped_model_role_id)
+				.addScroll(&g_ped_model_role_names).setPosition(&g_ped_model_role_id)
 				.addClick([=] {
 					if (Util::is_key_pressed(VK_RETURN)) {
 						apply_model(g_ped_model_role[g_ped_model_role_id]);
@@ -409,7 +409,7 @@ namespace menu {
 				}));
 
 			core->addOption(scrollOption<const char*, int>("Ambient")
-				.addScroll(&g_ped_model_ambient).setPosition(&g_ped_model_ambient_id)
+				.addScroll(&g_ped_model_ambient_names).setPosition(&g_ped_model_ambient_id)
 				.addClick([=] {
 					if (Util::is_key_pressed(VK_RETURN)) {
 						apply_model(g_ped_model_ambient[g_ped_model_ambient_id]);
@@ -418,7 +418,7 @@ namespace menu {
 
 
 			core->addOption(scrollOption<const char*, int>("Misc")
-				.addScroll(&g_ped_model_misc).setPosition(&g_ped_model_misc_id)
+				.addScroll(&g_ped_model_misc_names).setPosition(&g_ped_model_misc_id)
 				.addClick([=] {
 					if (Util::is_key_pressed(VK_RETURN)) {
 						apply_model(g_ped_model_misc[g_ped_model_misc_id]);

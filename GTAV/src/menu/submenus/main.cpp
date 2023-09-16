@@ -8,6 +8,7 @@
 #include "gui/util/panels.h"
 #include "gui/util/notify.h"
 #include "auth/vars.h"
+#include "security/themdia/secure_engine.h"
 using namespace base::gui;
 
 namespace menu {
@@ -36,6 +37,7 @@ namespace menu {
 
 	
 	void main_menu::render() {	
+		//MUTATE_START
 		//if (auth::vars::g_logged_in) {
 			renderer::addSubmenu("Main Menu", "Main Menu", [](core* core) {
 				core->addOption(submenuOption("Player")
@@ -83,20 +85,22 @@ namespace menu {
 					.setTarget("Settings"));
 				});
 		//}
-		//else {
-		//	renderer::addSubmenu("ERROR", "ERRORREROEROEOREORERERER", [](core* core) {
-		//		core->addOption(buttonOption(XOR("Not Logged In")));
+	//	else {
+	//		renderer::addSubmenu("ERROR", "ERRORREROEROEOREORERERER", [](core* core) {
+	//			core->addOption(buttonOption(XOR("Not Logged In")));
 		//	});
 		//}
+	//	MUTATE_END
 
 	}
-	std::unordered_map<int, std::unordered_map<int, uint32_t>> m_spectate_map;
+
 	void main_menu::update() {
-		if (auth::vars::g_logged_in) {
+
+		//if (auth::vars::g_logged_in) {
 			fonts::update_queue();
 			menu::textures::tick();
 			renderer::getRenderer()->render();
 			render();
-		}
+		//}
 	}
 }

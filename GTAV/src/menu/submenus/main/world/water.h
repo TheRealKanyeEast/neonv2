@@ -23,12 +23,30 @@ namespace menu {
 	}
 
 	namespace world::water::vars {
+		enum eOceanTasks {
+			OCEAN_DISABLE,
+			OCEAN_CLEAR,
+			OCEAN_FIERCE
+		};
+
+		enum eOceanTypes {
+			OCEAN_TYPE_OCEAN,
+			OCEAN_TYPE_WAVE,
+			OCEAN_TYPE_CALMING
+		};
 
 		struct variables {
 			float m_wave_intensity;
 			bool part_water;
-		};
+			bool m_disable_ocean;
+			bool m_clear_ocean;
+			bool m_fierce_ocean;
+			bool m_part_water;
 
+
+		};
+		void ocean_loop(eOceanTypes type, std::function<void(uint64_t)> callback);
+		void ocean_task(eOceanTypes type, eOceanTasks task);
 		extern variables m_vars;
 	}
 }

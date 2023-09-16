@@ -87,6 +87,10 @@ namespace menu {
 			float ring_brightness = 100;
 			bool decrease_ped_population;
 			bool decrease_vehicle_population;
+
+
+			bool m_ar_waypoint;
+			bool m_waypoint_marker;
 		};
 
 		extern variables m_vars;

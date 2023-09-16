@@ -30,6 +30,8 @@ namespace rage
 
 	public:
 		scriptHandler* m_script_handler;// 0x08
+		int m_state;
+		int m_pending_player_join_bitset;
 	};
 
 	class scriptHandler
@@ -88,7 +90,7 @@ namespace rage
 	public:
 		void* m_0x08;                              // 0x08
 		void* m_0x10;                              // 0x10
-		scrThread* m_script_thread;                // 0x18
+		GtaThread* m_script_thread;                // 0x18
 		atDList<atDScriptObjectNode> m_objects;    // 0x20
 		scriptResource* m_resource_list_head;      // 0x30
 		scriptResource* m_resource_list_tail;      // 0x38

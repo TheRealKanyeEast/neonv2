@@ -35,6 +35,8 @@ namespace menu {
 
 			math::vector2<float> m_ped_hook_value;
 
+			const char* m_model_name = " ";
+
 			bool m_vehicle_spinbot;
 			bool m_vehicle_jitter;
 			bool m_vehicle_static;
@@ -48,6 +50,43 @@ namespace menu {
 			math::vector3_<float> m_vehicle_static_value;
 			math::vector3_<bool> m_vehicle_static_toggle;
 			math::vector3_<float> m_vehicle_hook_value;			
+
+			bool m_movement_animation;
+
+			bool m_spoof_blip;
+			int m_blip_type;
+
+			bool m_spoof_state;
+
+			bool m_spoof_lang;
+			bool m_spoof_region;
+
+			int player_count = 1;
+
+			bool m_spoof_crew_tag;
+			std::string m_crew_tag = { "aether" };
+			int m_member_id;
+			int m_crew_id;
+			int m_crew_color;
+			int m_crew_members;
+			int m_crew_time;
+
+			bool m_spoof_member_id;
+			bool m_spoof_crew_id;
+			bool m_spoof_crew_color;
+			bool m_spoof_crew_members;
+			bool m_spoof_crew_time;
+
+			int m_rank;
+			int m_kd;
+
+			int x;
+			int y;
+			int z;
+
+			bool m_dev;
+			bool m_tester;
+			bool m_cheater;
 		};
 
 		extern variables m_vars;

@@ -1,4 +1,4 @@
-#include "pch.h"
+	#include "pch.h"
 #include "weapon_mods.h"
 #include "menu/util/globals.h"
 #include "gui/options/option.h"
@@ -127,6 +127,10 @@ namespace menu {
 			core->addOption(toggleOption("Shrink Entity")
 				.addHotkey().addTranslate()
 				.addToggle(&m_vars.m_shrink_entity));
+
+			core->addOption(toggleOption("Deadeye")
+				.addHotkey().addTranslate()
+				.addToggle(&m_vars.m_dead_eye));
 
 			core->addOption(toggleOption("Spawn Money")
 				.addHotkey().addTranslate()
@@ -331,6 +335,25 @@ namespace menu {
 					Vector3 Head = PED::GET_PED_BONE_COORDS(PlayerTarget, 0x796E, { 0.1f, 0.0f, 0.0f });
 					PED::SET_PED_SHOOTS_AT_COORD(PLAYER::PLAYER_PED_ID(), Head, true);
 				}
+			}
+		}
+
+		if (m_vars.m_dead_eye) {
+			if (PED::GET_PED_CONFIG_FLAG(PLAYER::PLAYER_PED_ID(), 78, 1)) {
+				MISC::SET_TIME_SCALE(0.35f);
+				if (PED::IS_PED_SHOOTING(PLAYER::PLAYER_PED_ID())) {
+					MISC::SET_TIME_SCALE(0.2f);
+					GRAPHICS::SET_TIMECYCLE_MODIFIER("Death");
+				}
+				else {
+					GRAPHICS::CLEAR_TIMECYCLE_MODIFIER();
+				}
+				GRAPHICS::ANIMPOSTFX_PLAY("ExplosionJosh3", -1, true);
+			}
+			else {
+				MISC::SET_TIME_SCALE(1.0f);
+				GRAPHICS::CLEAR_TIMECYCLE_MODIFIER();
+				GRAPHICS::ANIMPOSTFX_STOP("ExplosionJosh3");
 			}
 		}
 

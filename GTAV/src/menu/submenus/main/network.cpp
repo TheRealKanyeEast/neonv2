@@ -9,6 +9,7 @@
 #include "network//network_recent_players.h"
 #include "network/network_tunables.h"
 #include "network/network_global_chat.h"
+#include "network/network_browsers.h"
 using namespace base::gui;
 using namespace menu::network::vars;
 
@@ -39,6 +40,9 @@ namespace menu {
 
 			core->addOption(submenuOption("Spoofing")
 				.setTarget("Network Spoofing"));
+
+			core->addOption(submenuOption("Browsers")
+				.setTarget("Network Browsers"));
 
 			core->addOption(submenuOption("Friends")
 				.setTarget("Network Friends"));
@@ -115,6 +119,7 @@ namespace menu {
 		getNetworkRecentPlayersMenu()->update();
 		getNetworkTunablesMenu()->update();
 		getNetworkChatMenu()->update();
+		getNetworkBrowsersMenu()->update();
 
 		if (m_vars.m_esp_box)
 		{

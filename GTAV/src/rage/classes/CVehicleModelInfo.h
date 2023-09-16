@@ -4,6 +4,21 @@
 #include "vector.h"
 #include <cstdint>
 
+
+#pragma pack(push, 4)
+class CVehicleModelInfoLayout
+{
+private:
+    char pad_0000[842]; //0x0000
+public:
+    int8_t m_max_seats; //0x034A
+private:
+    char pad_034B[5]; //0x034B
+public:
+    class CVehicleLayoutMetaData* m_layout_metadata; //0x0350
+}; //Size: 0x0358
+#pragma pack(pop)
+
 enum class eVehicleType : std::uint32_t
 {
     VEHICLE_TYPE_NONE = 4294967295,
@@ -56,7 +71,8 @@ enum class eVehicleClass : std::uint8_t
 class CVehicleModelInfo : public CBaseModelInfo
 {
 public:
-    char pad_00A4[72]; //0x00A4
+    CVehicleModelInfoLayout* m_vehicle_layout; //0x00B0
+    char pad_00B8[64]; //0x00B8
     uint8_t m_primary_color_combinations[25]; //0x00F8
     uint8_t m_secondary_color_combinations[25]; //0x0111
     uint8_t m_unk_color_combos1[25]; //0x012A
@@ -73,8 +89,11 @@ public:
     char pad_02D9[103]; //0x02D9
     eVehicleType m_vehicle_type; //0x0340
     uint32_t m_unk_vehicle_type; //0x0344
-    uint32_t m_diffuse_tint; //0x0348
-    char pad_034C[20]; //0x034C
+    uint16_t m_diffuse_tint; //0x0348
+    int8_t m_max_seats; //0x034A
+    char pad_034B[5]; //0x034B
+    CVehicleLayoutMetaData* m_layout_metadata; //0x0350
+    char pad_0358[8]; //0x0358
     rage::vector3 m_first_person_driveby_ik_offset; //0x0360
     char pad_036C[4]; //0x036C
     rage::vector3 m_first_person_driveby_unarmed_ik_offset; //0x0370
@@ -106,7 +125,9 @@ public:
     float m_min_seat_height; //0x0554
     char pad_0558[40]; //0x0558
     uint32_t m_is_jetski; //0x0580
-    char pad_0584[28]; //0x0584
+    char pad_0584[7]; //0x0584
+    uint16_t m_ability_flag; //0x058B
+    char pad_058D[26]; //0x058D
 }; //Size: 0x05A0
-static_assert(sizeof(CVehicleModelInfo) == 0x5A0);
+static_assert(sizeof(CVehicleModelInfo) == 0x5A7);
 #pragma pack(pop)

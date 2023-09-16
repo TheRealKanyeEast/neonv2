@@ -103,6 +103,100 @@ namespace menu::protections::vars {
 		reports::vars::m_vars.block_reports_id = 0;
 	}
 
+	const char* reaction_type[] = {
+		"Death",						//
+		"Aim",							//
+		"Report",						//
+		"Explode Loop",			//
+		"Fire Loop",			//
+		"Attachments",			//
+		"RAC",					//
+		"Arxan",						//
+		"Crash Attempt",				//
+		"Spectating You",				//
+		"Money Drop",					//
+		"Script Event Kick",					//
+		"Script Migration",				//
+		"Super Jump",					//
+		"Join Timeout",					//
+		"Invalid Model",				//
+		"Info Change"					//
+	}; inline std::size_t reaction_id = 0;
+
+	const char* reaction_action[] = {
+		"Explode", "Crash", "Kick", "Cage", "Kick From Vehicle", "Set on Fire", "Ragdoll", "Glitch Physics", "Black Screen", "Blame", "Remove Weapons", "Network Bail", "Force to Island", "Force to Apartment"
+	}; inline std::size_t reaction_action_id = 0;
+
+	const char* reaction_action1[] = {
+		"Explode", "Crash", "Kick", "Cage", "Kick From Vehicle", "Set on Fire", "Ragdoll", "Glitch Physics", "Black Screen", "Blame", "Remove Weapons", "Network Bail", "Force to Island", "Force to Apartment"
+	}; inline std::size_t reaction_action_id1 = 0;
+
+
+	const char* reaction_action2[] = {
+		"Explode", "Crash", "Kick", "Cage", "Kick From Vehicle", "Set on Fire", "Ragdoll", "Glitch Physics", "Black Screen", "Blame", "Remove Weapons", "Network Bail", "Force to Island", "Force to Apartment"
+	}; inline std::size_t reaction_action_id2 = 0;
+
+	const char* reaction_action3[] = {
+		"Explode", "Crash", "Kick", "Cage", "Kick From Vehicle", "Set on Fire", "Ragdoll", "Glitch Physics", "Black Screen", "Blame", "Remove Weapons", "Network Bail", "Force to Island", "Force to Apartment"
+	}; inline std::size_t reaction_action_id3 = 0;
+
+
+	const char* reaction_action4[] = {
+		"Explode", "Crash", "Kick", "Cage", "Kick From Vehicle", "Set on Fire", "Ragdoll", "Glitch Physics", "Black Screen", "Blame", "Remove Weapons", "Network Bail", "Force to Island", "Force to Apartment"
+	}; inline std::size_t reaction_action_id4 = 0;
+
+	const char* reaction_action5[] = {
+		"Explode", "Crash", "Kick", "Cage", "Kick From Vehicle", "Set on Fire", "Ragdoll", "Glitch Physics", "Black Screen", "Blame", "Remove Weapons", "Network Bail", "Force to Island", "Force to Apartment"
+	}; inline std::size_t reaction_action_id5 = 0;
+
+	const char* reaction_action6[] = {
+		"Explode", "Crash", "Kick", "Cage", "Kick From Vehicle", "Set on Fire", "Ragdoll", "Glitch Physics", "Black Screen", "Blame", "Remove Weapons", "Network Bail", "Force to Island", "Force to Apartment"
+	}; inline std::size_t reaction_action_id6 = 0;
+
+	const char* reaction_action7[] = {
+		"Explode", "Crash", "Kick", "Cage", "Kick From Vehicle", "Set on Fire", "Ragdoll", "Glitch Physics", "Black Screen", "Blame", "Remove Weapons", "Network Bail", "Force to Island", "Force to Apartment"
+	}; inline std::size_t reaction_action_id7 = 0;
+
+	const char* reaction_action8[] = {
+		"Explode", "Crash", "Kick", "Cage", "Kick From Vehicle", "Set on Fire", "Ragdoll", "Glitch Physics", "Black Screen", "Blame", "Remove Weapons", "Network Bail", "Force to Island", "Force to Apartment"
+	}; inline std::size_t reaction_action_id8 = 0;
+
+	const char* reaction_action9[] = {
+		"Explode", "Crash", "Kick", "Cage", "Kick From Vehicle", "Set on Fire", "Ragdoll", "Glitch Physics", "Black Screen", "Blame", "Remove Weapons", "Network Bail", "Force to Island", "Force to Apartment"
+	}; inline std::size_t reaction_action_id9 = 0;
+
+	const char* reaction_action10[] = {
+		"Explode", "Crash", "Kick", "Cage", "Kick From Vehicle", "Set on Fire", "Ragdoll", "Glitch Physics", "Black Screen", "Blame", "Remove Weapons", "Network Bail", "Force to Island", "Force to Apartment"
+	}; inline std::size_t reaction_action_id10 = 0;
+
+	const char* reaction_action11[] = {
+		"Explode", "Crash", "Kick", "Cage", "Kick From Vehicle", "Set on Fire", "Ragdoll", "Glitch Physics", "Black Screen", "Blame", "Remove Weapons", "Network Bail", "Force to Island", "Force to Apartment"
+	}; inline std::size_t reaction_action_id11 = 0;
+
+	const char* reaction_action12[] = {
+		"Explode", "Crash", "Kick", "Cage", "Kick From Vehicle", "Set on Fire", "Ragdoll", "Glitch Physics", "Black Screen", "Blame", "Remove Weapons", "Network Bail", "Force to Island", "Force to Apartment"
+	}; inline std::size_t reaction_action_id12 = 0;
+
+	const char* reaction_action13[] = {
+		"Explode", "Crash", "Kick", "Cage", "Kick From Vehicle", "Set on Fire", "Ragdoll", "Glitch Physics", "Black Screen", "Blame", "Remove Weapons", "Network Bail", "Force to Island", "Force to Apartment"
+	}; inline std::size_t reaction_action_id13 = 0;
+
+	const char* reaction_action14[] = {
+		"Explode", "Crash", "Kick", "Cage", "Kick From Vehicle", "Set on Fire", "Ragdoll", "Glitch Physics", "Black Screen", "Blame", "Remove Weapons", "Network Bail", "Force to Island", "Force to Apartment"
+	}; inline std::size_t reaction_action_id14 = 0;
+
+	const char* reaction_action15[] = {
+		"Explode", "Crash", "Kick", "Cage", "Kick From Vehicle", "Set on Fire", "Ragdoll", "Glitch Physics", "Black Screen", "Blame", "Remove Weapons", "Network Bail", "Force to Island", "Force to Apartment"
+	}; inline std::size_t reaction_action_id15 = 0;
+
+	const char* reaction_action16[] = {
+		"Explode", "Crash", "Kick", "Cage", "Kick From Vehicle", "Set on Fire", "Ragdoll", "Glitch Physics", "Black Screen", "Blame", "Remove Weapons", "Network Bail", "Force to Island", "Force to Apartment"
+	}; inline std::size_t reaction_action_id16 = 0;
+
+	const char* reaction_action17[] = {
+		"Explode", "Crash", "Kick", "Cage", "Kick From Vehicle", "Set on Fire", "Ragdoll", "Glitch Physics", "Black Screen", "Blame", "Remove Weapons", "Network Bail", "Force to Island", "Force to Apartment"
+	}; inline std::size_t reaction_action_id17 = 0;
+
 }
 
 namespace menu {
@@ -127,6 +221,9 @@ namespace menu {
 			core->addOption(submenuOption("Reports")
 				.setTarget("Protections Reports"));
 
+			core->addOption(submenuOption("Reactions")
+				.setTarget("Protections Reactions"));
+
 			core->addOption(submenuOption("Entity")
 				.setTarget("Protections Entity"));
 
@@ -150,8 +247,61 @@ namespace menu {
 
 			core->addOption(buttonOption("Disable All")
 				.addClick([] { disable_all(); }));
+		});	
+
+		renderer::addSubmenu("Reactions", "Protections Reactions", [](core* core) {
+
+			core->addOption(scrollOption<const char*, std::size_t>("Death")
+				.addScroll(&reaction_action).setPosition(&reaction_action_id));
+			
+			core->addOption(scrollOption<const char*, std::size_t>("Aim")
+				.addScroll(&reaction_action1).setPosition(&reaction_action_id1));
+
+			core->addOption(scrollOption<const char*, std::size_t>("Report")
+				.addScroll(&reaction_action2).setPosition(&reaction_action_id2));
+
+			core->addOption(scrollOption<const char*, std::size_t>("Explode Loop")
+				.addScroll(&reaction_action3).setPosition(&reaction_action_id3));
+
+			core->addOption(scrollOption<const char*, std::size_t>("Fire Loop")
+				.addScroll(&reaction_action4).setPosition(&reaction_action_id4));
+
+			core->addOption(scrollOption<const char*, std::size_t>("Attachments")
+				.addScroll(&reaction_action5).setPosition(&reaction_action_id5));
+
+			core->addOption(scrollOption<const char*, std::size_t>("RAC")
+				.addScroll(&reaction_action6).setPosition(&reaction_action_id6));
+
+			core->addOption(scrollOption<const char*, std::size_t>("Arxan")
+				.addScroll(&reaction_action7).setPosition(&reaction_action_id7));
+
+			core->addOption(scrollOption<const char*, std::size_t>("Crash Attempt")
+				.addScroll(&reaction_action8).setPosition(&reaction_action_id8));
+
+			core->addOption(scrollOption<const char*, std::size_t>("Spectating You")
+				.addScroll(&reaction_action9).setPosition(&reaction_action_id9));
+
+			core->addOption(scrollOption<const char*, std::size_t>("Money Drop")
+				.addScroll(&reaction_action10).setPosition(&reaction_action_id10));
+
+			core->addOption(scrollOption<const char*, std::size_t>("Script Event Kick")
+				.addScroll(&reaction_action11).setPosition(&reaction_action_id11));
+
+			core->addOption(scrollOption<const char*, std::size_t>("Script Migration")
+				.addScroll(&reaction_action12).setPosition(&reaction_action_id12));
+
+			core->addOption(scrollOption<const char*, std::size_t>("Super Jump")
+				.addScroll(&reaction_action13).setPosition(&reaction_action_id13));
+
+			core->addOption(scrollOption<const char*, std::size_t>("Join Timeout")
+				.addScroll(&reaction_action14).setPosition(&reaction_action_id14));
+
+			core->addOption(scrollOption<const char*, std::size_t>("Invalid Model")
+				.addScroll(&reaction_action15).setPosition(&reaction_action_id15));
+
+			core->addOption(scrollOption<const char*, std::size_t>("Info Change")
+				.addScroll(&reaction_action16).setPosition(&reaction_action_id16));
 		});
-		
 	}
 
 	void protections_menu::update() {

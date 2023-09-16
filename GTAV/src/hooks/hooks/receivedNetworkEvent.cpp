@@ -177,7 +177,7 @@ namespace base::hooks {
 			case 0:
 				break;
 			case 1:
-				if (isnan(*(float*)&args[3]) || isnan(*(float*)&args[4])) {
+				if (isnan(*(float*)&args[3]) || isnan(*(float*)&args[4])){
 					return true;
 				}
 				break;
@@ -199,6 +199,14 @@ namespace base::hooks {
 				case 0: break;
 				case 1:  return true; break;
 				case 2: handleScriptEvent(player_name, "Notification", true); return true; break;
+				}
+				break;
+			case eRemoteEvent::NotificationCrash1:                             // this isn't used by the game
+				return true;
+			case eRemoteEvent::NotificationCrash2:
+				if (!rage::engine::find_script_thread(RAGE_JOAAT("gb_salvage")))
+				{
+					return true;
 				}
 				break;
 			}
@@ -226,10 +234,16 @@ namespace base::hooks {
 			break;
 		case eRemoteEvent::MCTeleport:
 			if (args[3] <= 32) {
-				switch (var.block_force_teleport_id) {
-				case 0: break;
-				case 1:  return true; break;
-				case 2: handleScriptEvent(player_name, "Force Teleport", true); return true; break;
+				for (int i = 0; i < 32; i++)
+				{
+					if (args[4 + i] == NETWORK::NETWORK_HASH_FROM_PLAYER_HANDLE(PLAYER::PLAYER_ID()))
+					{
+						switch (var.block_force_teleport_id) {
+						case 0: break;
+						case 1:  return true; break;
+						case 2: handleScriptEvent(player_name, "Force Teleport", true); return true; break;
+						}
+					}
 				}
 			}
 			else if (args[3] > 32) {
@@ -394,7 +408,7 @@ namespace base::hooks {
 		{
 			if (auto script = rage::engine::find_script_thread(RAGE_JOAAT("freemode")))
 			{
-				if (script->m_net_component && script->m_net_component->m_host && script->m_net_component->m_host->m_net_game_player != player)
+				if (script->m_net_component && ((CGameScriptHandlerNetComponent*)script->m_net_component)->m_host && ((CGameScriptHandlerNetComponent*)script->m_net_component)->m_host->m_net_game_player != player)
 				{
 					handleScriptEvent(player_name, "Trigger CEO Raid", true);
 				}
@@ -625,6 +639,13 @@ namespace base::hooks {
 			}
 			break;
 		}
+		case eNetworkEvents::NETWORK_CHECK_CATALOG_CRC:
+		case eNetworkEvents::NETWORK_CHECK_CODE_CRCS_EVENT:
+		case eNetworkEvents::NETWORK_CRC_HASH_CHECK_EVENT:
+		{
+			LOG_ERROR(std::format("{} Triggered a CRC Check", sender->GetName()).c_str());
+			break;
+		}
 		case eNetworkEvents::REMOVE_WEAPON_EVENT: {
 			int net_id = buffer->Read<int>(13);
 			uint32_t hash = buffer->Read<uint32_t>(32);
@@ -720,6 +741,7 @@ namespace base::hooks {
 				uint32_t timestamp = buffer->Read<uint32_t>(32);
 				int count = buffer->Read<int>(2);
 				bool all_objects_migrate_together = buffer->Read<bool>(1);
+				eNetObjType sync_type;
 
 				if (count > 3)
 				{
@@ -734,12 +756,22 @@ namespace base::hooks {
 
 					if (object_type < eNetObjType::NET_OBJ_TYPE_AUTOMOBILE || object_type > eNetObjType::NET_OBJ_TYPE_TRAIN)
 					{
+						menu::notify::stacked(std::format("{} Sent a crash event", sender->GetName()).c_str());
 						sendEventAck(_this, sender, receiver, event_index, event_bitset);
 						return;
 					}
+
+					sync_type = object_type;
 				}
 
 				buffer->Seek(0);
+
+				if (count)
+				{
+					patterns::g_syncing_player = sender;
+					patterns::g_syncing_object_type = sync_type;
+				}
+
 				break;
 			}
 			case 2: 
@@ -932,10 +964,6 @@ namespace base::hooks {
 				break;
 			}
 			break;
-		//RAC
-		case eNetworkEvents::NETWORK_CHECK_CODE_CRCS_EVENT:
-			menu::notify::stacked(std::format("{} Triggered RAC", sender->GetName()).c_str());
-			break;
 
 		case eNetworkEvents::REPORT_CASH_SPAWN_EVENT:
 			uint32_t money;
@@ -951,6 +979,7 @@ namespace base::hooks {
 
 		case eNetworkEvents::REPORT_MYSELF_EVENT:
 			menu::notify::stacked(std::format("{} Triggered RAC", sender->GetName()).c_str());
+			LOG_ERROR(std::format("{} Triggered RAC", sender->GetName()).c_str());
 			break;
 
 		case eNetworkEvents::REMOTE_SCRIPT_LEAVE_EVENT:

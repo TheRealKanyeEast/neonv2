@@ -21,22 +21,46 @@ namespace menu {
 
 	void network_players_menu::render() {
 		renderer::addSubmenu("Players", "Network Players", [](core* core) {
-			core->addOption(scrollOption<const char*, std::size_t>("Sort Players")
-				.addScroll(&sort_types).setPosition(&sort_types_id));
+			if (*patterns::is_session_started) {
+				core->addOption(scrollOption<const char*, std::size_t>("Sort Players")
+					.addScroll(&sort_types).setPosition(&sort_types_id));
 
-			core->addOption(breakOption("Players"));
+				core->addOption(breakOption("Players"));
 
-			for (uint32_t i = 0; i < 32; i++) {
-				if (auto ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i)) {
-					if (ENTITY::DOES_ENTITY_EXIST(ped)) {
-						std::string name = PLAYER::GET_PLAYER_NAME(i);
+				for (uint32_t i = 0; i < 32; i++) {
+					if (auto ped = PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i)) {
+						if (ENTITY::DOES_ENTITY_EXIST(ped)) {
+							std::string name = PLAYER::GET_PLAYER_NAME(i);
 
-						core->addOption(submenuOption(PLAYER::GET_PLAYER_NAME(i))
-							.addClick([=] { m_vars.m_selected_player = i; })
-							.setTarget("selected_player"));
+							auto plyr = patterns::get_net_player(i);
+
+							if (plyr->IsNetworkHost()) {
+								name.append(" ~p~[H]");
+							}
+
+							if (plyr->m_is_spectating) {
+								name.append(" ~p~[S]");
+							}
+
+							if (plyr->m_is_cheater) {
+								name.append(" ~p~[M]");
+							}
+
+							if (i == PLAYER::PLAYER_ID())
+								name.append(" ~p~[ME]");
+
+							if (i == NETWORK::NETWORK_GET_HOST_OF_SCRIPT("Freemode", 4294967295, 0))
+								name.append(" ~p~[SH]");
+
+							core->addOption(submenuOption(name.c_str())
+								.addClick([=] { m_vars.m_selected_player = i; })
+								.setTarget("selected_player"));
+						}
 					}
 				}
 			}
+			
+			
 		});
 	}
 

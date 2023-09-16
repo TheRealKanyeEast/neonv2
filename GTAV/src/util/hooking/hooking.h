@@ -3,6 +3,21 @@
 #include "minhook.h"
 #include "util/Log.h"
 namespace hooking {
+	template<typename V>
+	void write(uint64_t address, V value) {
+		uint32_t old;
+		VirtualProtect((void*)address, sizeof(value), PAGE_EXECUTE_READWRITE, (DWORD*)&old);
+		memcpy((void*)address, &value, sizeof(value));
+		VirtualProtect((void*)address, sizeof(value), old, (DWORD*)&old);
+	}
+
+	template<typename V>
+	void write(uint64_t address, V value, uint32_t size) {
+		uint32_t old;
+		VirtualProtect((void*)address, size, PAGE_EXECUTE_READWRITE, (DWORD*)&old);
+		memcpy((void*)address, value, size);
+		VirtualProtect((void*)address, size, old, (DWORD*)&old);
+	}
 #define HOOK_SIZE 20
 	class DetourContext {
 	public:
@@ -10,6 +25,13 @@ namespace hooking {
 		uint64_t m_address;
 		uint8_t m_original[HOOK_SIZE];
 		uint8_t m_hooked[HOOK_SIZE];
+		uint8_t m_encryption;
+	};
+
+	struct virtual_context {
+		std::pair<std::string, size_t> m_name;
+		uint64_t m_address;
+		uint64_t m_original;
 		uint8_t m_encryption;
 	};
 
@@ -25,7 +47,7 @@ namespace hooking {
 
 					MH_STATUS hook_status = MH_CreateHook((void*)address, function, (void**)trampoline);
 					if (hook_status == MH_OK || hook_status == MH_ERROR_ALREADY_CREATED) {
-						//LOG_CUSTOM_WARN("Hook", "Hooking %s", name)
+						LOG_CUSTOM_WARN("Hook", "Hooking: %s", name)
 						hook_status = MH_EnableHook((void*)address);
 						if (hook_status == MH_OK) {
 							
@@ -38,7 +60,7 @@ namespace hooking {
 
 							m_detours.push_back(detour);//update detour vector
 
-							//LOG_CUSTOM_SUCCESS("Hook", "Hooked %s", name);
+							LOG_CUSTOM_SUCCESS("Hook", "Hooked: %s", name);
 							return true;
 						}
 					}
@@ -66,6 +88,49 @@ namespace hooking {
 	template<typename T>
 	inline bool detour(const char* name, uint64_t address, void* function, T** trampoline) {
 		return getDetour()->detour<T>(name, address, function, trampoline);
+	}
+
+	class vmtHook {
+	public:
+		template<typename T>
+		__declspec(noinline) bool vmt(const char* name, uint64_t address, int index, void* function, T** trampoline) {
+			if (!address || !function) {
+				return false;
+			}
+
+			uint64_t table = address + (8 * index);
+			uint64_t original = *(uint64_t*)table;
+
+			if (*((void**)trampoline) == nullptr) {
+				*((void**)trampoline) = (void*)original;
+			}
+		
+			LOG_CUSTOM_WARN("Hook", "Hooking: %s", name)
+			virtual_context vmt;
+			vmt.m_name = std::make_pair(std::string(name), strlen(name));
+			vmt.m_address = table;
+			vmt.m_original = original;
+
+			m_vmts.push_back(vmt);
+
+			write(table, (uint64_t)function);
+
+			LOG_CUSTOM_SUCCESS("Hook", "Hooked: %s", name);
+			return true;
+		}
+		void remove_vmt();
+	private:
+		std::vector<virtual_context> m_vmts;
+	};
+
+	static vmtHook* getVmt() {
+		static vmtHook instance;
+		return &instance;
+	}
+
+	template<typename T>
+	inline bool vmt(const char* name, uint64_t address, int index, void* function, T** trampoline) {
+		return getVmt()->vmt<T>(name, address, index, function, trampoline);
 	}
 
 	class vmt_hook

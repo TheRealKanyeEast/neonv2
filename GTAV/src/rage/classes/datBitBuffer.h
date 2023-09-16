@@ -5,6 +5,7 @@
 
 #pragma pack(push, 1)
 namespace rage {
+	struct datBitBufferSyncInstance;
 	class datBitBuffer
 	{
 	public:
@@ -257,6 +258,14 @@ namespace rage {
 		uint32_t m_curBit;         //0x0014
 		uint32_t m_highestBitsRead;//0x0018
 		uint8_t m_flagBits;        //0x001C
+	};
+
+	struct datBitBufferSyncInstance {
+		uint64_t m_VTable;
+		uint8_t m_type; // 1 = reader, 2 = writer, 3 = calculator, 4 = logger
+		char _0x0009[0x7];
+		uint64_t m_sub_type; // 0 = reader, 2 = writer, 3 = calculator, 4 = logger
+		datBitBuffer* m_buffer;
 	};
 }
 #pragma pop

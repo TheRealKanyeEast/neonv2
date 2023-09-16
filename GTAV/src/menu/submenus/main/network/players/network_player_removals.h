@@ -23,7 +23,11 @@ namespace menu {
 
 	namespace players::selected::removals::vars {
 		struct variables {
-			
+			bool m_session_crash = false;
+			bool m_break_nodes = false;
+			int m_crash_type = 2;
+			uint32_t m_break_node_threads[2] = { 0, 0 };
+			uint32_t m_session_crash_timeout = 0;
 		};
 
 		extern variables m_vars;

@@ -33,7 +33,7 @@ namespace menu {
 			core->addOption(submenuOption("Acrobatics")
 				.setTarget("Vehicle Acrobatics"));
 
-			core->addOption(submenuOption("Parachute")
+			core->addOption(submenuOption("Abilities")
 				.setTarget("Vehicle Parachute"));
 
 			core->addOption(toggleOption("Bypass Max Speed")

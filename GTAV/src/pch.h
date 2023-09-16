@@ -3,7 +3,6 @@
 
 #include "framework.h"
 
-
 extern bool g_running;
 inline bool g_input_disabled{};
 extern bool g_freemode_terminated;
@@ -11,6 +10,14 @@ extern std::uint64_t g_vehicle_info;
 extern HWND g_window;
 inline HMODULE g_module{};
 
+inline static uint64_t g_timeout_fix_funcs[5];
+struct join_timeout_fix_context {
+    int32_t m_id;
+    uint32_t m_script_hash;
+    int m_retry_count;
+};
+inline std::vector<join_timeout_fix_context> g_join_timeout_fix;
+inline 	std::pair<uint64_t, uint32_t> g_game_address;
 //define namespaces
 using namespace std::chrono;
 using namespace std::chrono_literals;
@@ -36,6 +43,14 @@ using fnptr = std::add_pointer_t<t>;
 template<typename T, int N>
 constexpr int NUMOF(T(&)[N]) { return N; }
 
+struct alignment_test {
+    bool m_monitor;
+    bool m_block;
+    uint32_t m_thread_id;
+};
+inline std::unordered_map<std::string, alignment_test> g_alignment_tests;
+inline std::unordered_map<uint64_t, std::pair<uint32_t, uint32_t>> g_raw_buffer_translations;
+inline std::vector<std::pair<uint64_t, int>> g_return_address_node_iterations;
 
 struct protectionContext {
     int m_var = 0;
@@ -58,7 +73,7 @@ struct protectionContext {
 };
 
 namespace rage::types {
-
+   
     struct memory_heap_pt {
         virtual ~memory_heap_pt();
         virtual void _0x1();

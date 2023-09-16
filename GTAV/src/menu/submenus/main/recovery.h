@@ -29,6 +29,8 @@ namespace menu {
 			int m_kills;
 			int m_deaths;
 			float m_calculated;
+
+			bool m_loop2;
 		};
 
 		extern variables m_vars;

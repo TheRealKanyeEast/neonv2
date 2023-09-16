@@ -6,7 +6,7 @@ namespace util::log {
 
 	void log::Load() {
 		AllocConsole();
-		SetConsoleTitleA("Aether");
+		SetConsoleTitleA("Aether | 1.2.0");
 
 		FILE* stream;
 		freopen_s(&stream, "CONOUT$", "w", stdout);

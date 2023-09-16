@@ -53,6 +53,8 @@ namespace rage
 	class rlSessionByGamerTaskResult;
 }
 
+
+
 class GtaThread;
 
 class CGameScriptId;

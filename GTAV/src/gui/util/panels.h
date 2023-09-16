@@ -726,15 +726,6 @@ namespace menu {
         bool in_session = false;
         bool online = false;
 
-        for (uint32_t i = 0; i < 32; i++) {
-            if (patterns::get_net_player(i)) {
-                if (patterns::get_net_player(i)->m_player_info) {
-                    if (patterns::get_net_player(i)->GetGamerInfo()->m_gamer_handle.m_rockstar_id == plyr->m_rockstar_id) {
-                        in_session = true;
-                    }
-                }
-            }
-        }
 
         std::string online_display = in_session ? "Yes" : "No";
         std::string joinable = plyr->m_is_joinable ? "Yes" : "No";

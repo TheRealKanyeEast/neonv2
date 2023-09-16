@@ -25,11 +25,14 @@
 #include "auth/vars.h"
 #include "security/themdia/secure_engine.h"
 #include "util/util.h"
+#include "menu/util/matchmaking_service.h"
 namespace base::core {
 
 
 	DWORD WINAPI unload(LPVOID handle) {
+		g_alignment_tests.clear();
 		hooking::cleanup();
+		hooking::getVmt()->remove_vmt();
 		util::threads::getThreadPool()->Cleanup();
 		util::fiber::cleanup();
 		features::g_manager.clear();
@@ -68,16 +71,16 @@ namespace base::core {
 		}
 
 
-		auth::login();
-		if (auth::vars::g_type == XOR("NULL")) {
-			LOG_ERROR(XOR("Failed to validate account"));
-			auth::vars::g_logged_in = false;
-			std::this_thread::sleep_for(1500ms);
-			exit(0);
-		}
-		if (auth::vars::g_logged_in) {
-			std::thread hb_t(auth::run_heartbeat);
-			download_files();
+		//auth::login();
+		//if (auth::vars::g_type == XOR("NULL")) {
+		//	LOG_ERROR(XOR("Failed to validate account"));
+	//	auth::vars::g_logged_in = false;
+	//		std::this_thread::sleep_for(1500ms);
+	//		exit(0);
+	//	}
+		//if (auth::vars::g_logged_in) {
+		//	std::thread hb_t(auth::run_heartbeat);
+		//	download_files();
 
 			LOG(XOR("Welcome to Aether - Grand Theft Auto V"));
 
@@ -95,6 +98,8 @@ namespace base::core {
 					Sleep(1000);
 				}
 			}
+
+
 
 			//base::gui::getTranslationManager()->init();
 
@@ -125,6 +130,8 @@ namespace base::core {
 
 			d3d::initialize();
 
+			auto matchmaing_service = std::make_unique<menu::matchmaking_service>();
+
 			if (!base::hooks::hooks()) {
 				LOG_WARN(XOR("Failed to load hooks, unloading..."));
 				std::this_thread::sleep_for(6s);
@@ -135,12 +142,12 @@ namespace base::core {
 
 			//std::thread sc_t(rage::api::update);
 
-			LOG_SUCCESS(XOR("Loaded in-game patterns"));
-			LOG_SUCCESS(XOR("Loaded in-game hooks"));
+			//LOG_SUCCESS(XOR("Loaded in-game patterns"));
+			//LOG_SUCCESS(XOR("Loaded in-game hooks"));
 
 			g_running = true;
 
-
+			LOG("Aether Initialized Sucessfully");
 			///int ogHeapSize = *patterns::heap_size / 1024 / 1024;
 			//LOG(std::format("Original Memory Heap Size: {}MB", ogHeapSize).c_str());
 			//LOG("Modifying Memory Heap Size...");
@@ -155,10 +162,10 @@ namespace base::core {
 			while (g_running) {
 				//security::run();
 
-				if (!auth::vars::g_logged_in) {
-					Sleep(5000);
-					exit(0);
-				}
+				//if (!auth::vars::g_logged_in) {
+				//	Sleep(5000);
+			//		exit(0);
+			//	}
 
 				if (GetAsyncKeyState(VK_END)) {
 					g_running = false;
@@ -166,13 +173,14 @@ namespace base::core {
 			}
 
 			//script_patcher_service_instance.reset();
+			matchmaing_service.reset();
 			script_hooks.reset();
 			unload(handle);
-		}
-		else {
-			LOG_ERROR(XOR("Unable to login"));
-			auth::vars::g_logged_in = false;
-		}
+		//}
+		//else {
+		//	LOG_ERROR(XOR("Unable to login"));
+	//		auth::vars::g_logged_in = false;
+	//	}
 		//MUTATE_END
 		//VM_DOLPHIN_BLACK_END
 	}

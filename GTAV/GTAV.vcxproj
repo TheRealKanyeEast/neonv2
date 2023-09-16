@@ -131,7 +131,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalUsingDirectories>%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(SolutionDir)GTAV\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -194,6 +194,7 @@
     <ClInclude Include="src\menu\submenus\main.h" />
     <ClInclude Include="src\menu\submenus\main\misc.h" />
     <ClInclude Include="src\menu\submenus\main\network.h" />
+    <ClInclude Include="src\menu\submenus\main\network\network_browsers.h" />
     <ClInclude Include="src\menu\submenus\main\network\network_friends.h" />
     <ClInclude Include="src\menu\submenus\main\network\network_global_chat.h" />
     <ClInclude Include="src\menu\submenus\main\network\network_new_session.h" />
@@ -282,6 +283,7 @@
     <ClInclude Include="src\menu\util\globals.h" />
     <ClInclude Include="src\menu\util\helpers.h" />
     <ClInclude Include="src\menu\util\lists.h" />
+    <ClInclude Include="src\menu\util\matchmaking_service.h" />
     <ClInclude Include="src\menu\util\players.h" />
     <ClInclude Include="src\menu\util\pools.h" />
     <ClInclude Include="src\menu\util\raycast.h" />
@@ -436,16 +438,20 @@
     <ClCompile Include="src\gui\util\translate.cpp" />
     <ClCompile Include="src\hooks\hooks.cpp" />
     <ClCompile Include="src\hooks\hooks\applyPlayerPhysicalIndex.cpp" />
+    <ClCompile Include="src\hooks\hooks\bitBufferLoot.cpp" />
     <ClCompile Include="src\hooks\hooks\bypass.cpp" />
     <ClCompile Include="src\hooks\hooks\canApplyData.cpp" />
     <ClCompile Include="src\hooks\hooks\crash.cpp" />
+    <ClCompile Include="src\hooks\hooks\matchmaking.cpp" />
     <ClCompile Include="src\hooks\hooks\processGameEvent.cpp" />
     <ClCompile Include="src\hooks\hooks\readNewScriptHostMessage.cpp" />
     <ClCompile Include="src\hooks\hooks\receiveBroadcast.cpp" />
     <ClCompile Include="src\hooks\hooks\receiveCloneCreateAck.cpp" />
     <ClCompile Include="src\hooks\hooks\receiveCloneRemove.cpp" />
     <ClCompile Include="src\hooks\hooks\receiveCloneCreate.cpp" />
+    <ClCompile Include="src\hooks\hooks\receiveCloneRemoveAck.cpp" />
     <ClCompile Include="src\hooks\hooks\receiveCloneSync.cpp" />
+    <ClCompile Include="src\hooks\hooks\receiveCloneSyncAck.cpp" />
     <ClCompile Include="src\hooks\hooks\receivedNetworkEvent.cpp" />
     <ClCompile Include="src\hooks\hooks\receiveNetMessage.cpp" />
     <ClCompile Include="src\hooks\hooks\receivePresenceEvent.cpp" />
@@ -454,11 +460,13 @@
     <ClCompile Include="src\hooks\hooks\syncPedOrientation.cpp" />
     <ClCompile Include="src\hooks\hooks\syncPlayerGameState.cpp" />
     <ClCompile Include="src\hooks\hooks\syncVehicleOrientation.cpp" />
+    <ClCompile Include="src\hooks\hooks\updateUIValues.cpp" />
     <ClCompile Include="src\hooks\patterns.cpp" />
     <ClCompile Include="src\memory\pattern.cpp" />
     <ClCompile Include="src\menu\submenus\main.cpp" />
     <ClCompile Include="src\menu\submenus\main\misc.cpp" />
     <ClCompile Include="src\menu\submenus\main\network.cpp" />
+    <ClCompile Include="src\menu\submenus\main\network\network_browsers.cpp" />
     <ClCompile Include="src\menu\submenus\main\network\network_friends.cpp" />
     <ClCompile Include="src\menu\submenus\main\network\network_global_chat.cpp" />
     <ClCompile Include="src\menu\submenus\main\network\network_new_session.cpp" />
@@ -543,6 +551,7 @@
     <ClCompile Include="src\menu\submenus\main\world\weather.cpp" />
     <ClCompile Include="src\menu\submenus\main\world\world_glow.cpp" />
     <ClCompile Include="src\menu\util\globals.cpp" />
+    <ClCompile Include="src\menu\util\matchmaking_service.cpp" />
     <ClCompile Include="src\menu\util\players.cpp" />
     <ClCompile Include="src\menu\util\script_patch.cpp" />
     <ClCompile Include="src\menu\util\script_patcher_service.cpp" />

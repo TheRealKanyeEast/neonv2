@@ -30,7 +30,7 @@ namespace menu::vehicle::tyre_tracks::vars {
 				vfx_wheel[i].m_unk2 = TRUE;
 				vfx_wheel[i].m_unk3 = TRUE;
 				vfx_wheel[i].m_unk4 = TRUE;
-				vfx_wheel[i].m_pressure_min = 0.0f;
+				vfx_wheel[i].m_pressure_min = -1.f;
 				vfx_wheel[i].m_pressure_max = 0.0f;
 			}
 			else {
@@ -159,7 +159,7 @@ namespace menu {
 				vfx_wheel[i].m_unk2 = TRUE;
 				vfx_wheel[i].m_unk3 = TRUE;
 				vfx_wheel[i].m_unk4 = TRUE;
-				vfx_wheel[i].m_pressure_min = 0.0f;
+				vfx_wheel[i].m_pressure_min = -1.f;
 				vfx_wheel[i].m_pressure_max = 0.0f;
 
 			}
@@ -179,8 +179,6 @@ namespace menu {
 		}
 
 		set_color(false, m_vars.m_color);
-
-
 
 		const auto vehicle = PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false);
 	}

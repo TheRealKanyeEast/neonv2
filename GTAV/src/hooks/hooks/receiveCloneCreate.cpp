@@ -15,6 +15,16 @@ namespace base::hooks {
 			return true;
 		}
 
+		g_alignment_tests["RCC"].m_block = false;
+		g_alignment_tests["RCC"].m_monitor = true;
+		g_alignment_tests["RCC"].m_thread_id = GetCurrentThreadId();
+
+		g_alignment_tests["RCC"].m_monitor = false;
+		if (g_alignment_tests["RCC"].m_block) {
+			menu::notify::stacked(std::format("RCC blocked node crash from {}", src->GetName()).c_str());
+			return 69;
+		}
+
 		auto& var = menu::protections::entity::vars::m_vars;
 
 		if (var.entity_type_pos == 1) {
@@ -62,7 +72,7 @@ namespace base::hooks {
 			}
 
 		}
-
+		patterns::g_syncing_object_type = object_type;
 		patterns::g_syncing_player = src;
 		return ogReceiveCloneCreateHook(mgr, src, dst, object_type, object_id, object_flag, buffer, timestamp);
 	}

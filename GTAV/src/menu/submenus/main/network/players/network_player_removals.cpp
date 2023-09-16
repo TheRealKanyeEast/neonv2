@@ -8,8 +8,27 @@
 #include "menu/util/control.h"
 #include "gui/util/notify.h"
 #include <array>
+#include "rage/classes/netGameEvent.h"
 using namespace base::gui;
 using namespace menu::players::selected::removals::vars;
+
+class CRCEvent : public rage::netGameEvent
+{
+public:
+	std::uint16_t m_unk; // 0x30
+};
+
+class REPORTMYSELFEVENT : public rage::netGameEvent
+{
+public:
+	std::uint16_t m_unk; // 0x30
+};
+
+class CASHSPAWNEVENT : public rage::netGameEvent
+{
+public:
+	std::uint16_t m_unk; // 0x30
+};
 
 namespace menu::players::selected::removals::vars {
 	variables m_vars;
@@ -33,6 +52,12 @@ namespace menu::players::selected::removals::vars {
 
 		std::int64_t Args3[] = { (std::int64_t)eRemoteEvent::Crash3, (std::int64_t)PLAYER::PLAYER_ID(), rand() % INT64_MAX, rand() % INT64_MAX };
 		patterns::trigger_script_event(1, Args3, sizeof(Args3) / sizeof(Args3[0]), 1 << player);
+
+		std::int64_t Args4[] = { (std::int64_t)eRemoteEvent::NotificationCrash1, (std::int64_t)PLAYER::PLAYER_ID() };
+		patterns::trigger_script_event(1, Args4, sizeof(Args4) / sizeof(Args4[0]), 1 << player);
+
+		std::int64_t Args5[] = { (std::int64_t)eRemoteEvent::NotificationCrash2, (std::int64_t)PLAYER::PLAYER_ID() };
+		patterns::trigger_script_event(1, Args5, sizeof(Args5) / sizeof(Args5[0]), 1 << player);
 
 		menu::notify::stacked("Player crash sent");
 	}
@@ -199,6 +224,8 @@ namespace menu::players::selected::removals::vars {
 		patterns::trigger_script_event(1, args, arg_count, 1 << player);
 	}
 
+
+
 }
 
 namespace menu {
@@ -237,7 +264,9 @@ namespace menu {
 				.addClick([] { util::fiber::pool::add([] { model_crash(players::vars::m_vars.m_selected_player); }); }));
 
 			core->addOption(buttonOption("Pickup Crash")
-				.addClick([] { util::fiber::pool::add([] { pickup_crash(players::vars::m_vars.m_selected_player); }); }));
+				.addClick([] { util::fiber::pool::add([] { pickup_crash(players::vars::m_vars.m_selected_player); }); })); 
+
+		
 
 			});
 
@@ -245,7 +274,5 @@ namespace menu {
 
 	void network_players_removals_menu::update() {
 		render();
-
-
 	}
 }

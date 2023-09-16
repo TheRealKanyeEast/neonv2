@@ -4,7 +4,7 @@
 
 namespace menu::lists {
 	struct weapons { std::string name; uint32_t id; };
-	std::vector<weapons> g_weapons = {
+	inline std::vector<weapons> g_weapons = {
 		{ "Pistol", 0x1b06d571 },
 		{ "Pistol Mk II", 0xbfe256d4 },
 		{ "Combat Pistol", 0x5ef9fec4 },
@@ -122,7 +122,7 @@ namespace menu::lists {
 		uint32_t hash;
 	};
 
-	std::vector<weapon_component> weapon_components = {
+	inline std::vector<weapon_component> weapon_components = {
 		// Barrel
 		{"Default", 0xCCFD2AC5},
 		{"Suppressor", 0xA73D4664},

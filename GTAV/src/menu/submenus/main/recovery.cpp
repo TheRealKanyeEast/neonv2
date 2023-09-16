@@ -118,6 +118,20 @@ namespace menu::recovery::vars {
 			});
 	}
 
+	void job_bonus() {
+		rage::engine::add_basket_transaction(rage::joaat("CATEGORY_SERVICE_WITH_THRESHOLD"), 1445302971, 4,
+			{
+				{ (int)rage::joaat("SERVICE_EARN_JOB_BONUS_HEIST_AWARD"), 1, 2000000, 0, 1 },
+			});
+	}
+
+	void tuner_robbery_finale() {
+		rage::engine::add_basket_transaction(rage::joaat("CATEGORY_SERVICE_WITH_THRESHOLD"), 1445302971, 4,
+			{
+				{ (int)rage::joaat("SERVICE_EARN_TUNER_ROBBERY_FINALE"), 1, 2000000, 0, 1 },
+			});
+	}
+
 	const char* characters[] = {
 		"PLACEHOLDER", "PLACEHOLDER"
 	}; 
@@ -379,6 +393,12 @@ namespace menu {
 			core->addOption(buttonOption("Gang Operations (2M)")
 				.addClick(gang_award));
 
+			core->addOption(buttonOption("Job Bonus (2M)")
+				.addClick(job_bonus));
+
+			core->addOption(buttonOption("Tuner Robbery Finale (2M)")
+				.addClick(tuner_robbery_finale));
+
 			core->addOption(buttonOption("Daily Objective (1M)")
 				.addClick(daily_objective));
 
@@ -413,6 +433,53 @@ namespace menu {
 		render();
 		getRecoveryLevelMenu()->update();
 		getRecoveryUnlocksMenu()->update();
+
+
+		if (m_vars.m_loop2) {
+
+			*script_global(278108).as<int*>() = 6000000;
+			*script_global(277873).as<int*>() = 0;
+			*script_global(277874).as<int*>() = 0;
+
+			util::fiber::go_to_main();
+
+			if (auto script = rage::engine::find_script_thread("gb_contraband_sell"_joaat)) {
+				if (*script_local(script->m_stack, 2).as<int*>() == 1) {
+					*script_local(script->m_stack, 1136).as<int*>() = 1;
+					*script_local(script->m_stack, 596).as<int*>() = 0;
+					*script_local(script->m_stack, 1125).as<int*>() = 0;
+					*script_local(script->m_stack, 548).as<int*>() = 7;
+					util::fiber::sleep(500);
+					*script_local(script->m_stack, 542).as<int*>() = 99999;
+				}
+			}
+
+			if (auto script = rage::engine::find_script_thread("appsecuroserv"_joaat)) {
+				if (*script_local(script->m_stack, 2).as<int*>() == 1) {
+					util::fiber::sleep(500);
+					*script_local(script->m_stack, 737).as<int*>() = 1;
+					util::fiber::sleep(200);
+					*script_local(script->m_stack, 738).as<int*>() = 1;
+					util::fiber::sleep(200);
+					*script_local(script->m_stack, 556).as<int*>() = 3012;
+					util::fiber::sleep(1000);
+				}
+			}
+
+			if (auto script = rage::engine::find_script_thread("gb_contraband_sell"_joaat)) {
+				if (*script_local(script->m_stack, 2).as<int*>() != 1) {
+					util::fiber::sleep(500);
+					if (auto script2 = rage::engine::find_script_thread("am_mp_warehouse"_joaat)) {
+						if (*script_local(script2->m_stack, 2).as<int*>() == 1) {
+							SCRIPT::REQUEST_SCRIPT("appsecuroserv");
+							SYSTEM::START_NEW_SCRIPT("appsecuroserv", 8344);
+							SCRIPT::SET_SCRIPT_AS_NO_LONGER_NEEDED("appsecuroserv");
+						}
+					}
+
+				}
+			}
+		}
 
 		int m_timer = 0;
 		if (m_vars.m_loop) {

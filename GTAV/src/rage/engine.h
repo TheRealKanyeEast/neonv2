@@ -10,7 +10,8 @@
 
 #include "rage/classes/script_handler.h"
 #include "rage/classes/CNetworkPlayerMgr.h"
-
+#include "rage/classes/CNetGamePlayer.h"
+#include "rage/classes/CPlayerInfo.h"
 #include "rage/classes/netShopping.h"
 #include "util/log.h"
 #include "util/math.h"
@@ -233,7 +234,7 @@ namespace rage::engine {
 
 	inline bool force_host(rage::joaat_t hash) {
 		if (auto launcher = find_script_thread(hash); launcher && launcher->m_net_component) {
-			for (int i = 0; !launcher->m_net_component->is_local_player_host(); i++) {
+			for (int i = 0; !((CGameScriptHandlerNetComponent*)launcher->m_net_component)->is_local_player_host(); i++) {
 				if (i > 200)
 					return false;
 
@@ -274,13 +275,17 @@ namespace rage::engine {
 				if (!launcher->m_net_component)
 					return false;
 
-				for (auto& plyr : (*patterns::network_player_mgr)->m_player_list) {
-					if (launcher->m_net_component->is_player_a_participant(plyr)) {
-						if (*menu::script_local(launcher->m_stack, 232).at(plyr->m_player_id, 3).at(2).as<int*>() == state) {
-							set = true;
-							break;
+				for (uint32_t i = 0; i < 32; i++) {
+					if (patterns::get_net_player(i)) {
+						auto plyr = patterns::get_net_player(i);
+						if (((CGameScriptHandlerNetComponent*)launcher->m_net_component)->is_player_a_participant(plyr)) {
+							if (*menu::script_local(launcher->m_stack, 232).at(plyr->m_player_id, 3).at(2).as<int*>() == state) {
+								set = true;
+								break;
+							}
 						}
 					}
+					
 				}
 
 				return set;

@@ -140,6 +140,11 @@ namespace base::hooks {
 				}
 				break;
 			}
+			case rage::netConnection::eNetMessage::MsgRadioStationSyncRequest:
+			{
+				return true;
+				break;
+			}
 			case rage::netConnection::eNetMessage::MsgNetComplaint:
 			{
 				uint64_t host_token{};

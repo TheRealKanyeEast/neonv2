@@ -6,6 +6,7 @@
 #include "rage/classes/WebConstuction.h"
 #include "rage/classes/enums.h"
 #include "rage/classes/netShopping.h"
+#include "rage/classes/SyncTree.h"
 class CPlayerGamerDataNode;
 class CPlayerGameStateDataNode;
 class CPedInventoryDataNode;
@@ -30,6 +31,7 @@ class CFoundDevice;
 class IDirectSoundCapture;
 class CVehicleProximityMigrationDataNode;
 class CTrainGameStateDataNode;
+class CPed;
 namespace rage
 {
 	class snSession;
@@ -41,9 +43,12 @@ namespace rage
 	class rlGamerInfo;
 	class netConnectionManager;
 	class datBitBuffer;
+	struct datBitBufferSyncInstance;
 	class rlMetric;
-	class gs_session;
+	struct gs_session;
 	class rlTaskStatus;
+	class TimecycleKeyframeData;
+	class fwEntity;
 
 	namespace netConnection
 	{
@@ -112,7 +117,7 @@ namespace base::hooks {
 	void receivedNetworkEventHook(void* _this, CNetGamePlayer* sender, CNetGamePlayer* receiver, uint16_t event_id, int event_index, int event_bitset, uint32_t buffer_size, rage::datBitBuffer* buffer);
 	inline decltype(&receivedNetworkEventHook) ogReceivedNetworkEventHook;
 
-	eAckCode receiveCloneSyncHook(CNetworkObjectMgr* mgr, CNetGamePlayer* src, CNetGamePlayer* dst, eNetObjType object_type, uint16_t object_id, rage::datBitBuffer* buffer, uint16_t unk, uint32_t timestamp);
+	int receiveCloneSyncHook(CNetworkObjectMgr* mgr, CNetGamePlayer* src, CNetGamePlayer* dst, eNetObjType object_type, uint16_t object_id, rage::datBitBuffer* buffer, uint16_t unk, uint32_t timestamp);
 	inline decltype(&receiveCloneSyncHook) ogReceiveCloneSyncHook;
 
 	bool receiveCloneCreateHook(CNetworkObjectMgr* mgr, CNetGamePlayer* src, CNetGamePlayer* dst, eNetObjType object_type, int32_t object_id, int32_t object_flag, rage::datBitBuffer* buffer, int32_t timestamp);
@@ -121,8 +126,14 @@ namespace base::hooks {
 	bool receiveCloneRemoveHook(CNetworkObjectMgr* mgr, CNetGamePlayer* src, CNetGamePlayer* dst, int32_t object_id, int32_t timestamp);
 	inline decltype(&receiveCloneRemoveHook) ogReceiveCloneRemoveHook;
 
+	void receiveCloneRemoveAckHook(CNetworkObjectMgr* mgr, CNetGamePlayer* src, CNetGamePlayer* dst, int32_t object_id, int32_t timestamp);
+	inline decltype(&receiveCloneRemoveAckHook) ogReceiveCloneRemoveAckHook;
+
 	void receiveCloneCreateAckHook(CNetworkObjectMgr* mgr, CNetGamePlayer* src, CNetGamePlayer* dst, uint16_t object_id, int32_t ack_code);
 	inline decltype(&receiveCloneCreateAckHook) ogReceiveCloneCreateAckHook;
+
+	void receiveCloneSyncAckHook(CNetworkObjectMgr* mgr, CNetGamePlayer* src, CNetGamePlayer* dst, rage::datBitBuffer* buffer, uint16_t object_id, int32_t ack_code);
+	inline decltype(&receiveCloneSyncAckHook) ogReceiveCloneSyncAckHook;
 
 	bool canApplyDataHook(rage::netSyncTree* tree, rage::netObject* object);
 	inline decltype(&canApplyDataHook) ogCanApplyDataHook;
@@ -194,9 +205,144 @@ namespace base::hooks {
 	void syncPedHealthHook(uint64_t rcx, uint64_t rdx);
 	inline decltype(&syncPedHealthHook) ogSyncPedHealthHook;
 
+	/*void syncPlayerAppearanceDataNodeHook(rage::netObject* player, CPlayerAppearanceDataNode* node);//first arg is incorrect
+	inline decltype(&syncPlayerAppearanceDataNodeHook) ogSyncPlayerAppearanceDataNodeHook;*/
+
 	void readTrainGameStateHook(rage::netObject* player, CTrainGameStateDataNode* node);
 	inline decltype(&readTrainGameStateHook) ogReadTrainGameStateHook;
 
 	void* infiniteTrainCrashHook(void* carriage);
 	inline decltype(&infiniteTrainCrashHook) ogInfiniteTrainCrashHook;
+
+	void* renderPedHook(__int64 renderer, CPed* ped, __int64 a3, __int64 a4);
+	inline decltype(&renderPedHook) ogRenderPedHook;
+
+	void renderEntityHook(__int64 renderer, rage::fwEntity* entity, int unk, bool a4);
+	inline decltype(&renderEntityHook) ogRenderEntityHook;
+
+	__int64 renderBigPedHook(__int64 renderer, CPed* ped, __int64 a3, __int64 a4);
+	inline decltype(&renderBigPedHook) ogRenderBigPedHook;
+
+	bool processMatchmakingFindResponseHook(void* _this, void* rdx, rage::JSONNode* node, int* unk);
+	inline decltype(&processMatchmakingFindResponseHook) ogProcessMatchmakingFindResponseHook;
+	
+	//pdn2: 48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 41 54 41 55 41 56 41 57 48 83 EC 30 48 8B 01 4C 8B F2 33 D2 48 8B F1 FF 90 ? ? ? ? 84 C0 0F 84
+	bool compressDataNodeHook2(rage::netSyncDataNode* node, rage::netObject* object);
+	inline decltype(&compressDataNodeHook2) ogCompressDataNodeHook2;
+
+	uint64_t updateUIValuesHook(int64_t _this, rage::TimecycleKeyframeData* data);
+	inline decltype(&updateUIValuesHook) ogUpdateUIValuesHook;
+	//uint64_t syncPedMovementDataNodeHook(CPedMovementDataNode* node, rage::netObject* player);
+	//inline decltype(&syncPedMovementDataNodeHook) ogSyncPedMovementDataNodeHook;
+	//bool sendSessionMatchmakingAttributesHook(void* a1, rage::rlSessionInfo* info, std::uint64_t session_id, bool use_session_id, MatchmakingAttributes* attributes);
+	//inline decltype(&sendSessionMatchmakingAttributesHook) ogSendSessionMatchmakingAttributesHook;
+
+
+
+	bool read_unsigned_int_from_buffer(rage::datBitBufferSyncInstance* _this, uint32_t* output, int count);
+	inline decltype(&read_unsigned_int_from_buffer) read_unsigned_int_from_buffer_t;
+
+	bool read_unsigned_short_from_buffer(rage::datBitBufferSyncInstance* _this, uint16_t* output, int count);
+	inline decltype(&read_unsigned_short_from_buffer) read_unsigned_short_from_buffer_t;
+
+	bool read_unsigned_char_from_buffer(rage::datBitBufferSyncInstance* _this, uint8_t* output, int count);
+	inline decltype(&read_unsigned_char_from_buffer) read_unsigned_char_from_buffer_t;
+
+	bool read_int_from_buffer(rage::datBitBufferSyncInstance* _this, int* output, int count);
+	inline decltype(&read_int_from_buffer) read_int_from_buffer_t;
+
+	bool read_short_from_buffer(rage::datBitBufferSyncInstance* _this, short* output, int count);
+	inline decltype(&read_short_from_buffer) read_short_from_buffer_t;
+
+	bool read_char_from_buffer(rage::datBitBufferSyncInstance* _this, char* output, int count);
+	inline decltype(&read_char_from_buffer) read_char_from_buffer_t;
+
+	bool read_bool_from_buffer(rage::datBitBufferSyncInstance* _this, bool* output);
+	inline decltype(&read_bool_from_buffer) read_bool_from_buffer_t;
+
+	bool read_long_long_from_buffer(rage::datBitBufferSyncInstance* _this, long long* output, int count);
+	inline decltype(&read_long_long_from_buffer) read_long_long_from_buffer_t;
+
+	bool read_unsigned_long_long_from_buffer(rage::datBitBufferSyncInstance* _this, uint64_t* output, int count);
+	inline decltype(&read_unsigned_long_long_from_buffer) read_unsigned_long_long_from_buffer_t;
+
+	bool read_float_from_buffer(rage::datBitBufferSyncInstance* _this, float* output, float mod, int count);
+	inline decltype(&read_float_from_buffer) read_float_from_buffer_t;
+
+	bool read_unsigned_float_from_buffer(rage::datBitBufferSyncInstance* _this, float* output, float mod, int count);
+	inline decltype(&read_unsigned_float_from_buffer) read_unsigned_float_from_buffer_t;
+
+	bool read_network_id_from_buffer(rage::datBitBufferSyncInstance* _this, short* output);
+	inline decltype(&read_network_id_from_buffer) read_network_id_from_buffer_t;
+
+	bool read_array_from_buffer(rage::datBitBufferSyncInstance* _this, int* output, int count, int unk);
+	inline decltype(&read_array_from_buffer) read_array_from_buffer_t;
+
+	bool read_string_from_buffer(rage::datBitBufferSyncInstance* _this, char* output, int length);
+	inline decltype(&read_string_from_buffer) read_string_from_buffer_t;
+
+	int task_ambient_clips(uint64_t _this, int a2, int a3);
+	inline decltype(&task_ambient_clips) task_ambient_clips_t;
+
+	void serialize_parachute_task(__int64 info, rage::CSyncDataBase* serializer);
+	inline decltype(&serialize_parachute_task) serialize_parachute_task_t;
+
+	bool read_bitbuf_dword(rage::datBitBuffer * buffer, PVOID read, int bits);
+	inline decltype(&read_bitbuf_dword) read_bitbuf_dword_t;
+
+	bool read_bitbuf_string(rage::datBitBuffer* buffer, char* read, int bits);
+	inline decltype(&read_bitbuf_string) read_bitbuf_string_t;
+
+	bool read_bitbuf_bool(rage::datBitBuffer* buffer, bool* read, int bits);
+	inline decltype(&read_bitbuf_bool) read_bitbuf_bool_t;
+
+	bool read_bitbuf_array(rage::datBitBuffer* buffer, PVOID read, int bits, int unk);
+	inline decltype(&read_bitbuf_array) read_bitbuf_array_t;
+
+
+	bool write_unsigned_int_from_buffer();
+	inline decltype(&write_unsigned_int_from_buffer) write_unsigned_int_from_buffer_t;
+
+	bool write_unsigned_short_from_buffer(rage::datBitBufferSyncInstance* _this, uint16_t* output, int count);
+	inline decltype(&write_unsigned_short_from_buffer) write_unsigned_short_from_buffer_t;
+
+	bool write_unsigned_char_from_buffer(rage::datBitBufferSyncInstance* _this, uint8_t* output, int count);
+	inline decltype(&write_unsigned_char_from_buffer) write_unsigned_char_from_buffer_t;
+
+	bool write_int_from_buffer(rage::datBitBufferSyncInstance* _this, int* output, int count);
+	inline decltype(&write_int_from_buffer) write_int_from_buffer_t;
+
+	bool write_short_from_buffer(rage::datBitBufferSyncInstance* _this, short* output, int count);
+	inline decltype(&write_short_from_buffer) write_short_from_buffer_t;
+
+	bool write_char_from_buffer(rage::datBitBufferSyncInstance* _this, char* output, int count);
+	inline decltype(&write_char_from_buffer) write_char_from_buffer_t;
+
+	bool write_bool_from_buffer(rage::datBitBufferSyncInstance* _this, bool* output);
+	inline decltype(&write_bool_from_buffer) write_bool_from_buffer_t;
+
+	bool write_long_long_from_buffer(rage::datBitBufferSyncInstance* _this, long long* output, int count);
+	inline decltype(&write_long_long_from_buffer) write_long_long_from_buffer_t;
+
+	bool write_unsigned_long_long_from_buffer(rage::datBitBufferSyncInstance* _this, uint64_t* output, int count);
+	inline decltype(&write_unsigned_long_long_from_buffer) write_unsigned_long_long_from_buffer_t;
+
+	bool write_float_from_buffer(rage::datBitBufferSyncInstance* _this, float* output, float mod, int count);
+	inline decltype(&write_float_from_buffer) write_float_from_buffer_t;
+
+	bool write_unsigned_float_from_buffer(rage::datBitBufferSyncInstance* _this, float* output, float mod, int count);
+	inline decltype(&write_unsigned_float_from_buffer) write_unsigned_float_from_buffer_t;
+
+	bool write_network_id_from_buffer(rage::datBitBufferSyncInstance* _this, short* output);
+	inline decltype(&write_network_id_from_buffer) write_network_id_from_buffer_t;
+
+	bool write_array_from_buffer(rage::datBitBufferSyncInstance* _this, int* output, int count, int unk);
+	inline decltype(&write_array_from_buffer) write_array_from_buffer_t;
+
+	bool write_string_from_buffer(rage::datBitBufferSyncInstance* _this, char* output, int length);
+	inline decltype(&write_string_from_buffer) write_string_from_buffer_t;
+
+
+	void updatePlayerScriptStatus(rage::scriptHandlerNetComponent* component, uint64_t rdx, uint64_t r8);
+	inline decltype(&updatePlayerScriptStatus) ogUpdatePlayerScriptStatus;
 }

@@ -36,46 +36,81 @@
 #include "security/themdia/secure_engine.h"
 #include "rage/classes/netShopping.h"
 #include "rage/classes/dataNodes.h"
+#include "menu/submenus/main/network/network_spoofing.h"
 using namespace memory;
 
 
 
 namespace base::hooks {
+
+
+	bool(*join_timeout_fix_t)(uint64_t);
+	bool join_timeout_fix(uint64_t config) {
+		uint64_t g_game_base = g_game_address.first;
+		int offset = 0x0;
+
+		if (!caller::call<uint8_t>(g_timeout_fix_funcs[0], *(uint64_t*)(config + 0x20 + offset))) {
+			return false;
+		}
+
+		if (!*(uint64_t*)(*(uint64_t*)(g_timeout_fix_funcs[1]) + 8)) {
+			return false;
+		}
+
+		uint64_t v3 = *(uint64_t*)(g_timeout_fix_funcs[2]);
+
+		if (*(uint32_t*)(v3 + 0x288)) {
+			uint32_t current_time = timeGetTime() | 1;
+
+			uint32_t max_timeout = caller::call<uint32_t>(g_timeout_fix_funcs[5], config);
+			if (current_time - *(uint32_t*)(config + 0x869C + offset) >= max_timeout - 1) {
+				LOG(XOR("Join timeout detected"));
+
+				*(uint32_t*)(config + 0x869C + offset) = current_time;
+				*(uint32_t*)(v3 + 0x288) = 0;
+				*(uint8_t*)(config + 0x1A96C + offset) = 0;
+				return true;
+			}
+		}
+
+		return join_timeout_fix_t(config);
+	}
+
 	bool patterns() {
 		batch batch;
 		bool out = true;
-	    VM_TIGER_BLACK_START
-			batch.Add({ XOR("GS"), XOR("83 3D ? ? ? ? ? 75 17 8B 43 20") }, [](Ptr ptr) {
+	  // VM_TIGER_BLACK_START
+		batch.Add({ XOR("GS"), XOR("83 3D ? ? ? ? ? 75 17 8B 43 20") }, [](Ptr ptr) {
 			patterns::game_state = ptr.lea().as<decltype(patterns::game_state)>();
 			return util::is_valid_ptr(patterns::game_state);
-				}, out);
+		}, out);
 
 		batch.Add({ XOR("NRT"), XOR("48 8D 0D ? ? ? ? 48 8B 14 FA E8 ? ? ? ? 48 85 C0 75 0A") }, [](Ptr ptr) {
 			patterns::init_native_tables = ptr.sub(37).as<uint64_t>();
 			patterns::native_registration_table = ptr.from_instruction().as<decltype(patterns::native_registration_table)>();
 			patterns::get_native_handler = ptr.add(12).rip().as<decltype(patterns::get_native_handler)>();
 			return hooking::detour("INT", patterns::init_native_tables, &initNativeTablesHook, &ogInitNativeTablesHook);
-			}, out);
+		}, out);
 
 		batch.Add({ XOR("JRR"), XOR("23 C3 C1 E0 0C") }, [](Ptr ptr) {
 			patterns::jmp_rbx_register = ptr.sub(1).as<decltype(patterns::jmp_rbx_register)>();
 			return util::is_valid_ptr(patterns::jmp_rbx_register);
-			}, out);
+		}, out);
 
 		batch.Add({ XOR("SP"), XOR("48 8B 1D ? ? ? ? 41 83 F8 FF") }, [](Ptr ptr) {
 			patterns::script_program = ptr.from_instruction().as<decltype(patterns::script_program)>();
 			return util::is_valid_ptr(patterns::script_program);
-			}, out);
+		}, out);
 
 		batch.Add({ XOR("GFX_FT"), XOR("48 8B 05 ? ? ? ? 48 8B CB 48 69 C9 ? ? ? ? 40 38 AC 01 ? ? ? ? 74 0F E8 ? ? ? ? 0F 28 CE 8B CB E8 ? ? ? ? F3 0F 10 05 ? ? ? ? B2 01 E8") }, [](Ptr ptr) {
 			patterns::font_table = ptr.from_instruction().as<uint64_t>();
 			return util::is_valid_ptr(patterns::font_table);
-			}, out);
+		}, out);
 
 		batch.Add({ XOR("GFX_FMH"), XOR("48 8B 0D ? ? ? ? E8 ? ? ? ? 48 8B 0D ? ? ? ? 33 DB 48 85 C9") }, [](Ptr ptr) {
 			patterns::font_memory_helper = ptr.from_instruction().as<uint64_t>();
 			return util::is_valid_ptr(patterns::font_memory_helper);
-			}, out);
+		}, out);
 
 		batch.Add({ XOR("GFX_D"), XOR("48 83 EC 28 F0 FF 49 08 75 0F 48 85 C9 74 0A 48 8B 01 BA ? ? ? ? FF 10 48 83 C4 28 C3") }, [](Ptr ptr) {
 			patterns::destruct = ptr.as<uint64_t>();
@@ -85,7 +120,7 @@ namespace base::hooks {
 		batch.Add({ XOR("GFX_CGF"), XOR("40 53 48 83 EC 20 C7 41 ? ? ? ? ? 48 8D 05 ? ? ? ? 48 8B D9 48 89 01 C7 41 ? ? ? ? ? 48 8D 05 ? ? ? ? 48 89 01") }, [](Ptr ptr) {
 			patterns::construct_gfx_font = ptr.as<uint64_t>();//gfx :thumbs_up:
 			return util::is_valid_ptr(patterns::construct_gfx_font);
-			}, out);
+		}, out);
 
 		batch.Add({ XOR("GFX_CIFF"), XOR("40 55 48 8B EC 48 81 EC ? ? ? ? 49 8B 00 F3 0F 10 02 F3 0F 10 4A ? 83 65 B8 00 83 65 C0 00 83 65 C4 00 F3") }, [](Ptr ptr) {
 			patterns::create_id_for_font = ptr.as<uint64_t>();
@@ -123,7 +158,7 @@ namespace base::hooks {
 
 		batch.Add({ XOR("STTN"), XOR("48 8B C8 FF 52 30 84 C0 74 05 48") }, [](Ptr ptr) {
 			patterns::set_this_thread_networked = ptr.add(8).as<decltype(patterns::set_this_thread_networked)>();
-			}, out);
+		}, out);
 
 		batch.Add({ XOR("SG"), XOR("48 8D 15 ? ? ? ? 4C 8B C0 E8 ? ? ? ? 48 85 FF 48 89 1D") }, [](Ptr ptr) {
 			patterns::script_globals = ptr.from_instruction().as<std::int64_t**>();
@@ -195,7 +230,11 @@ namespace base::hooks {
 
 		batch.Add({ XOR("PRP"), XOR("48 8B 0D ? ? ? ? 49 8B D0 E8 ? ? ? ? 39 03 EB 19 41 80 78 ? ? 75 15 48 8B 0D ? ? ? ? 49 8B D0 E8 ? ? ? ? 39 43 04") }, [](Ptr ptr) {
 			patterns::prop_pool = ptr.from_instruction().as<decltype(patterns::prop_pool)>();
-			}, out);
+		}, out);
+
+		batch.Add({ XOR("PUP"), XOR("48 8B 05 ? ? ? ? 0F B7 48 10 66 03 CA 66 44 03 C1 41 80 F9 04") }, [](Ptr ptr) {
+			patterns::pickup_pool = ptr.from_instruction().as<decltype(patterns::pickup_pool)>();
+		}, out);
 
 		batch.Add({ XOR("VEP"), XOR("4C 8B 25 ? ? ? ? 8B 29 33 F6 49 8B 04 24 33 DB 4C 8D 71 08 44 8B 78 08 45 85 FF 0F 8E ? ? ? ? 4D 8B 0C 24 41 3B 59 08 7D 29 49 8B 51 30 44 8B C3 8B CB 49 C1 E8 05 83 E1 1F 44 8B D3 42 8B 04 82") }, [](Ptr ptr) {
 			patterns::vehicle_pool = ptr.from_instruction().as<decltype(patterns::vehicle_pool)>();
@@ -303,21 +342,6 @@ namespace base::hooks {
 			patterns::send_event_ack = ptr.call().as<decltype(patterns::send_event_ack)>();
 			}, out);
 
-		batch.Add({ XOR("RBWD"), XOR("48 89 74 24 ? 57 48 83 EC 20 48 8B D9 33 C9 41 8B F0 8A") }, [](Ptr ptr) {
-			patterns::read_bitbuf_dword = ptr.sub(5).as<decltype(patterns::read_bitbuf_dword)>();
-			}, out);
-
-		batch.Add({ XOR("RBA"), XOR("48 89 5C 24 ? 57 48 83 EC 30 41 8B F8 4C") }, [](Ptr ptr) {
-			patterns::read_bitbuf_array = ptr.as<decltype(patterns::read_bitbuf_array)>();
-			}, out);
-
-		batch.Add({ XOR("RBS"), XOR("48 89 5C 24 08 48 89 6C 24 18 56 57 41 56 48 83 EC 20 48 8B F2 45") }, [](Ptr ptr) {
-			patterns::read_bitbuf_string = ptr.as<decltype(patterns::read_bitbuf_string)>();
-			}, out);
-
-		batch.Add({ XOR("RBB"), XOR("E8 ? ? ? ? 84 C0 74 41 48 8D 56 2C") }, [](Ptr ptr) {
-			patterns::read_bitbuf_bool = ptr.call().as<decltype(patterns::read_bitbuf_bool)>();
-			}, out);
 
 		batch.Add({ XOR("WBD"), XOR("48 8B C4 48 89 58 08 48 89 68 10 48 89 70 18 48 89 78 20 41 56 48 83 EC 20 8B EA BF 01") }, [](Ptr ptr) {
 			patterns::write_bitbuf_dword = ptr.as<decltype(patterns::write_bitbuf_dword)>();
@@ -408,7 +432,7 @@ namespace base::hooks {
 			}, out);
 
 		batch.Add({ XOR("VFX_W"), XOR("48 8D 0D ? ? ? ? 44 8A CE 44 8A C5 8B D3 44 89 64 24 ? 89 7C 24 20 E8 ? ? ? ? 8D") }, [](Ptr ptr) {
-			patterns::ui_weather = ptr.from_instruction().add(0x60).as<rage::ui_weather*>();
+			patterns::ui_weather = ptr.from_instruction().add(0x60).as<rage::TimecycleKeyframeData*>();
 			}, out);
 
 		batch.Add({ XOR("VFX_WFX"), XOR("4C 8D 35 B6 6F 8E 01") }, [](Ptr ptr) {
@@ -423,16 +447,60 @@ namespace base::hooks {
 			patterns::visual_settings = ptr.from_instruction().as<rage::CVisualVfx*>();
 			}, out);
 
-		batch.Add({ XOR("VFX_UUV"), XOR("48 83 EC 18 48 8B 0D ? ? ? ? 4C 8D 05 ? ? ? ? F3 0F 10 89 ? ? ? ? F3 0F 10 81 ? ? ? ? F3 0F 10 99 ? ? ? ? 0F 14 D9") }, [](Ptr ptr) {
-			patterns::update_ui_values = ptr.as<decltype(patterns::update_ui_values)>();
-			}, out);
-
 		batch.Add({ XOR("VFX_UUV2"), XOR("48 8B C4 53 48 81 EC ? ? ? ? 80 B9 ? ? ? ? ? 0F 29 70 E8 0F 29 78 D8 48 8B D9 44 0F 29 40 ? 44 0F 29 48 ? 44") }, [](Ptr ptr) {
 			patterns::update_ui_values_2 = ptr.as<decltype(patterns::update_ui_values_2)>();
 			}, out);
 
 		batch.Add({ XOR("MISC_MR"), XOR("40 53 48 83 EC 20 8A D9 48 8D 0D ? ? ? ? E8 ? ? ? ? 48 8D 0D ? ? ? ? 8B D0 E8 ? ? ? ? 48 85 C0 74 10") }, [](Ptr ptr) {
 			patterns::mobile_radio = ptr.add(1).as<decltype(patterns::mobile_radio)>();
+			}, out);
+
+		batch.Add({ XOR("DHM"), XOR("48 89 05 ? ? ? ? EB 07 48 89 1D ? ? ? ? 48 8B CB") }, [](Ptr ptr) {
+			patterns::draw_handler_mgr = ptr.from_instruction().as<PVOID*>();
+		}, out);
+
+		batch.Add({ XOR("WD"), XOR("48 8D 0D ? ? ? ? 48 98 4C 8B C6 41 8B 44 85 ? 0D ? ? ? ? 89 44 24 30 83 64 24 ? ? C6 44 24") }, [](Ptr ptr) {
+			patterns::waypoint_data = ptr.from_instruction().as<rage::waypoint_data*>();
+		}, out);
+
+		batch.Add({ XOR("RR"), XOR("48 89 5C 24 08 57 48 83 EC 20 80 3D ? ? ? ? ? 48 8B FA 48 8B D9 74 13") }, [](Ptr ptr) {
+			patterns::remove_reference = ptr.from_instruction().as<decltype(patterns::remove_reference)>();
+		}, out);
+
+		batch.Add({ XOR("IPP"), XOR("4C 8B 05 ? ? ? ? 4C 0F BF 0B") }, [](Ptr ptr) {
+			patterns::interior_proxy_pool = ptr.from_instruction().as<decltype(patterns::interior_proxy_pool)>();
+		}, out);
+
+		batch.Add({ XOR("TCA"), XOR("48 8D 0D ? ? ? ? E8 ? ? ? ? 44 88 64 24 30 4C 8D 8C 24 60 02 00 00") }, [](Ptr ptr) {
+			patterns::train_config_array = ptr.from_instruction().as<decltype(patterns::train_config_array)>();
+			}, out);
+
+		batch.Add({ XOR("NEM"), XOR("48 39 99 D0 00 00 00 74 3C") }, [](Ptr ptr) {
+			patterns::m_net_event_manager = ptr.add(0xC).rip().as<rage::netEventMgr**>();
+			patterns::m_check_event_queue = ptr.add(0x13).rip().as<patterns::check_event_queue_t>();
+			patterns::m_net_event_pool = ptr.add(0x1A).rip().as<GenericPool**>();
+			patterns::m_get_new_pool_item = ptr.add(0x1F).rip().as<patterns::get_new_pool_item_t>();
+			patterns::m_queue_network_event = ptr.add(0x41).rip().as<patterns::queue_network_event_t>();
+		}, out);
+
+		//40 53 48 83 EC 20 8A D9 8A D1 48 8D 0D ? ? ? ? 45 33 C0 E8 ? ? ? ? 88 1D ? ? ? ? 48 83 C4 20
+
+		batch.Add({ XOR("HVBO"), XOR("40 53 48 83 EC 20 8A D9 8A D1 48 8D 0D ? ? ? ? 45 33 C0 E8 ? ? ? ? 88 1D ? ? ? ? 48 83 C4 20") }, [](Ptr ptr) {
+			patterns::set_seethrough = ptr.as<decltype(patterns::set_seethrough)>();
+		}, out);
+
+		batch.Add({ XOR("OQ"), XOR("40 53 48 83 EC 20 33 DB 44 8D 43 01 41 3B C8 75") }, [](Ptr ptr) {
+			patterns::ocean_quads.m_ocean = (rage::ocean_quad_info*)ptr.add(118).from_instruction().as<decltype(patterns::ocean_quads.m_ocean)>();
+			patterns::ocean_quads.m_calming = (rage::ocean_quad_info*)ptr.add(118).from_instruction().add(0xC).as<decltype(patterns::ocean_quads.m_calming)>();
+			patterns::ocean_quads.m_wave = (rage::ocean_quad_info*)ptr.add(118).from_instruction().add(0x25).as<decltype(patterns::ocean_quads.m_wave)>();
+		}, out);
+
+		batch.Add({ XOR("WT"), XOR("4C 8D 0D ? ? ? ? 48 0F 45 D1 48 8B 0D ? ? ? ? 48 83 64 24 ? ? 4C 8D 05 ? ? ? ? E8 ? ? ? ? 84 C0 0F 85") }, [](Ptr ptr) {
+			patterns::water_tune = (rage::water_tune*)ptr.from_instruction().as<decltype(patterns::water_tune)>();
+		}, out);
+
+		batch.Add({ XOR("VFXL"), XOR("48 8D 05 ? ? ? ? 4C 8D 1C 7F 48 8B 4A 10 49 C1 E3 05 4C 03 D8 0F B6 85 ? ? ? ? 48 23 C8 8B 42 18 48 3B") }, [](Ptr ptr) {
+			patterns::vfx_liquid = ptr.from_instruction().as<decltype(patterns::vfx_liquid)>();
 			}, out);
 
 		/*batch.Add({ XOR("RI2"), XOR("0F B7 44 24 ? 66 89 44 4E") }, [](Ptr ptr) {
@@ -448,14 +516,14 @@ namespace base::hooks {
 			patterns::max_wanted_level_2 = byte_patch::make(ptr.add(14).rip().as<uint32_t*>(), 0).get();
 			}, out);
 
-		VM_TIGER_BLACK_END	
+		//VM_TIGER_BLACK_END	
 
 		auto mod = memory::module(XOR("GTA5.exe"));
 		batch.run(mod);
 
 
 
-		LOG_SUCCESS(XOR("Loaded patterns"));
+		//LOG_SUCCESS(XOR("Loaded patterns"));
 		return true;
 	}
 
@@ -482,26 +550,33 @@ namespace base::hooks {
 			patterns::interval_check_func = ptr.from_instruction().as<PVOID>();
 		}, out);*/
 
-
+		/*batch.Add({ XOR("ACT"), XOR("48 83 EC 48 48 83 64 24 ? ? 83 4C 24 ? ? 33 D2 48 8D 05 ? ? ? ? 44 8D 4A 0F 48 8D 0D ? ? ? ? 41 B8 ? ? ? ? 48 89 44 24 ? E8") }, [](Ptr ptr) {
+			HANDLE thread_id = ptr.add(51).from_instruction().as<HANDLE>();
+			if (thread_id) {
+				LOG_WARN("Suspended Arxan Thread -> ID: %i", GetThreadId(thread_id));
+				SuspendThread(thread_id);
+			}
+			}, out);*/
 
 		//MUTATE_END
 		
 		auto mod = memory::module(XOR("GTA5.exe"));
 		batch.run(mod);
-		//VM_TIGER_BLACK_START
+		
+		//ARXAN ARXAN ARXAN ARXAN ARXAN ARXAN ARXAN ARXAN ARXAN ARXAN ARXAN ARXAN ARXAN ARXAN ARXAN 
 		auto patches = mod.scan_all(XOR("48 8D 45 ? 48 89 45 ? 48 8D 05 ? ? ? ? 48 89 45"));
-		//VM_TIGER_BLACK_END
-		int patchCount = 0;
 		for (auto patch : patches) {
+			//sig lands us on the first lea instruction, we want to create the patch on the second so we skip the first one
 			memset(patch.add(8).as<PVOID>(), 0x90, 7);
-			patchCount++;
-			//LOG_WARN("Created Integerity Patch #%d", patchCount);
 		}
+
+	
+		
 
 		//48 8D 45 ? 48 8D 45
 
 
-		//LOG_SUCCESS(XOR("Loaded bypasses"));
+	//	LOG_SUCCESS(XOR("Loaded bypasses"));
 		//VM_LION_BLACK_END
 		return true;
 	}
@@ -509,9 +584,15 @@ namespace base::hooks {
 	bool hooks() {
 		batch batch;
 		bool out = false;
-		MUTATE_START
+	//	MUTATE_START
 		
 		//VM_TIGER_BLACK_START
+
+
+
+			batch.Add({ XOR("MEM_HS"), XOR("83 C8 01 48 8D 0D ? ? ? ? 41 B1 01 45 33 C0") }, [](Ptr ptr) {
+			patterns::heap_size = ptr.add(17).as<decltype(patterns::heap_size)>();
+			}, out);
 
 		batch.Add({ XOR("AC_QD"), XOR("48 89 5C 24 ? 57 48 83 EC ? 0F B6 99") }, [](Ptr ptr) {
 			patterns::queue_dependency = ptr.as<uint64_t>();
@@ -521,15 +602,15 @@ namespace base::hooks {
 
 		batch.Add({ XOR("AC_CRC"), XOR("48 8B C4 48 89 58 08 48 89 68 10 48 89 70 18 48 89 78 20 41 56 48 83 EC 30 44 8B F1 48 8B 0D") }, [](Ptr ptr) {
 			patterns::check_crc = ptr.add(0x64).as<uint64_t>();
-			}, out);
+		}, out);
 
 		batch.Add({ XOR("AC_RMS"), XOR("40 53 48 83 EC 40 83 B9 ? ? ? ? ? 48 8B D9 75 67 48 83 64 24 ? ? 48 83 64 24 ? ? 48 8D 54 24 ? 48 81 C1") }, [](Ptr ptr) {
 			patterns::report_myself = ptr.add(0x5E).call().add(0x22).as<uint64_t>();
-			}, out);
+		}, out);
 
 		batch.Add({ XOR("AC_CS"), XOR("48 89 5C 24 08 57 48 83 EC 20 33 FF 48 8B D9 48 85 C9 74 0B") }, [](Ptr ptr) {
 			patterns::cash_spawn = ptr.sub(0x3F).as<uint64_t>();
-			}, out);
+		}, out);
 
 		batch.Add({ XOR("AC_AETL"), XOR("4C 8B D1 48 63 49 18") }, [](Ptr ptr) {
 			patterns::add_event_to_list = ptr.as<uint64_t>();
@@ -549,6 +630,59 @@ namespace base::hooks {
 		batch.Add({ XOR("AC_SM"), XOR("E8 ? ? ? ? EB 69 41 8B D6") }, [](Ptr ptr) {
 			patterns::send_metric = ptr.call().as<uint64_t>();
 			return hooking::detour("SM", patterns::send_metric, &sendMetricHook, &ogSendMetricHook);
+		}, out);
+
+		batch.Add({ XOR("IDKBRUH"), XOR("48 8B 05 CA 29 FF FF") }, [](Ptr ptr) {
+			uint64_t target = ptr.as<uint64_t>();
+			return hooking::detour("IDKBRUH", target, &write_unsigned_int_from_buffer, &write_unsigned_int_from_buffer_t);
+		}, out);
+
+		batch.Add({ XOR("RUTDRB"), XOR("48 8D 05 ? ? ? ? 48 8D 8E ? ? ? ? 48 8D 54 24 ? 48 89 5C 24 ? 48 89 44 24") }, [](Ptr ptr) {
+			patterns::sync_data_reader_vtable = ptr.from_instruction().as<decltype(patterns::sync_data_reader_vtable)>();
+			return hooking::vmt(XOR("BB_1"), patterns::sync_data_reader_vtable, 1, &read_unsigned_int_from_buffer, &read_unsigned_int_from_buffer_t)
+				&& hooking::vmt(XOR("BB_2"), patterns::sync_data_reader_vtable, 2, &read_unsigned_short_from_buffer, &read_unsigned_short_from_buffer_t)
+				&& hooking::vmt(XOR("BB_3"), patterns::sync_data_reader_vtable, 3, &read_unsigned_char_from_buffer, &read_unsigned_char_from_buffer_t)
+				&& hooking::vmt(XOR("BB_4"), patterns::sync_data_reader_vtable, 4, &read_int_from_buffer, &read_int_from_buffer_t)
+				&& hooking::vmt(XOR("BB_5"), patterns::sync_data_reader_vtable, 5, &read_short_from_buffer, &read_short_from_buffer_t)
+				&& hooking::vmt(XOR("BB_6"), patterns::sync_data_reader_vtable, 6, &read_char_from_buffer, &read_char_from_buffer_t)
+				&& hooking::vmt(XOR("BB_7"), patterns::sync_data_reader_vtable, 7, &read_bool_from_buffer, &read_bool_from_buffer_t)
+				&& hooking::vmt(XOR("BB_8"), patterns::sync_data_reader_vtable, 8, &read_long_long_from_buffer, &read_long_long_from_buffer_t)
+				&& hooking::vmt(XOR("BB_9"), patterns::sync_data_reader_vtable, 9, &read_int_from_buffer, &read_int_from_buffer_t)
+				&& hooking::vmt(XOR("BB_10"), patterns::sync_data_reader_vtable, 10, &read_short_from_buffer, &read_short_from_buffer_t)
+				&& hooking::vmt(XOR("BB_11"), patterns::sync_data_reader_vtable, 11, &read_char_from_buffer, &read_char_from_buffer_t)
+				&& hooking::vmt(XOR("BB_12"), patterns::sync_data_reader_vtable, 12, &read_unsigned_long_long_from_buffer, &read_unsigned_long_long_from_buffer_t)
+				&& hooking::vmt(XOR("BB_13"), patterns::sync_data_reader_vtable, 13, &read_unsigned_int_from_buffer, &read_unsigned_int_from_buffer_t)
+				&& hooking::vmt(XOR("BB_14"), patterns::sync_data_reader_vtable, 14, &read_unsigned_short_from_buffer, &read_unsigned_short_from_buffer_t)
+				&& hooking::vmt(XOR("BB_15"), patterns::sync_data_reader_vtable, 15, &read_unsigned_char_from_buffer, &read_unsigned_char_from_buffer_t)
+				&& hooking::vmt(XOR("BB_16"), patterns::sync_data_reader_vtable, 16, &read_float_from_buffer, &read_float_from_buffer_t)
+				&& hooking::vmt(XOR("BB_17"), patterns::sync_data_reader_vtable, 17, &read_unsigned_float_from_buffer, &read_unsigned_float_from_buffer_t)
+				&& hooking::vmt(XOR("BB_18"), patterns::sync_data_reader_vtable, 18, &read_network_id_from_buffer, &read_network_id_from_buffer_t)
+				&& hooking::vmt(XOR("BB_19"), patterns::sync_data_reader_vtable, 23, &read_array_from_buffer, &read_array_from_buffer_t)
+				&& hooking::vmt(XOR("BB_20"), patterns::sync_data_reader_vtable, 24, &read_string_from_buffer, &read_string_from_buffer_t);
+		}, out);
+
+		batch.Add({ XOR("RBWD"), XOR("48 89 74 24 ? 57 48 83 EC 20 48 8B D9 33 C9 41 8B F0 8A") }, [](Ptr ptr) {
+			patterns::read_bitbuf_dword = ptr.sub(5).as<decltype(patterns::read_bitbuf_dword)>();
+			uint64_t target = ptr.sub(5).as<uint64_t>();
+			return hooking::detour("RBWD", target, &read_bitbuf_dword, &read_bitbuf_dword_t);
+			}, out);
+
+		batch.Add({ XOR("RBA"), XOR("48 89 5C 24 ? 57 48 83 EC 30 41 8B F8 4C") }, [](Ptr ptr) {
+			patterns::read_bitbuf_array = ptr.as<decltype(patterns::read_bitbuf_array)>();
+			uint64_t target = ptr.as<uint64_t>();
+			return hooking::detour("RBA", target, &read_bitbuf_array, &read_bitbuf_array_t);
+			}, out);
+
+		batch.Add({ XOR("RBS"), XOR("48 89 5C 24 08 48 89 6C 24 18 56 57 41 56 48 83 EC 20 48 8B F2 45") }, [](Ptr ptr) {
+			patterns::read_bitbuf_string = ptr.as<decltype(patterns::read_bitbuf_string)>();
+			uint64_t target = ptr.as<uint64_t>();
+			return hooking::detour("RBS", target, &read_bitbuf_string, &read_bitbuf_string_t);
+			}, out);
+
+		batch.Add({ XOR("RBB"), XOR("E8 ? ? ? ? 84 C0 74 41 48 8D 56 2C") }, [](Ptr ptr) {
+			patterns::read_bitbuf_bool = ptr.call().as<decltype(patterns::read_bitbuf_bool)>();
+			uint64_t target = ptr.call().as<uint64_t>();
+			return hooking::detour("RBB", target, &read_bitbuf_bool, &read_bitbuf_bool_t);
 			}, out);
 
 
@@ -593,21 +727,31 @@ namespace base::hooks {
 		batch.Add({ XOR("RCR"), XOR("48 8B C4 48 89 58 08 48 89 68 10 48 89 70 18 48 89 78 20 41 54 41 56 41 57 48 83 EC 50 4C 8B F2 4D 8B E0 48") }, [](Ptr ptr) {
 			patterns::receive_clone_remove = ptr.as<uint64_t>();
 			return hooking::detour("RCR", patterns::receive_clone_remove, &receiveCloneRemoveHook, &ogReceiveCloneRemoveHook);
-			}, out);
+		}, out);
 
-		/*batch.Add({ XOR("RCCA"), XOR(48 8B C4 48 89 58 08 48 89 68 10 48 89 70 18 48 89 78 20 41 54 41 56 41 57 48 83 EC 50 4C 8B FA" }, [](Ptr ptr) {
+		batch.Add({ XOR("RCRA"), XOR("48 8B C4 48 89 58 ? 48 89 68 ? 48 89 70 ? 57 41 56 41 57 48 83 EC ? 4C 8B FA 49 8B D8") }, [](Ptr ptr) {
+			patterns::receive_clone_remove_ack = ptr.as<uint64_t>();
+			//return hooking::detour("RCRA", patterns::receive_clone_remove_ack, &receiveCloneRemoveAckHook, &ogReceiveCloneRemoveAckHook);
+		}, out);
+
+		batch.Add({ XOR("RCCA"), XOR("48 8B C4 48 89 58 08 48 89 68 10 48 89 70 18 48 89 78 20 41 54 41 56 41 57 48 83 EC 50 4C 8B FA") }, [](Ptr ptr) {
 			patterns::receive_clone_create_ack = ptr.as<uint64_t>();
-			return hooking::detour("RCCA", patterns::receive_clone_create_ack, &receiveCloneCreateAckHook, &ogReceiveCloneCreateAckHook);
-		}, out);*/
+			//return hooking::detour("RCCA", patterns::receive_clone_create_ack, &receiveCloneCreateAckHook, &ogReceiveCloneCreateAckHook);
+		}, out);
+
+		batch.Add({ XOR("RCSA"), XOR("48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 54 41 56 41 57 48 83 EC ? 4C 8B E2") }, [](Ptr ptr) {
+			patterns::receive_clone_sync_ack = ptr.as<uint64_t>();
+			//return hooking::detour("RCSA", patterns::receive_clone_sync_ack, &receiveCloneSyncAckHook, &ogReceiveCloneSyncAckHook);
+		}, out);
 
 		batch.Add({ XOR("CAD"), XOR("E8 ? ? ? ? 84 C0 0F 84 AF 01 00 00 48 8B 03") }, [](Ptr ptr) {
 			patterns::can_apply_data = ptr.call().as<uint64_t>();
 			return hooking::detour("CAD", patterns::can_apply_data, &canApplyDataHook, &ogCanApplyDataHook);
-			}, out);
+		}, out);
 
 		/*batch.Add({ XOR("RPE"), XOR("E8 ? ? ? ? ? ? ? ? F6 C3 02 74 15") }, [](Ptr ptr) {
 			patterns::receive_presence_event = ptr.call().as<uint64_t>();
-			return hooking::detour("RPE", patterns::receive_presence_event, &receivePresenceEvent, &ogReceivePresenceEvent);
+			//return hooking::detour("RPE", patterns::receive_presence_event, &receivePresenceEvent, &ogReceivePresenceEvent);
 		}, out);*/
 
 		/*batch.Add({XOR("WGSITEM"), XOR(48 89 5C 24 ? ? 48 89 74 24 ? ? 57 48 81 EC ? ? ? ? ? ? ? ? 48 8B 02" }, [](Ptr ptr) {
@@ -634,6 +778,11 @@ namespace base::hooks {
 			patterns::apply_player_physical_index = ptr.as<uint64_t>();
 			return hooking::detour("APPI", patterns::apply_player_physical_index, &applyPlayerPhysicalIndexHook, &ogApplyPlayerPhysicalIndexHook);
 			}, out);
+
+		batch.Add({ XOR("UPSS"), XOR("40 53 48 83 EC 30 48 8B 05 ? ? ? ? 4C 8B D1 41 83 7A ? ? 48 8B 48 40 7D 23 48 85 C9 0F 84 ? ? ? ? 48 8B 01 4C 8D 05")}, [](Ptr ptr) {
+			auto target = ptr.as<uint64_t>();
+			return hooking::detour("UPSS", target, &updatePlayerScriptStatus, &ogUpdatePlayerScriptStatus);
+		}, out);
 
 		batch.Add({ XOR("STT"), XOR("48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC 20 80 B9 ? ? ? ? ? 8B FA 48 8B D9 74 05 8B 41 10 EB 7F E8 ? ? ? ? 83 25") }, [](Ptr ptr) {
 			patterns::tick_script_thread = ptr.as<uint64_t>();
@@ -667,7 +816,7 @@ namespace base::hooks {
 
 		batch.Add({ XOR("GNED"), XOR("53 43 52 49 50 54 5F 4E 45 54 57 4F 52 4B") }, [](Ptr ptr) {
 			patterns::network_event_data = ptr.sub(0x38).as<uint64_t>();
-		//return hooking::detour("GNED", patterns::network_event_data, &getNetworkEventDataHook, &ogGetNetworkEventDataHook);
+			//return hooking::detour("GNED", patterns::network_event_data, &getNetworkEventDataHook, &ogGetNetworkEventDataHook);
 			}, out);
 
 		batch.Add({ XOR("SCM"), XOR("48 83 EC 20 48 8B F1 48 8B CA 41 8A E9") }, [](Ptr ptr) {
@@ -685,24 +834,83 @@ namespace base::hooks {
 			return hooking::detour("CCP", patterns::chat_profanity, &checkChatProfanityHook, &ogCheckChatProfanityHook);
 			}, out);
 
+		batch.Add({ XOR("RBPH"), XOR("48 89 5C 24 08 4C 89 44 24 18 55 56 57 41 54 41 55 41 56 41 57 48 8B EC 48 81 EC 80 00 00 00 48") }, [](Ptr ptr) {
+			auto target = ptr.as<uint64_t>();
+			return hooking::detour("RBPH", target, &renderBigPedHook, &ogRenderBigPedHook);
+		}, out);
+
+		batch.Add({ XOR("RPH"), XOR("48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 41 54 41 55 41 56 41 57 48 81 EC 80 00 00 00 48 8B FA") }, [](Ptr ptr) {
+			auto target = ptr.as<uint64_t>();
+			return hooking::detour("RPH", target, &renderPedHook, &ogRenderPedHook);
+		}, out);
+
+
+
+		batch.Add({ XOR("REH"), XOR("48 8B C4 48 89 58 08 48 89 68 10 48 89 70 18 57 41 54 41 55 41 56 41 57 48 83 EC 70 0F BA") }, [](Ptr ptr) {
+			auto target = ptr.as<uint64_t>();
+			return hooking::detour("REH", target, &renderEntityHook, &ogRenderEntityHook);
+		}, out);
+
+		/*batch.Add({ XOR("SPTTT"), XOR("40 55 53 56 57 41 54 48 8B") }, [](Ptr ptr) {
+			auto target = ptr.as<uint64_t>();
+			return hooking::detour("SPTTT", target, &serialize_parachute_task, &serialize_parachute_task_t);
+		}, out);*/
+
+
+		batch.Add({ XOR("TAC"), XOR("48 89 5C 24 08 48 89 74 24 10 57 48 83 EC 20 80 3D ? ? ? ? ? 41 8B D8 8B F2") }, [](Ptr ptr) {
+			auto target = ptr.as<uint64_t>();
+			//return hooking::detour("TAC", target, &task_ambient_clips, &task_ambient_clips_t);
+			}, out);
+
 		batch.Add({ XOR("RTGSDN"), XOR("48 89 5C 24 ? 57 48 83 EC 30 48 8B 02 48 8B FA") }, [](Ptr ptr) {
 			patterns::read_train_data_node = ptr.as<uint64_t>();
 			//return hooking::detour("RTGSDN", patterns::read_train_data_node, &readTrainGameStateHook, &ogReadTrainGameStateHook);
 		}, out);
 
+		batch.Add({ XOR("PMFR"), XOR("48 89 5C 24 08 48 89 74 24 10 57 48 81 EC F0 00 00 00 41 83") }, [](Ptr ptr) {
+			uint64_t target = ptr.as<uint64_t>();
+			return hooking::detour("PMFR", target, &processMatchmakingFindResponseHook, &ogProcessMatchmakingFindResponseHook);
+		}, out);
+
+		batch.Add({ XOR("PDN2"), XOR("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 41 54 41 55 41 56 41 57 48 83 EC 30 48 8B 01 4C 8B F2 33 D2 48 8B F1 FF 90 ? ? ? ? 84 C0 0F 84") }, [](Ptr ptr) {
+			uint64_t target = ptr.as<uint64_t>();
+			//return hooking::detour("PDN2", target, &compressDataNodeHook2, &ogCompressDataNodeHook2);
+		}, out);
+
+		batch.Add({ XOR("SPMDN"), XOR("48 89 5C 24 18 55 56 57 48 83 EC 30 48 8B 02 48 8D 99 C0 00 00 00") }, [](Ptr ptr) {
+			uint64_t target = ptr.as<uint64_t>();
+			//return hooking::detour("SPMDN", target, &syncPedMovementDataNodeHook, &ogSyncPedMovementDataNodeHook);
+		}, out);
+
+		batch.Add({ XOR("VFX_UUV"), XOR("48 83 EC 18 48 8B 0D") }, [](Ptr ptr) {
+			patterns::update_ui_values = ptr.as<decltype(patterns::update_ui_values)>();
+			return hooking::detour("VFX_UUV", patterns::update_ui_values, &updateUIValuesHook, &ogUpdateUIValuesHook);
+		}, out);
+
+
+		batch.Add({ XOR("SSMA"), XOR("48 8B C4 48 89 58 08 48 89 68 10 48 89 70 18 48 89 78 20 41 56 48 81 EC D0 00 00 00 49 8B") }, [](Ptr ptr) {
+			uint64_t target = ptr.as<uint64_t>();
+			//return hooking::detour("SSMA", target, &sendSessionMatchmakingAttributesHook, &ogSendSessionMatchmakingAttributesHook);
+		}, out);
+
+		batch.Add({ XOR("SGSBGH2"), XOR("E8 ? ? ? ? 84 C0 0F 84 F6 FE FF FF") }, [](Ptr ptr) {
+			patterns::start_session_search = ptr.call().as<uint64_t>();
+			//return hooking::detour("SGSBGH2", target, &startMatchmakingFindSessionsHook, &ogStartMatchmakingFindSessionsHook);
+			}, out);
+
 		/*
-		* batch.Add({ XOR("ITC"), XOR("E8 ? ? ? ? F3 44 0F 10 93 90 03 00 00") }, [](Ptr ptr) {
+		batch.Add({ XOR("ITC"), XOR("E8 ? ? ? ? F3 44 0F 10 93 90 03 00 00") }, [](Ptr ptr) {
 			patterns::infinite_train_crash = ptr.call().as<uint64_t>();
 			patterns::get_next_carriage = ptr.call().add(0xF).rip().as<patterns::get_next_carriage_t>();
-			return hooking::detour("ITC", patterns::infinite_train_crash, &infiniteTrainCrashHook, &ogInfiniteTrainCrashHook);
-		}, out);
-		*/
+			//return hooking::detour("ITC", patterns::infinite_train_crash, &infiniteTrainCrashHook, &ogInfiniteTrainCrashHook);
+		}, out);	*/
+		
 
 		/*batch.Add({ "RNSM", "E8 ? ? ? ? 84 C0 74 60 4C 39 77 40 74 29 48 8B 4C 24 ? 48 8B 01 FF 50 28 48 8B 4F 40 44 0F B7" }, [](Ptr ptr) {
 			patterns::read_new_script_host_message = ptr.call().as<uint64_t>();
 			return hooking::detour("RNSM", patterns::read_new_script_host_message - 0x6D, &readNewScriptHostMessageHook, &ogReadNewScriptHostMessageHook);
 		}, out);*/
-		MUTATE_END
+		//MUTATE_END
 
 		//VM_TIGER_BLACK_END
 
@@ -749,10 +957,11 @@ namespace base::hooks {
 		auto mod2 = memory::module("socialclub.dll");
 		batch2.run(mod2);*/
 
-		LOG_SUCCESS(XOR("Loaded hooks"));
+		//LOG_SUCCESS(XOR("Loaded hooks"));
 
 		return true;
 	}
+
 
 	void* hooks::infiniteTrainCrashHook(void* carriage) {
 		void* current_carriage = carriage;
@@ -806,7 +1015,11 @@ namespace base::hooks {
 	bool hooks::initNativeTablesHook(rage::scrProgram* program) {
 		bool ret = ogInitNativeTablesHook(program);
 		//menu::g_script_patcher_service->on_script_load(program);
-		script::g_native_hooks->hook_program(program);
+
+		if (program->m_code_size && program->m_code_blocks) // ensure that we aren't hooking SHV threads
+		{
+			script::g_native_hooks->hook_program(program);
+		}
 
 		return ret;
 	}
@@ -919,4 +1132,142 @@ namespace base::hooks {
 		return ogUnknownCheckHook(rcx, rdx, r8);
 	}
 
+	__int64 hooks::renderBigPedHook(__int64 renderer, CPed* ped, __int64 a3, __int64 a4) {
+		if (*(int*)(((__int64)(*patterns::draw_handler_mgr) + 0x14730)) >= 512)
+		{
+			*(int*)(a4 + 4) = -2;
+			return a4 + 0x14;
+		}
+		else {
+			return ogRenderBigPedHook(renderer, ped, a3, a4);
+		}
+	}
+
+	void* hooks::renderPedHook(__int64 renderer, CPed* ped, __int64 a3, __int64 a4) {
+		if (*(int*)(((__int64)(*patterns::draw_handler_mgr) + 0x14730)) >= 499)
+		{
+			return nullptr;
+		}
+		else {
+			return ogRenderPedHook(renderer, ped, a3, a4);
+		}
+	}
+
+	void hooks::renderEntityHook(__int64 renderer, rage::fwEntity* entity, int unk, bool a4) {
+		if (*(int*)(((__int64)(*patterns::draw_handler_mgr) + 0x14730)) >= 512)
+		{
+			*(int*)(renderer + 4) &= ~0x80000000;
+			*(int*)(renderer + 4) &= ~0x40000000;
+			*(int*)(renderer + 4) |= (a4 & 1) << 30;
+			*(int*)renderer = -2;
+		}
+		else {
+			return ogRenderEntityHook(renderer, entity, unk, a4);
+		}
+	}
+#pragma pack(push, 8)
+	struct TaskObject
+	{
+		uint16_t m_net_id;
+		rage::CDynamicEntity* m_entity;
+	};
+#pragma pack(pop)
+
+	void hooks::serialize_parachute_task(__int64 info, rage::CSyncDataBase* serializer)
+	{
+		auto object = reinterpret_cast<TaskObject*>(info + 0x30);
+		return serialize_parachute_task_t(info, serializer);
+
+		if (object->m_entity && object->m_entity->m_entity_type != 5)
+		{
+			patterns::remove_reference(object->m_entity, &object->m_entity);
+			object->m_entity = nullptr;
+			object->m_net_id = 0;
+		}
+	}
+
+	int hooks::task_ambient_clips(uint64_t _this, int a2, int a3)
+	{
+		// enter crash func
+		// TODO: this doesn't block the crash completely
+
+		if (*(uint64_t*)(_this + 0x100))
+			return task_ambient_clips(_this, a2, a3);
+
+		return 0;
+	}
+
+
+	enum eUpdatePlayerScriptStatus {
+		REMOVE_BITSET,
+		SCRIPT_ADD_CANDIDATE,
+		SCRIPT_ADDED_CANDIDATE,
+		SCRIPT_RETRY_JOIN,
+	};
+
+	struct script_status {
+		char _0x0000[0x8];
+		eUpdatePlayerScriptStatus m_status;
+	};
+	//E8 ?? ?? ?? ?? 44 8B E0 85 C0 0F 84
+
+
+
+	void updatePlayerScriptStatus(rage::scriptHandlerNetComponent* component, uint64_t rdx, uint64_t r8) {
+		script_status* status = (script_status*)rdx;
+		if (!util::is_valid_ptr(component)) {
+			LOG_ERROR("BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD BAD");
+			return;
+		}
+
+		if (component->m_state == 2) {
+
+			std::string state = "";
+			switch (status->m_status) {
+			case 0: state = "REMOVE_BITSET"; break;
+			case 1: state = "SCRIPT_ADD_CANDIDATE"; break;
+			case 2: state = "SCRIPT_ADDED_CANDIDATE"; break;
+			case 3: state = "SCRIPT_RETRY_JOIN"; break;
+			}
+
+
+			CNetGamePlayer* player = *(CNetGamePlayer**)(r8 + 0x10);
+			if (player) {
+				if (util::is_valid_ptr(component->m_script_handler)) {
+					if (util::is_valid_ptr(component->m_script_handler->m_script_thread)) {
+						LOG_WARN("[%s][%s] State=%s", player->GetName(), component->m_script_handler->m_script_thread->m_name, state.c_str());
+
+						if (status->m_status == SCRIPT_RETRY_JOIN) {
+							auto vit = std::find_if(begin(g_join_timeout_fix), end(g_join_timeout_fix), [=](join_timeout_fix_context& element) {
+								return element.m_id == player->m_player_id && element.m_script_hash == component->m_script_handler->m_script_thread->m_script_hash;
+								});
+
+							if (vit == end(g_join_timeout_fix)) {
+								g_join_timeout_fix.push_back({ player->m_player_id, component->m_script_handler->m_script_thread->m_script_hash, 1 });
+								goto end;
+							}
+
+							vit->m_retry_count++;
+							if (vit->m_retry_count >= 5) {
+								status->m_status = SCRIPT_ADD_CANDIDATE;
+
+								rage::engine::force_host(rage::joaat(component->m_script_handler->m_script_thread->m_name));
+
+								//if (!strcmp(component->m_component->m_thread->m_name, "freemode")) {
+								LOG_WARN("Prevented Join Timeout");
+								//}
+							}
+						}
+					}
+				}
+			}
+		}
+
+	end:
+		ogUpdatePlayerScriptStatus(component, rdx, r8);
+	}
+
+	bool write_unsigned_int_from_buffer() {
+		return write_unsigned_int_from_buffer_t();
+	}
 }

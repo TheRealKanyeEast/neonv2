@@ -16,8 +16,10 @@ namespace base::hooks {
 		if (beast)
 		{
 			old_beast_index = *menu::script_local(beast->m_stack, menu::scr_locals::am_hunt_the_beast::broadcast_idx).at(1).at(6).as<int*>();
-			if (beast->m_net_component)
-				participant_id = beast->m_net_component->m_local_participant_index;
+			if (beast->m_net_component) {
+				//participant_id = beast->m_net_component->m_local_participant_index;
+			}
+			//	
 		}
 
 		bool result = ogReceiveArrayBroadcastHook(array, sender, buffer, size, cycle);

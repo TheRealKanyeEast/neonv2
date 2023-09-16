@@ -39,6 +39,7 @@ namespace patterns {
 	extern IDXGISwapChain** swapchain;
 	extern GenericPool** ped_pool;
 	extern GenericPool** prop_pool;
+	extern GenericPool** pickup_pool;
 	extern VehiclePool*** vehicle_pool;
 	extern std::pair<CWheelVfx*, uint8_t> vfx_wheel;
 	extern CBlipList* blip_list;
@@ -149,6 +150,7 @@ namespace patterns {
 	extern ptr_to_handle_t ptr_to_handle;
 	extern get_native_handler_t get_native_handler;
 
+	extern PVOID* draw_handler_mgr;
 	extern rage::types::memory_heap_pt* memory_heap_pool;
 
 
@@ -165,7 +167,9 @@ namespace patterns {
 	extern uint64_t receive_clone_sync;
 	extern uint64_t receive_clone_create;
 	extern uint64_t receive_clone_remove;
+	extern uint64_t receive_clone_remove_ack;
 	extern uint64_t receive_clone_create_ack;
+	extern uint64_t receive_clone_sync_ack;
 	extern uint64_t can_apply_data;
 	extern get_sync_tree_for_type_t get_sync_tree_for_type;
 	extern get_sync_type_info_t get_sync_type_info;
@@ -200,6 +204,7 @@ namespace patterns {
 	extern uint64_t receive_array_broadcast;
 
 	inline CNetGamePlayer* g_syncing_player;
+	inline eNetObjType g_syncing_object_type = (eNetObjType)-1;
 
 	extern uint64_t write_player_game_state_data_node;
 	extern uint64_t write_ped_health_data_node;
@@ -235,9 +240,15 @@ namespace patterns {
 	using get_model_info_t = uint64_t(*)(rage::joaat_t hash, uint32_t* ctx);
 	extern get_model_info_t get_model_info;
 
+	using remove_reference_t = void (*)(rage::fwRefAwareBase* object, void* reference);
+	extern remove_reference_t remove_reference;
+
 	extern uint64_t dispatch_table;
 
-	extern rage::ui_weather* ui_weather;
+	extern rage::ocean_quads ocean_quads;
+	extern rage::water_tune* water_tune;
+
+	extern rage::TimecycleKeyframeData* ui_weather;
 
 	inline bool m_disable_sky = true;
 
@@ -245,6 +256,12 @@ namespace patterns {
 
 	extern uint64_t update_ui_values;
 	extern uint64_t update_ui_values_2;
+
+	extern uint64_t sync_data_reader_vtable;
+	extern uint64_t sync_data_writer_vtable;
+	extern rage::waypoint_data* waypoint_data;
+
+	extern uint64_t set_seethrough;
 
 	extern rage::CWeatherVfx* weather_fx;
 	extern rage::CGameVisuals* game_visuals;
@@ -261,8 +278,23 @@ namespace patterns {
 	extern get_next_carriage_t get_next_carriage;
 	extern uint64_t attach_crash_patch;
 
+	extern uint64_t start_session_search;
+
 	inline void test() {
 		ui_weather->set_sky(m_disable_sky);
 
 	}
+	extern rage::atArray<CTrainConfig>* train_config_array;
+	using check_event_queue_t = bool (*)(rage::netEventMgr* mgr, bool free);
+	using get_new_pool_item_t = void* (*)(GenericPool* pool);
+	using queue_network_event_t = void (*)(rage::netEventMgr* mgr, rage::netGameEvent* event);
+	extern rage::netEventMgr** m_net_event_manager;
+	extern GenericPool** m_net_event_pool;
+	extern check_event_queue_t m_check_event_queue;
+	extern get_new_pool_item_t m_get_new_pool_item;
+	extern queue_network_event_t m_queue_network_event;
+
+	extern GenericPool** interior_proxy_pool;
+
+	extern rage::vfx_liquid* vfx_liquid;
 }

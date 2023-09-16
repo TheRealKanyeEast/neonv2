@@ -16,6 +16,7 @@ namespace patterns {
 	GenericPool** ped_pool;
 	GenericPool** prop_pool;
 	VehiclePool*** vehicle_pool;
+	GenericPool** pickup_pool;
 	std::pair<CWheelVfx*, uint8_t> vfx_wheel;
 	CBlipList* blip_list;
 	rage::atArray<GtaThread*>* script_threads;
@@ -78,10 +79,11 @@ namespace patterns {
 	int* resolution_y;
 	bool* is_session_started;
 	void* jmp_rbx_register;
-
+	rage::atArray<CTrainConfig>* train_config_array;
+	PVOID* draw_handler_mgr;
 	memory::byte_patch* max_wanted_level;
 	memory::byte_patch* max_wanted_level_2;
-
+	GenericPool** interior_proxy_pool;
 	read_bitbuf_dword_t read_bitbuf_dword;
 	read_bitbuf_string_t read_bitbuf_string;
 	read_bitbuf_bool_t read_bitbuf_bool;
@@ -131,6 +133,8 @@ namespace patterns {
 	uint64_t read_new_script_host_message;
 
 	uint64_t receive_clone_remove;
+	uint64_t receive_clone_remove_ack;
+	uint64_t receive_clone_sync_ack;
 	uint64_t can_apply_data;
 	uint64_t apply_player_physical_index;
 	uint64_t receive_array_broadcast;
@@ -161,11 +165,24 @@ namespace patterns {
 	uint64_t chat_profanity;
 	get_model_info_t get_model_info;
 	uint64_t dispatch_table;
-	rage::ui_weather* ui_weather;
+	rage::TimecycleKeyframeData* ui_weather;
 
 	uint64_t update_ui_values;
 	uint64_t update_ui_values_2;
+	rage::waypoint_data* waypoint_data;
+	uint64_t set_seethrough;
+	uint64_t sync_data_reader_vtable;
+	uint64_t sync_data_writer_vtable;
+	remove_reference_t remove_reference;
+	rage::ocean_quads ocean_quads;
+	rage::water_tune* water_tune;
 
+	rage::netEventMgr** m_net_event_manager;
+	GenericPool** m_net_event_pool;
+	check_event_queue_t m_check_event_queue;
+	get_new_pool_item_t m_get_new_pool_item;
+	queue_network_event_t m_queue_network_event;
+	rage::vfx_liquid* vfx_liquid;
 	uint64_t send_metric;
 	rage::CWeatherVfx* weather_fx;
 	rage::CGameVisuals* game_visuals;
@@ -175,6 +192,6 @@ namespace patterns {
 	uint64_t infinite_train_crash;
 	get_next_carriage_t get_next_carriage;
 	uint64_t attach_crash_patch;
-
+	uint64_t start_session_search;
 	uint64_t mobile_radio;
 }

@@ -8,7 +8,15 @@ using namespace menu::world::rendering::vars;
 namespace menu::world::rendering::vars {
 	variables m_vars;
 
+	inline const char* sky_color_names[] = {
+	"Azimuth East", "Azimuth West", "Azimuth Transition", "Zenith", "Zenith Transition", "Cloud Base Minus Mid Color", "Cloud Mid", "Cloud Shadow Base Color", "Moon Color", "Sun Color"
+	}; inline std::size_t selected_sky_color = 0;
 
+	const float epsilon = 1e-5;
+
+	bool isApproximatelyEqual(float a, float b, float epsilon) {
+		return std::abs(a - b) < epsilon;
+	}
 
 }
 
@@ -19,6 +27,9 @@ namespace menu {
 			core->addOption(submenuOption("Visual Settings")
 				.setTarget("visual_settings"));
 
+			core->addOption(submenuOption("Sky Color")
+				.setTarget("sky_color"));
+
 			core->addOption(toggleOption("Night Vision")
 				.addToggle(&m_vars.night_vision));
 
@@ -27,6 +38,9 @@ namespace menu {
 
 			core->addOption(toggleOption("See Through Walls")
 				.addToggle(&m_vars.m_see_through_walls).addTooltip("See through walls when aiming"));
+
+			core->addOption(numberOption<float>("Starfield Intensity")
+				.addNumber(&m_vars.m_starfield_intensity).addMin(1.00f).addMax(10000.0f).addStep(1.f).setPrecision(2));
 
 			core->addOption(numberOption<float>("Distance Scaling")
 				.addNumber(&m_vars.distance_scaling).addMin(1.00f).addMax(200.0f).addStep(0.01f).setPrecision(2));
@@ -39,6 +53,224 @@ namespace menu {
 
 			core->addOption(toggleOption("Potato Mode")
 				.addToggle(&m_vars.decrease_graphics));
+		});
+
+		renderer::addSubmenu("Sky Color", "sky_color", [](core* core) {
+			core->addOption(scrollOption<const char*, std::size_t>("Element")
+				.addScroll(&sky_color_names).setPosition(&selected_sky_color));
+
+			switch (selected_sky_color) {
+			case 0:
+				core->addOption(toggleOption("Toggle")
+					.addToggle(&m_vars.m_azimuth_east_color.m_toggle_color));
+
+				if (m_vars.m_azimuth_east_color.m_toggle_color) {
+					core->addOption(numberOption<float>("[R]ed")
+						.addNumber(&m_vars.m_azimuth_east_color.m_color[0]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("[G]reen")
+						.addNumber(&m_vars.m_azimuth_east_color.m_color[1]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("[B]lue")
+						.addNumber(&m_vars.m_azimuth_east_color.m_color[2]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("Luminance")
+						.addNumber(&m_vars.m_azimuth_east_color.m_luminance).addMin(0).addMax(10).addStep(0.1f).setPrecision(2));
+
+					core->addOption(toggleOption("Rainbow")
+						.addToggle(&m_vars.m_azimuth_east_color.m_rainbow_toggle));
+				}
+				break;
+			case 1:
+				core->addOption(toggleOption("Toggle")
+					.addToggle(&m_vars.m_azimuth_west_color.m_toggle_color));
+
+				if (m_vars.m_azimuth_west_color.m_toggle_color) {
+					core->addOption(numberOption<float>("[R]ed")
+						.addNumber(&m_vars.m_azimuth_west_color.m_color[0]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("[G]reen")
+						.addNumber(&m_vars.m_azimuth_west_color.m_color[1]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("[B]lue")
+						.addNumber(&m_vars.m_azimuth_west_color.m_color[2]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("Luminance")
+						.addNumber(&m_vars.m_azimuth_west_color.m_luminance).addMin(0).addMax(10).addStep(0.1f).setPrecision(2));
+
+					core->addOption(toggleOption("Rainbow")
+						.addToggle(&m_vars.m_azimuth_west_color.m_rainbow_toggle));
+				}
+				break;
+			case 2:
+				core->addOption(toggleOption("Toggle")
+					.addToggle(&m_vars.m_azimuth_transition_color.m_toggle_color));
+
+				if (m_vars.m_azimuth_transition_color.m_toggle_color) {
+					core->addOption(numberOption<float>("[R]ed")
+						.addNumber(&m_vars.m_azimuth_transition_color.m_color[0]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("[G]reen")
+						.addNumber(&m_vars.m_azimuth_transition_color.m_color[1]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("[B]lue")
+						.addNumber(&m_vars.m_azimuth_transition_color.m_color[2]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("Luminance")
+						.addNumber(&m_vars.m_azimuth_transition_color.m_luminance).addMin(0).addMax(10).addStep(0.1f).setPrecision(2));
+
+					core->addOption(toggleOption("Rainbow")
+						.addToggle(&m_vars.m_azimuth_transition_color.m_rainbow_toggle));
+				}
+				break;
+			case 3:
+				core->addOption(toggleOption("Toggle")
+					.addToggle(&m_vars.m_zenith_color.m_toggle_color));
+
+				if (m_vars.m_zenith_color.m_toggle_color) {
+					core->addOption(numberOption<float>("[R]ed")
+						.addNumber(&m_vars.m_zenith_color.m_color[0]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("[G]reen")
+						.addNumber(&m_vars.m_zenith_color.m_color[1]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("[B]lue")
+						.addNumber(&m_vars.m_zenith_color.m_color[2]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("Luminance")
+						.addNumber(&m_vars.m_zenith_color.m_luminance).addMin(0).addMax(10).addStep(0.1f).setPrecision(2));
+
+					core->addOption(toggleOption("Rainbow")
+						.addToggle(&m_vars.m_zenith_color.m_rainbow_toggle));
+				}
+				break;
+			case 4:
+				core->addOption(toggleOption("Toggle")
+					.addToggle(&m_vars.m_zenith_transition_color.m_toggle_color));
+
+				if (m_vars.m_zenith_transition_color.m_toggle_color) {
+					core->addOption(numberOption<float>("[R]ed")
+						.addNumber(&m_vars.m_zenith_transition_color.m_color[0]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("[G]reen")
+						.addNumber(&m_vars.m_zenith_transition_color.m_color[1]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("[B]lue")
+						.addNumber(&m_vars.m_zenith_transition_color.m_color[2]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("Luminance")
+						.addNumber(&m_vars.m_zenith_transition_color.m_luminance).addMin(0).addMax(10).addStep(0.1f).setPrecision(2));
+
+					core->addOption(toggleOption("Rainbow")
+						.addToggle(&m_vars.m_zenith_transition_color.m_rainbow_toggle));
+				}
+				break;
+			case 5:
+				core->addOption(toggleOption("Toggle")
+					.addToggle(&m_vars.m_cloud_base_minus_mid_colour.m_toggle_color));
+
+				if (m_vars.m_cloud_base_minus_mid_colour.m_toggle_color) {
+					core->addOption(numberOption<float>("[R]ed")
+						.addNumber(&m_vars.m_cloud_base_minus_mid_colour.m_color[0]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("[G]reen")
+						.addNumber(&m_vars.m_cloud_base_minus_mid_colour.m_color[1]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("[B]lue")
+						.addNumber(&m_vars.m_cloud_base_minus_mid_colour.m_color[2]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("Luminance")
+						.addNumber(&m_vars.m_cloud_base_minus_mid_colour.m_luminance).addMin(0).addMax(10).addStep(0.1f).setPrecision(2));
+
+					core->addOption(toggleOption("Rainbow")
+						.addToggle(&m_vars.m_cloud_base_minus_mid_colour.m_rainbow_toggle));
+				}
+				break;
+			case 6:
+				core->addOption(toggleOption("Toggle")
+					.addToggle(&m_vars.m_cloud_mid_color.m_toggle_color));
+
+				if (m_vars.m_cloud_mid_color.m_toggle_color) {
+					core->addOption(numberOption<float>("[R]ed")
+						.addNumber(&m_vars.m_cloud_mid_color.m_color[0]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("[G]reen")
+						.addNumber(&m_vars.m_cloud_mid_color.m_color[1]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("[B]lue")
+						.addNumber(&m_vars.m_cloud_mid_color.m_color[2]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("Luminance")
+						.addNumber(&m_vars.m_cloud_mid_color.m_luminance).addMin(0).addMax(10).addStep(0.1f).setPrecision(2));
+
+					core->addOption(toggleOption("Rainbow")
+						.addToggle(&m_vars.m_cloud_mid_color.m_rainbow_toggle));
+				}
+				break;
+			case 7:
+				core->addOption(toggleOption("Toggle")
+					.addToggle(&m_vars.m_cloud_shadow_minus_base_colour_times_shadow_strength.m_toggle_color));
+
+				if (m_vars.m_cloud_shadow_minus_base_colour_times_shadow_strength.m_toggle_color) {
+					core->addOption(numberOption<float>("[R]ed")
+						.addNumber(&m_vars.m_cloud_shadow_minus_base_colour_times_shadow_strength.m_color[0]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("[G]reen")
+						.addNumber(&m_vars.m_cloud_shadow_minus_base_colour_times_shadow_strength.m_color[1]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("[B]lue")
+						.addNumber(&m_vars.m_cloud_shadow_minus_base_colour_times_shadow_strength.m_color[2]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("Luminance")
+						.addNumber(&m_vars.m_cloud_shadow_minus_base_colour_times_shadow_strength.m_luminance).addMin(0).addMax(10).addStep(0.1f).setPrecision(2));
+
+					core->addOption(toggleOption("Rainbow")
+						.addToggle(&m_vars.m_cloud_shadow_minus_base_colour_times_shadow_strength.m_rainbow_toggle));
+				}
+				break;
+			case 8:
+				core->addOption(toggleOption("Toggle")
+					.addToggle(&m_vars.m_moon_color.m_toggle_color));
+
+				if (m_vars.m_moon_color.m_toggle_color) {
+					core->addOption(numberOption<float>("[R]ed")
+						.addNumber(&m_vars.m_moon_color.m_color[0]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("[G]reen")
+						.addNumber(&m_vars.m_moon_color.m_color[1]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("[B]lue")
+						.addNumber(&m_vars.m_moon_color.m_color[2]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("Luminance")
+						.addNumber(&m_vars.m_moon_color.m_luminance).addMin(0).addMax(10).addStep(0.1f).setPrecision(2));
+
+					core->addOption(toggleOption("Rainbow")
+						.addToggle(&m_vars.m_sun_color.m_rainbow_toggle));
+				}
+				break;
+			case 9:
+				core->addOption(toggleOption("Toggle")
+					.addToggle(&m_vars.m_sun_color.m_toggle_color));
+
+				if (m_vars.m_sun_color.m_toggle_color) {
+					core->addOption(numberOption<float>("[R]ed")
+						.addNumber(&m_vars.m_sun_color.m_color[0]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("[G]reen")
+						.addNumber(&m_vars.m_sun_color.m_color[1]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("[B]lue")
+						.addNumber(&m_vars.m_sun_color.m_color[2]).addMin(0).addMax(255).addStep(1).setPrecision(1));
+
+					core->addOption(numberOption<float>("Luminance")
+						.addNumber(&m_vars.m_sun_color.m_luminance).addMin(0).addMax(10).addStep(0.1f).setPrecision(2));
+
+					core->addOption(toggleOption("Rainbow")
+						.addToggle(&m_vars.m_moon_color.m_rainbow_toggle));
+				}
+				break;
+			}
 		});
 
 		renderer::addSubmenu("Visual Settings", "visual_settings", [](core* core) {
@@ -69,6 +301,159 @@ namespace menu {
 		render();
 		if (m_vars.m_see_through_walls) {
 			CAM::SET_THIRD_PERSON_AIM_CAM_NEAR_CLIP_THIS_UPDATE(418.490f);
+		}
+
+		
+		// ...
+
+		if (m_vars.m_azimuth_east_color.m_rainbow_toggle) {
+			if (m_vars.m_azimuth_east_color.m_color[0] > 0 && isApproximatelyEqual(m_vars.m_azimuth_east_color.m_color[2], 0.0f, epsilon)) {
+				m_vars.m_azimuth_east_color.m_color[0] -= 1.0f;
+				m_vars.m_azimuth_east_color.m_color[1] += 1.0f;
+			}
+			if (m_vars.m_azimuth_east_color.m_color[1] > 0 && isApproximatelyEqual(m_vars.m_azimuth_east_color.m_color[0], 0.0f, epsilon)) {
+				m_vars.m_azimuth_east_color.m_color[1] -= 1.0f;
+				m_vars.m_azimuth_east_color.m_color[2] += 1.0f;
+			}
+			if (m_vars.m_azimuth_east_color.m_color[2] > 0 && isApproximatelyEqual(m_vars.m_azimuth_east_color.m_color[1], 0.0f, epsilon)) {
+				m_vars.m_azimuth_east_color.m_color[0] += 1.0f;
+				m_vars.m_azimuth_east_color.m_color[2] -= 1.0f;
+			}
+		}
+
+		if (m_vars.m_azimuth_west_color.m_rainbow_toggle) {
+			if (m_vars.m_azimuth_west_color.m_color[0] > 0 && isApproximatelyEqual(m_vars.m_azimuth_west_color.m_color[2], 0.0f, epsilon)) {
+				m_vars.m_azimuth_west_color.m_color[0] -= 1.0f;
+				m_vars.m_azimuth_west_color.m_color[1] += 1.0f;
+			}
+			if (m_vars.m_azimuth_west_color.m_color[1] > 0 && isApproximatelyEqual(m_vars.m_azimuth_west_color.m_color[0], 0.0f, epsilon)) {
+				m_vars.m_azimuth_west_color.m_color[1] -= 1.0f;
+				m_vars.m_azimuth_west_color.m_color[2] += 1.0f;
+			}
+			if (m_vars.m_azimuth_west_color.m_color[2] > 0 && isApproximatelyEqual(m_vars.m_azimuth_west_color.m_color[1], 0.0f, epsilon)) {
+				m_vars.m_azimuth_west_color.m_color[0] += 1.0f;
+				m_vars.m_azimuth_west_color.m_color[2] -= 1.0f;
+			}
+		}
+
+		if (m_vars.m_azimuth_transition_color.m_rainbow_toggle) {
+			if (m_vars.m_azimuth_transition_color.m_color[0] > 0 && isApproximatelyEqual(m_vars.m_azimuth_transition_color.m_color[2], 0.0f, epsilon)) {
+				m_vars.m_azimuth_transition_color.m_color[0] -= 1.0f;
+				m_vars.m_azimuth_transition_color.m_color[1] += 1.0f;
+			}
+			if (m_vars.m_azimuth_transition_color.m_color[1] > 0 && isApproximatelyEqual(m_vars.m_azimuth_transition_color.m_color[0], 0.0f, epsilon)) {
+				m_vars.m_azimuth_transition_color.m_color[1] -= 1.0f;
+				m_vars.m_azimuth_transition_color.m_color[2] += 1.0f;
+			}
+			if (m_vars.m_azimuth_transition_color.m_color[2] > 0 && isApproximatelyEqual(m_vars.m_azimuth_transition_color.m_color[1], 0.0f, epsilon)) {
+				m_vars.m_azimuth_transition_color.m_color[0] += 1.0f;
+				m_vars.m_azimuth_transition_color.m_color[2] -= 1.0f;
+			}
+		}
+
+		if (m_vars.m_zenith_color.m_rainbow_toggle) {
+			if (m_vars.m_zenith_color.m_color[0] > 0 && isApproximatelyEqual(m_vars.m_zenith_color.m_color[2], 0.0f, epsilon)) {
+				m_vars.m_zenith_color.m_color[0] -= 1.0f;
+				m_vars.m_zenith_color.m_color[1] += 1.0f;
+			}
+			if (m_vars.m_zenith_color.m_color[1] > 0 && isApproximatelyEqual(m_vars.m_zenith_color.m_color[0], 0.0f, epsilon)) {
+				m_vars.m_zenith_color.m_color[1] -= 1.0f;
+				m_vars.m_zenith_color.m_color[2] += 1.0f;
+			}
+			if (m_vars.m_zenith_color.m_color[2] > 0 && isApproximatelyEqual(m_vars.m_zenith_color.m_color[1], 0.0f, epsilon)) {
+				m_vars.m_zenith_color.m_color[0] += 1.0f;
+				m_vars.m_zenith_color.m_color[2] -= 1.0f;
+			}
+		}
+
+		if (m_vars.m_zenith_transition_color.m_rainbow_toggle) {
+			if (m_vars.m_zenith_transition_color.m_color[0] > 0 && isApproximatelyEqual(m_vars.m_zenith_transition_color.m_color[2], 0.0f, epsilon)) {
+				m_vars.m_zenith_transition_color.m_color[0] -= 1.0f;
+				m_vars.m_zenith_transition_color.m_color[1] += 1.0f;
+			}
+			if (m_vars.m_zenith_transition_color.m_color[1] > 0 && isApproximatelyEqual(m_vars.m_zenith_transition_color.m_color[0], 0.0f, epsilon)) {
+				m_vars.m_zenith_transition_color.m_color[1] -= 1.0f;
+				m_vars.m_zenith_transition_color.m_color[2] += 1.0f;
+			}
+			if (m_vars.m_zenith_transition_color.m_color[2] > 0 && isApproximatelyEqual(m_vars.m_zenith_transition_color.m_color[1], 0.0f, epsilon)) {
+				m_vars.m_zenith_transition_color.m_color[0] += 1.0f;
+				m_vars.m_zenith_transition_color.m_color[2] -= 1.0f;
+			}
+		}
+
+		if (m_vars.m_cloud_base_minus_mid_colour.m_rainbow_toggle) {
+			if (m_vars.m_cloud_base_minus_mid_colour.m_color[0] > 0 && isApproximatelyEqual(m_vars.m_cloud_base_minus_mid_colour.m_color[2], 0.0f, epsilon)) {
+				m_vars.m_cloud_base_minus_mid_colour.m_color[0] -= 1.0f;
+				m_vars.m_cloud_base_minus_mid_colour.m_color[1] += 1.0f;
+			}
+			if (m_vars.m_cloud_base_minus_mid_colour.m_color[1] > 0 && isApproximatelyEqual(m_vars.m_cloud_base_minus_mid_colour.m_color[0], 0.0f, epsilon)) {
+				m_vars.m_cloud_base_minus_mid_colour.m_color[1] -= 1.0f;
+				m_vars.m_cloud_base_minus_mid_colour.m_color[2] += 1.0f;
+			}
+			if (m_vars.m_cloud_base_minus_mid_colour.m_color[2] > 0 && isApproximatelyEqual(m_vars.m_cloud_base_minus_mid_colour.m_color[1], 0.0f, epsilon)) {
+				m_vars.m_cloud_base_minus_mid_colour.m_color[0] += 1.0f;
+				m_vars.m_cloud_base_minus_mid_colour.m_color[2] -= 1.0f;
+			}
+		}
+
+		if (m_vars.m_cloud_mid_color.m_rainbow_toggle) {
+			if (m_vars.m_cloud_mid_color.m_color[0] > 0 && isApproximatelyEqual(m_vars.m_cloud_mid_color.m_color[2], 0.0f, epsilon)) {
+				m_vars.m_cloud_mid_color.m_color[0] -= 1.0f;
+				m_vars.m_cloud_mid_color.m_color[1] += 1.0f;
+			}
+			if (m_vars.m_cloud_mid_color.m_color[1] > 0 && isApproximatelyEqual(m_vars.m_cloud_mid_color.m_color[0], 0.0f, epsilon)) {
+				m_vars.m_cloud_mid_color.m_color[1] -= 1.0f;
+				m_vars.m_cloud_mid_color.m_color[2] += 1.0f;
+			}
+			if (m_vars.m_cloud_mid_color.m_color[2] > 0 && isApproximatelyEqual(m_vars.m_cloud_mid_color.m_color[1], 0.0f, epsilon)) {
+				m_vars.m_cloud_mid_color.m_color[0] += 1.0f;
+				m_vars.m_cloud_mid_color.m_color[2] -= 1.0f;
+			}
+		}
+
+		if (m_vars.m_cloud_shadow_minus_base_colour_times_shadow_strength.m_rainbow_toggle) {
+			if (m_vars.m_cloud_shadow_minus_base_colour_times_shadow_strength.m_color[0] > 0 && isApproximatelyEqual(m_vars.m_cloud_shadow_minus_base_colour_times_shadow_strength.m_color[2], 0.0f, epsilon)) {
+				m_vars.m_cloud_shadow_minus_base_colour_times_shadow_strength.m_color[0] -= 1.0f;
+				m_vars.m_cloud_shadow_minus_base_colour_times_shadow_strength.m_color[1] += 1.0f;
+			}
+			if (m_vars.m_cloud_shadow_minus_base_colour_times_shadow_strength.m_color[1] > 0 && isApproximatelyEqual(m_vars.m_cloud_shadow_minus_base_colour_times_shadow_strength.m_color[0], 0.0f, epsilon)) {
+				m_vars.m_cloud_shadow_minus_base_colour_times_shadow_strength.m_color[1] -= 1.0f;
+				m_vars.m_cloud_shadow_minus_base_colour_times_shadow_strength.m_color[2] += 1.0f;
+			}
+			if (m_vars.m_cloud_shadow_minus_base_colour_times_shadow_strength.m_color[2] > 0 && isApproximatelyEqual(m_vars.m_cloud_shadow_minus_base_colour_times_shadow_strength.m_color[1], 0.0f, epsilon)) {
+				m_vars.m_cloud_shadow_minus_base_colour_times_shadow_strength.m_color[0] += 1.0f;
+				m_vars.m_cloud_shadow_minus_base_colour_times_shadow_strength.m_color[2] -= 1.0f;
+			}
+		}
+
+		if (m_vars.m_sun_color.m_rainbow_toggle) {
+			if (m_vars.m_sun_color.m_color[0] > 0 && isApproximatelyEqual(m_vars.m_sun_color.m_color[2], 0.0f, epsilon)) {
+				m_vars.m_sun_color.m_color[0] -= 1.0f;
+				m_vars.m_sun_color.m_color[1] += 1.0f;
+			}
+			if (m_vars.m_sun_color.m_color[1] > 0 && isApproximatelyEqual(m_vars.m_sun_color.m_color[0], 0.0f, epsilon)) {
+				m_vars.m_sun_color.m_color[1] -= 1.0f;
+				m_vars.m_sun_color.m_color[2] += 1.0f;
+			}
+			if (m_vars.m_sun_color.m_color[2] > 0 && isApproximatelyEqual(m_vars.m_sun_color.m_color[1], 0.0f, epsilon)) {
+				m_vars.m_sun_color.m_color[0] += 1.0f;
+				m_vars.m_sun_color.m_color[2] -= 1.0f;
+			}
+		}
+
+		if (m_vars.m_moon_color.m_rainbow_toggle) {
+			if (m_vars.m_moon_color.m_color[0] > 0 && isApproximatelyEqual(m_vars.m_moon_color.m_color[2], 0.0f, epsilon)) {
+				m_vars.m_moon_color.m_color[0] -= 1.0f;
+				m_vars.m_moon_color.m_color[1] += 1.0f;
+			}
+			if (m_vars.m_moon_color.m_color[1] > 0 && isApproximatelyEqual(m_vars.m_moon_color.m_color[0], 0.0f, epsilon)) {
+				m_vars.m_moon_color.m_color[1] -= 1.0f;
+				m_vars.m_moon_color.m_color[2] += 1.0f;
+			}
+			if (m_vars.m_moon_color.m_color[2] > 0 && isApproximatelyEqual(m_vars.m_moon_color.m_color[1], 0.0f, epsilon)) {
+				m_vars.m_moon_color.m_color[0] += 1.0f;
+				m_vars.m_moon_color.m_color[2] -= 1.0f;
+			}
 		}
 
 		STREAMING::OVERRIDE_LODSCALE_THIS_FRAME(m_vars.distance_scaling);
